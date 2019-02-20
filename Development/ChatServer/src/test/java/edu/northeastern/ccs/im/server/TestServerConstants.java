@@ -1,8 +1,12 @@
 package edu.northeastern.ccs.im.server;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * This class contains the test suite for the ServerConstants class. These
@@ -61,5 +65,16 @@ public class TestServerConstants {
 	@Test
 	public void testVerifyBouncerId() {
 		assertEquals("Bouncer", ServerConstants.BOUNCER_ID);
-	}	
+	}
+
+	/**
+	 * This test calls the private constructor to ensure it does not throw any exception.
+	 */
+	@Test
+	public void testPrivateConstructor() {
+		@SuppressWarnings("unchecked")
+		Constructor<ServerConstants> constructor= (Constructor<ServerConstants>) ServerConstants.class.getDeclaredConstructors()[0];
+		constructor.setAccessible(true);
+		assertDoesNotThrow(() -> constructor.newInstance());
+	}
 }

@@ -4,6 +4,7 @@
 ##### log file
 *.lck
 *.log
+*.log.*
 
 ##### eclipse files #####
 .checkstyle

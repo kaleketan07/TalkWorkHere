@@ -39,7 +39,7 @@ public class TestClientRunnable {
 
 
 	/**
-	 * Test to check weather run method changes the status of the initialized data member 
+	 * Test to check weather run() changes the status of the initialized data member 
 	 * to true in the first run with using a message iterator with one message
 	 */
 	@Test
@@ -76,7 +76,7 @@ public class TestClientRunnable {
 
 
 	/**
-	 * Testing HandleIncomingMessage() and HandleOutGoingMessage() method with 
+	 * Testing handleIncomingMessage() and HandleOutGoingMessage() method with 
 	 * true Condition of initialized data member by running run() method twice 
 	 */
 	@Test
@@ -96,7 +96,7 @@ public class TestClientRunnable {
 	}
 
 	/**
-	 * Testing HandleIncomingMessage() where the Message iterator does
+	 * Testing handleIncomingMessage() where the Message iterator does
 	 * not have broadcast message
 	 */
 	@Test
@@ -156,7 +156,7 @@ public class TestClientRunnable {
 	
 	
 	/**
-	 * Testing SetFuture() using ScheduledFuture Object and also testing the 
+	 * Testing setFuture() using ScheduledFuture Object and also testing the 
 	 * case of a quit(terminate Message as a part of handleIncomingMessages
 	 * method
 	 */
@@ -185,7 +185,7 @@ public class TestClientRunnable {
 	
 	
 	/**
-	 * Testing SetFuture() using ScheduledFuture
+	 * Testing setFuture() using ScheduledFuture
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 * @throws NoSuchMethodException
@@ -239,7 +239,7 @@ public class TestClientRunnable {
 	}
 
 	/**
-	 * Testing CheckForIntialization Method using with Empty
+	 * Testing checkForIntialization() Method using with Empty
 	 * message Iterator from network connection
 	 */
 	@Test
@@ -257,7 +257,7 @@ public class TestClientRunnable {
 	
 	
 	/**
-	 * Testing SetUserName using Null as input
+	 * Testing setUserName() using Null as input
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 * @throws NoSuchMethodException

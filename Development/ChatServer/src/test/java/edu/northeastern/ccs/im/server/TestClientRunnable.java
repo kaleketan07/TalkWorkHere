@@ -46,7 +46,7 @@ public class TestClientRunnable {
 	public void testRun() {
 		
 		List<Message> messageList = new ArrayList<>();
-		messageList.add(broadcast);
+		messageList.add(BROADCAST);
 		Iterator<Message> messageIter = messageList.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
 		Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);	
@@ -62,7 +62,8 @@ public class TestClientRunnable {
 	/**
 	 * Testing method Set User Name by given a string as input and using 
 	 * get method to assert the test
-	 * @throws IOException
+	 * 
+	 * @throws IOException    the io exception that can be encountered when opening a SocketChannel
 	 */
 	@Test
 	public void testSetNameandGetName() throws IOException {
@@ -83,8 +84,8 @@ public class TestClientRunnable {
 	public void testHandleIncomingMessageandHandleOutGoingMessage() {
 		
 		List<Message> messageList = new ArrayList<>();
-		messageList.add(broadcast);
-		messageList.add(broadcast);
+		messageList.add(BROADCAST);
+		messageList.add(BROADCAST);
 		Iterator<Message> messageIter = messageList.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
 		Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
@@ -103,8 +104,8 @@ public class TestClientRunnable {
 	public void testHandleIncomingMessageWithoutBroadcastMessage() {
 		
 		List<Message> messageList = new ArrayList<>();
-		messageList.add(broadcast);
-		messageList.add(login);
+		messageList.add(BROADCAST);
+		messageList.add(LOGIN);
 		Iterator<Message> messageIter = messageList.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
 		Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
@@ -121,11 +122,10 @@ public class TestClientRunnable {
 	 * Test can be done by asserting initialized data variable which is set after first run()
 	 * 
 	 * 
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
+	 * @throws IllegalAccessException        the illegal access exception to be used while using java Reflection
+	 * @throws IllegalArgumentException      the illegal Argument exception to be used while using java Reflection
+	 * @throws InvocationTargetException     the the underlying reflection method call throws an exception .
+	 * @throws NoSuchMethodException         the no such method exception to be used while using java Reflection
 	 */
 	@Test
 	public void testHandleIncomingMessageandEnqueueMessage() throws IllegalAccessException,  InvocationTargetException, NoSuchMethodException {
@@ -165,7 +165,7 @@ public class TestClientRunnable {
 		
 		List<Message> messageList = new ArrayList<>();
 		Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
-		messageList.add(broadcast);
+		messageList.add(BROADCAST);
 		messageList.add(quitMessage);
 		Iterator<Message> messageIter = messageList.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
@@ -181,14 +181,13 @@ public class TestClientRunnable {
 		
 	}
      
-	
-	
-	
 	/**
 	 * Testing setFuture() using ScheduledFuture
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
+	 * 
+	 * 
+	 * @throws IllegalAccessException      the illegal access exception to be used while using java Reflection
+	 * @throws InvocationTargetException   the underlying reflection method call throws an exception 
+	 * @throws NoSuchMethodException       the no such method exception to be used while using java Reflection
 	 */
 	@Test
 	public void testSetFutureMethod() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -198,9 +197,9 @@ public class TestClientRunnable {
 		Message.class.getDeclaredMethods();
 		List<Message> messageList = new ArrayList<>();
 		Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
-		messageList.add(login);
+		messageList.add(LOGIN);
 		messageList.add(helloMessage); 
-		messageList.add(broadcast);
+		messageList.add(BROADCAST);
 		Iterator<Message> messageIter = messageList.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
 		Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);	
@@ -209,8 +208,8 @@ public class TestClientRunnable {
 		ScheduledFuture<?> future =  threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
 				ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
 		clientRunnableObject.setFuture(future);
-		clientRunnableObject.enqueueMessage(broadcast);
-		clientRunnableObject.enqueueMessage(broadcast);
+		clientRunnableObject.enqueueMessage(BROADCAST);
+		clientRunnableObject.enqueueMessage(BROADCAST);
 		clientRunnableObject.run();
 		clientRunnableObject.run();
 		assertTrue(clientRunnableObject.isInitialized());
@@ -225,7 +224,7 @@ public class TestClientRunnable {
 	public void testHandleIncomingMessageWithEmptyIterator() {
 		
 		List<Message> messageList = new ArrayList<>();
-		messageList.add(broadcast);
+		messageList.add(BROADCAST);
 		Iterator<Message> messageIter = messageList.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
 		Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
@@ -258,9 +257,11 @@ public class TestClientRunnable {
 	
 	/**
 	 * Testing setUserName() using Null as input
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
+	 * 
+	 * 
+	 * @throws IllegalAccessException       the illegal access exception to be used while using java Reflection
+	 * @throws InvocationTargetException    the the underlying reflection method call throws an exception .
+	 * @throws NoSuchMethodException        the no such method exception to be used while using java Reflection
 	 */
 	@Test
 	public void testSetUserName() throws IllegalAccessException,  InvocationTargetException, NoSuchMethodException {
@@ -282,9 +283,10 @@ public class TestClientRunnable {
 	/**
 	 * Test Enqueue Message WithOut run() thus not changing value of
 	 *  initialized  variable
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
+	 *  
+	 * @throws IllegalAccessException        the illegal access exception to be used while using java Reflection
+	 * @throws InvocationTargetException if  the underlying reflection method call throws an exception .
+	 * @throws NoSuchMethodException         the no such method exception to be used while using java Reflection
 	 */
 	@Test
 	public void testEnqueueMessage() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -307,10 +309,10 @@ public class TestClientRunnable {
 	
 	/**
 	 * Testing isBehind() condition in run() by setting it to True
-	 * @throws IOException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws NoSuchFieldException
+	 * 
+	 * @throws InvocationTargetException  the underlying reflection method call throws an exception 
+	 * @throws NoSuchMethodException      the no such method exception to be used while using java Reflection
+	 * @throws NoSuchFieldException       the no such field exception to be used while using java Reflection
 	 */
 	@Test
 	public void testTimerIsBehind() throws IllegalAccessException,  InvocationTargetException, NoSuchMethodException,  NoSuchFieldException {
@@ -350,8 +352,8 @@ public class TestClientRunnable {
 		
 		List<Message> ml = new ArrayList<>();
 		Message quit = Message.makeQuitMessage(SENDER_NAME);
-		ml.add(broadcast);
-		ml.add(broadcast);
+		ml.add(BROADCAST);
+		ml.add(BROADCAST);
 		ml.add(quit);
 		Iterator<Message> messageIter = ml.iterator();
 		NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);		
@@ -365,11 +367,11 @@ public class TestClientRunnable {
 	}
 	
 	/**
-	 * Test GetUserId by setting the userId and retrieving it using getUserID()
-	 * @throws NoSuchFieldException 
-	 * @throws IllegalAccessException 
+	 * Test getUserId by setting the userId and retrieving it using getUserID()
+	 * 
+	 * @throws NoSuchFieldException     the no such field exception to be used while using java Reflection
+	 * @throws IllegalAccessException   the illegal access exception to be used while using java Reflection
 	 */
-
 	@Test
 	public void testGetUserId() throws NoSuchFieldException, IllegalAccessException {
 		Field privateStringField = ClientRunnable.class.
@@ -388,9 +390,10 @@ public class TestClientRunnable {
 	 * Test messageCheck() with condition where msg.getName is not null
 	 * and msg.getName() returns same as getName()
 	 * Condition one True condition two true
-	 * @throws NoSuchMethodException
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
+	 * 
+	 * @throws NoSuchMethodException       the no such method exception to be used while using java Reflection
+	 * @throws IllegalAccessException      the illegal access exception to be used while using java Reflection
+	 * @throws InvocationTargetException   the the underlying reflection method call throws an exception .
 	 */
 	@Test
 	public void testMessageChecksConditionOne() throws NoSuchMethodException, IllegalAccessException,  InvocationTargetException {
@@ -406,9 +409,10 @@ public class TestClientRunnable {
 	 * Test messageCheck() with condition where msg.getName is not null
 	 * and msg.getName() does not return same as getName()
 	 * Condition one True condition two false
-	 * @throws NoSuchMethodException
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
+	 * 
+	 * @throws NoSuchMethodException       the no such method exception to be used while using java Reflection
+	 * @throws IllegalAccessException      the illegal access exception to be used while using java Reflection
+	 * @throws InvocationTargetException   the the underlying reflection method call throws an exception .
 	 */
 	@Test
 	public void testMessageChecksConditionTwo() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -424,12 +428,14 @@ public class TestClientRunnable {
 	 * Test messageCheck() with condition where msg.getName is null
 	 * and msg.getName() does not return same as getName()
 	 * Condition one false condition two false
-	 * @throws NoSuchMethodException
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
+	 * 
+	 * @throws NoSuchMethodException       the no such method exception to be used while using java Reflection
+	 * @throws IllegalAccessException      the illegal access exception to be used while using java Reflection
+	 * @throws IllegalArgumentException     the illegal access exception to be used while using java Reflection
+	 * @throws InvocationTargetException    the the underlying reflection method call throws an exception . 
 	 */
 	@Test
-	public void testMessageConditionThree() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	public void testMessageConditionThree() throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method method = ClientRunnable.class.getDeclaredMethod("messageChecks", Message.class);
 		method.setAccessible(true);
 		NetworkConnection nc = Mockito.mock(NetworkConnection.class);
@@ -442,8 +448,8 @@ public class TestClientRunnable {
 	}
 	
 	//Private fields to be used in tests
-	 private static final Message broadcast = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
-	 private static final Message login = Message.makeSimpleLoginMessage(TestClientRunnable.SENDER_NAME);
+	 private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
+	 private static final Message LOGIN = Message.makeSimpleLoginMessage(TestClientRunnable.SENDER_NAME);
 	 private static final int USER_ID = 120000;
 	 private static final String SENDER_NAME = "Alice";
 	 private static final String MESSAGE_TEXT = "Hello, I am Alice";

@@ -17,8 +17,8 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
 		<sonar.language>java</sonar.language>
-		<sonar.login> kspatil </sonar.login>
-		<sonar.password> kspatil </sonar.password>
+		<!-- <sonar.login></sonar.login> -->
+		<!-- <sonar.password></sonar.password> -->
 	</properties>
 
 	<build>
@@ -136,8 +136,8 @@
 			</activation>
 			<properties>
 				<sonar.host.url>
-					<!-- https://5500sonar-2.cciscloud.com -->
-					http://localhost.com
+					https://5500sonar-2.cciscloud.com -->
+					<!--://localhost.com -->
 				</sonar.host.url>
 			</properties>
 		</profile>

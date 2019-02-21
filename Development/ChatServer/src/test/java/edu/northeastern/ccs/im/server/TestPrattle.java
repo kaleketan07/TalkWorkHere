@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im.server;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,6 +53,9 @@ public class TestPrattle {
 		Mockito.when(testDead1.isInitialized()).thenReturn(true);
 		Prattle.broadcastMessage(m);
 		Mockito.verify(testDead1).enqueueMessage(m);
+		activeField.setAccessible(true);
+		activeField.set(Prattle.class, new ConcurrentLinkedQueue<>());
+		activeField.setAccessible(false);
 	}
 	
 	/**
@@ -96,7 +100,10 @@ public class TestPrattle {
 		Field activeField = Prattle.class.getDeclaredField("active");
 		activeField.setAccessible(true);
 		ConcurrentLinkedQueue activeList = (ConcurrentLinkedQueue) activeField.get(Prattle.class.getName());
-		assertTrue(activeList.size()==1);
+		assertEquals(activeList.size(), 1);
+		activeField.set(Prattle.class, new ConcurrentLinkedQueue<>());
+		activeField.setAccessible(false);
+		
 	}
 	
 	/**
@@ -122,7 +129,10 @@ public class TestPrattle {
 		Field activeField = Prattle.class.getDeclaredField("active");
 		activeField.setAccessible(true);
 		ConcurrentLinkedQueue activeList = (ConcurrentLinkedQueue) activeField.get(Prattle.class.getName());
-		assertTrue(activeList.size()==0);
+		assertEquals(activeList.size(), 0);
+		activeField.set(Prattle.class, new ConcurrentLinkedQueue<>());
+		activeField.setAccessible(false);
+		
 	}
 	
 	/**
@@ -222,6 +232,10 @@ public class TestPrattle {
 			assertTrue(message.contains("Could not find a thread that I tried to remove!"));
 		} finally {
 			logger.removeHandler(handler);
+			activeField.setAccessible(true);
+			activeField.set(Prattle.class, new ConcurrentLinkedQueue<>());
+			activeField.setAccessible(false);
 		}
+		
 	}
 }

@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
  * @author Sachin Haldavanekar
  * @version 1.0
  */
-class TestChatLogger {
+public class TestChatLogger {
 
 	/**
 	 * Test the static method error to print the expected error message with SEVERE log level.
 	 */
 	@Test
-	void testError() {
+	public void testError() {
 		Logger logger = Logger.getLogger(ChatLogger.class.getName());
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		SimpleFormatter formatter = new SimpleFormatter();
@@ -43,7 +43,7 @@ class TestChatLogger {
 	 * Test the static method warning to print the expected error message with WARNING log level.
 	 */
 	@Test
-	void testWarning() {
+	public void testWarning() {
 		Logger logger = Logger.getLogger(ChatLogger.class.getName());
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		SimpleFormatter formatter = new SimpleFormatter();
@@ -66,7 +66,7 @@ class TestChatLogger {
 	 * Test the static method info to print the expected error message with INFO log level.
 	 */
 	@Test
-	void testInfo() throws IllegalArgumentException {
+	public void testInfo() throws IllegalArgumentException {
 		Logger logger = Logger.getLogger(ChatLogger.class.getName());
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		SimpleFormatter formatter = new SimpleFormatter();
@@ -89,7 +89,7 @@ class TestChatLogger {
 	 * Test the private constructor and verify if it throws an IllegalStateException.
 	 */
 	@Test
-	void testPrivateConstructor() throws  IllegalArgumentException, IllegalAccessException, InstantiationException {
+	public void testPrivateConstructor() throws  IllegalArgumentException, IllegalAccessException, InstantiationException {
 		@SuppressWarnings("unchecked")
 		Constructor<ChatLogger> constructor = (Constructor<ChatLogger>) ChatLogger.class.getDeclaredConstructors()[0];
 		constructor.setAccessible(true);
@@ -106,7 +106,7 @@ class TestChatLogger {
 	 * Test the Logger for SetMode only for console handler.
 	 */
 	@Test
-	void testSetModeForConsole() {
+	public void testSetModeForConsole() {
 		Logger logger = Logger.getLogger(ChatLogger.class.getName());
 		ChatLogger.setMode(ChatLogger.HandlerType.CONSOLE);
 		assertEquals(ConsoleHandler.class,logger.getHandlers()[logger.getHandlers().length - 1].getClass());
@@ -116,7 +116,7 @@ class TestChatLogger {
 	 * Test the Logger for SetMode only for file handler.
 	 */
 	@Test
-	void testSetModeForFile() {
+	public void testSetModeForFile() {
 		Logger logger = Logger.getLogger(ChatLogger.class.getName());
 		ChatLogger.setMode(ChatLogger.HandlerType.FILE);
 		assertEquals(FileHandler.class,logger.getHandlers()[logger.getHandlers().length - 1].getClass());

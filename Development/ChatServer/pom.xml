@@ -136,7 +136,7 @@
 			</activation>
 			<properties>
 				<sonar.host.url>
-					https://5500sonar-2.cciscloud.com -->
+					https://5500sonar-2.cciscloud.com
 					<!--://localhost.com -->
 				</sonar.host.url>
 			</properties>

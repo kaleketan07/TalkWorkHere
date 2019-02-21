@@ -149,7 +149,7 @@ public class TestNetworkConnection {
      * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
      */
     @Test
-     public void testIteratorHasNextException() throws IOException,NoSuchFieldException,IllegalAccessException{
+    public void testIteratorHasNextException() throws IOException,NoSuchFieldException,IllegalAccessException{
          SocketChannel channel = SocketChannel.open();
          NetworkConnection conn = new NetworkConnection(channel);
          Field f = NetworkConnection.class.getDeclaredField("selector");
@@ -168,7 +168,7 @@ public class TestNetworkConnection {
      * @throws IOException the io exception that can be encountered when opening a SocketChannel
      */
     @Test
-     public void testIteratorNextException() throws IOException{
+    public void testIteratorNextException() throws IOException{
          SocketChannel channel = SocketChannel.open();
          NetworkConnection conn = new NetworkConnection(channel);
          Iterator<Message> itr = conn.iterator();
@@ -188,7 +188,7 @@ public class TestNetworkConnection {
      * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
      */
     @Test
-     public void testIterateChannelContent() throws IOException,NoSuchFieldException,IllegalAccessException{
+    public void testIterateChannelContent() throws IOException,NoSuchFieldException,IllegalAccessException{
          ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
          SocketChannel channel = SocketChannel.open();
          NetworkConnection connection = new NetworkConnection(channel);

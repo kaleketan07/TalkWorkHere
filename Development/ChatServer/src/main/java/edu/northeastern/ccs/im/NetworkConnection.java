@@ -91,7 +91,6 @@ public class NetworkConnection implements Iterable<Message> {
 		} catch (IOException e) {
 			// For the moment we are going to simply cover up that there was a problem.
 			ChatLogger.error(e.toString());
-//			assert false;
             throw new AssertionError();
 		}
 	}
@@ -138,7 +137,6 @@ public class NetworkConnection implements Iterable<Message> {
 			channel.close();
 		} catch (IOException e) {
 			ChatLogger.error("Caught exception: " + e.toString());
-			//assert false;
             throw new AssertionError();
 		}
 	}
@@ -171,7 +169,8 @@ public class NetworkConnection implements Iterable<Message> {
 	            }
 	            // Otherwise, check if we can read in at least one new message
 	            else if (selector.selectNow() != 0) {
-	                assert key.isReadable();
+	                if(!key.isReadable())
+	                	throw new AssertionError();
 	                // Read in the next set of commands from the channel.
 	                channel.read(buff);
 	                selector.selectedKeys().remove(key);
@@ -214,7 +213,6 @@ public class NetworkConnection implements Iterable<Message> {
 	            }
 	        } catch (IOException ioe) {
 	            // For the moment, we will cover up this exception and hope it never occurs.
-	            //assert false;
                 throw new AssertionError();
 	        }
 	        // Do we now have any messages?
@@ -247,7 +245,8 @@ public class NetworkConnection implements Iterable<Message> {
 	        int seen = 0;
 	        // Assert that this character is a digit representing the length of the first
 	        // argument
-	        assert Character.isDigit(charBuffer.get(pos));
+	        if(!Character.isDigit(charBuffer.get(pos)))
+	        	throw new AssertionError();
 	        // Now read in the length of the first argument
 	        while (Character.isDigit(charBuffer.get(pos))) {
 	            // My quick-and-dirty numeric converter

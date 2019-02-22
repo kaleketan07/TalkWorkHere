@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Team 201 - Kunal
  * @version 1.0
- *
  */
 public class TestNetworkConnection {
 
@@ -67,8 +66,8 @@ public class TestNetworkConnection {
         f.setAccessible(true);
         SocketChannel mockedChannel = mock(SocketChannel.class);
         f.set(conn,mockedChannel);
-        when(mockedChannel.write(ByteBuffer.allocate(10))).thenReturn(10);
-        assertFalse(conn.sendMessage(Message.makeHelloMessage("Test")));
+        when(mockedChannel.write(ByteBuffer.wrap("HLO 2 -- 4 Test".getBytes()))).thenReturn(10);
+        assertFalse(conn.sendMessage(Message.makeHelloMessage("Hello")));
     }
 
     /**
@@ -101,6 +100,7 @@ public class TestNetworkConnection {
     /**
      * Test close exception. Force an exception by mocking the Selector and force to throw an exception
      * when the selector is closed.
+     *
      * @throws IOException            the io exception that can be encountered when opening a SocketChannel
      * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
      * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
@@ -152,17 +152,17 @@ public class TestNetworkConnection {
      * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
      */
     @Test
-	public void testIteratorHasNextException() throws IOException,NoSuchFieldException,IllegalAccessException{
-		SocketChannel channel = SocketChannel.open();
-		NetworkConnection conn = new NetworkConnection(channel);
-		Field f = NetworkConnection.class.getDeclaredField("selector");
-		f.setAccessible(true);
-		Selector mockedSelector = mock(Selector.class);
-		doThrow(IOException.class).when(mockedSelector).selectNow();
-		f.set(conn,mockedSelector);
-		Iterator<Message> itr = conn.iterator();
-		assertThrows(AssertionError.class , () -> itr.hasNext());
-	}
+     public void testIteratorHasNextException() throws IOException,NoSuchFieldException,IllegalAccessException{
+         SocketChannel channel = SocketChannel.open();
+         NetworkConnection conn = new NetworkConnection(channel);
+         Field f = NetworkConnection.class.getDeclaredField("selector");
+         f.setAccessible(true);
+         Selector mockedSelector = mock(Selector.class);
+         doThrow(IOException.class).when(mockedSelector).selectNow();
+         f.set(conn,mockedSelector);
+         Iterator<Message> itr = conn.iterator();
+         assertThrows(AssertionError.class , () -> itr.hasNext());
+     }
 
     /**
      * Test if the next() method throws an exception when there are no messages
@@ -171,12 +171,12 @@ public class TestNetworkConnection {
      * @throws IOException the io exception that can be encountered when opening a SocketChannel
      */
     @Test
-    public void testIteratorNextException() throws IOException{
-		SocketChannel channel = SocketChannel.open();
-		NetworkConnection conn = new NetworkConnection(channel);
-		Iterator<Message> itr = conn.iterator();
-		assertThrows(NoSuchElementException.class,()->itr.next());
-	}
+     public void testIteratorNextException() throws IOException{
+         SocketChannel channel = SocketChannel.open();
+         NetworkConnection conn = new NetworkConnection(channel);
+         Iterator<Message> itr = conn.iterator();
+         assertThrows(NoSuchElementException.class,()->itr.next());
+     }
 
     /**
      * Test the iteration of the hasNext() method on the network channel established.
@@ -184,7 +184,7 @@ public class TestNetworkConnection {
      * expected message into the buffer field (buff) of the NetworkConnection class and
      * reads and iterates over that buffer.
      * NOTE: This test makes heavy use of the mocking and reflection.Field methods to emulate
-     *       a connected channel and put data into the buffer.
+     * a connected channel and put data into the buffer.
      *
      * @throws IOException            the io exception that can be encountered when opening a SocketChannel
      * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
@@ -192,51 +192,176 @@ public class TestNetworkConnection {
      */
     @Test
     public void testIterateChannelContent() throws IOException,NoSuchFieldException,IllegalAccessException{
-		ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
-		SocketChannel channel = SocketChannel.open();
-		NetworkConnection connection = new NetworkConnection(channel);
-		Iterator<Message> itr = connection.iterator();
-		Selector mockedSelector = mock(Selector.class);
-		when(mockedSelector.selectNow()).thenReturn(1);
-		Field s = NetworkConnection.class.getDeclaredField("selector");
-		s.setAccessible(true);
-		s.set(connection,mockedSelector);
-		SelectionKey mockedKey = mock(SelectionKey.class);
-		doReturn(1).when(mockedKey).readyOps();
-		Field k = NetworkConnection.class.getDeclaredField("key");
-		k.setAccessible(true);
-		k.set(connection,mockedKey);
-		myBuff.put("HLO 2 -- 4 TestBCT 2 -- 5 Hello".getBytes());
-		Field b = NetworkConnection.class.getDeclaredField("buff");
-		b.setAccessible(true);
-		b.set(connection,myBuff);
-		SocketChannel mockedChannel = mock(SocketChannel.class);
-		when(mockedChannel.read((ByteBuffer)b.get(connection))).thenReturn(64);
-		Field c = NetworkConnection.class.getDeclaredField("channel");
-		c.setAccessible(true);
-		c.set(connection,mockedChannel);
-		assertTrue(itr.hasNext());
-	}
-	
-	
-	/**
-     * Test the remaining condition for sendMessage() method throws an exception when there are no messages
-     * present.
+         ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
+         SocketChannel channel = SocketChannel.open();
+         NetworkConnection connection = new NetworkConnection(channel);
+         Iterator<Message> itr = connection.iterator();
+         Selector mockedSelector = mock(Selector.class);
+         when(mockedSelector.selectNow()).thenReturn(1);
+         Field s = NetworkConnection.class.getDeclaredField("selector");
+         s.setAccessible(true);
+         s.set(connection,mockedSelector);
+         SelectionKey mockedKey = mock(SelectionKey.class);
+         doReturn(1).when(mockedKey).readyOps();
+         Field k = NetworkConnection.class.getDeclaredField("key");
+         k.setAccessible(true);
+         k.set(connection,mockedKey);
+         myBuff.put("HLO 2 -- 4 TestBCT 2 -- 5 Hello".getBytes());
+         Field b = NetworkConnection.class.getDeclaredField("buff");
+         b.setAccessible(true);
+         b.set(connection,myBuff);
+         SocketChannel mockedChannel = mock(SocketChannel.class);
+         when(mockedChannel.read((ByteBuffer)b.get(connection))).thenReturn(64);
+         Field c = NetworkConnection.class.getDeclaredField("channel");
+         c.setAccessible(true);
+         c.set(connection,mockedChannel);
+        assertTrue(itr.hasNext());
+     }
+
+    /**
+     * Test sendMessage() method to send an empty message over the mocked network.
      *
-     * @throws IOException the io exception that can be encountered when opening a SocketChannel
-	 * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
+     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
+     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
      * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
      */
     @Test
     public void testSendMessageConditionSendEmptyMessage() throws IOException,NoSuchFieldException,IllegalAccessException{
-		Message msg = Message.makeHelloMessage(null);
-		SocketChannel channel = SocketChannel.open();
-		NetworkConnection conn = new NetworkConnection(channel);
-		Field f = NetworkConnection.class.getDeclaredField("channel");
-		f.setAccessible(true);
-		SocketChannel mockedChannel = mock(SocketChannel.class);
-		f.set(conn,mockedChannel);
-		when(mockedChannel.write(ByteBuffer.allocate(10))).thenReturn(0);
-		assertFalse(conn.sendMessage(msg));
-	}
+        Message msg = Message.makeHelloMessage(null);
+        SocketChannel channel = SocketChannel.open();
+        NetworkConnection conn = new NetworkConnection(channel);
+        Field f = NetworkConnection.class.getDeclaredField("channel");
+        f.setAccessible(true);
+        SocketChannel mockedChannel = mock(SocketChannel.class);
+        f.set(conn,mockedChannel);
+        when(mockedChannel.write(ByteBuffer.allocate(10))).thenReturn(0);
+        assertFalse(conn.sendMessage(msg));
+     }
+
+    /**
+     * Test hasNext() method of the iterator when there is no message
+     *
+     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
+     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
+     * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
+     */
+    @Test
+    public void testIterateChannelZero() throws IOException,NoSuchFieldException,IllegalAccessException{
+        ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
+        SocketChannel channel = SocketChannel.open();
+        NetworkConnection connection = new NetworkConnection(channel);
+        Iterator<Message> itr = connection.iterator();
+        Selector mockedSelector = mock(Selector.class);
+        when(mockedSelector.selectNow()).thenReturn(1);
+        Field s = NetworkConnection.class.getDeclaredField("selector");
+        s.setAccessible(true);
+        s.set(connection,mockedSelector);
+        SelectionKey mockedKey = mock(SelectionKey.class);
+        doReturn(1).when(mockedKey).readyOps();
+        Field k = NetworkConnection.class.getDeclaredField("key");
+        k.setAccessible(true);
+        k.set(connection,mockedKey);
+        myBuff.put("HLO 0 --".getBytes());
+        Field b = NetworkConnection.class.getDeclaredField("buff");
+        b.setAccessible(true);
+        b.set(connection,myBuff);
+        SocketChannel mockedChannel = mock(SocketChannel.class);
+        when(mockedChannel.read((ByteBuffer)b.get(connection))).thenReturn(64);
+        Field c = NetworkConnection.class.getDeclaredField("channel");
+        c.setAccessible(true);
+        c.set(connection,mockedChannel);
+        assertThrows(AssertionError.class,() -> itr.hasNext());
+    }
+
+    /**
+     * Test next() method and ensure that it retrieves the first message in the
+     * ConcurrentLinkedQueue.
+     *
+     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
+     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
+     * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
+     */
+    @Test
+    public void testNextMethod() throws IOException,NoSuchFieldException,IllegalAccessException{
+        SocketChannel channel = SocketChannel.open();
+        NetworkConnection connection = new NetworkConnection(channel);
+        Field f = NetworkConnection.class.getDeclaredField("messages");
+        f.setAccessible(true);
+        Message m1 = Message.makeHelloMessage("Test");
+        Message m2 = Message.makeHelloMessage("Test");
+        f.set(connection, new ConcurrentLinkedQueue<>(Arrays.asList(m1, m2)));
+        Iterator<Message> itr = connection.iterator();
+        assertNotNull(itr.next());
+    }
+
+    /**
+     * Test iterate channel content condition selector.
+     *
+     * @throws IOException            the io exception
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testIterateChannelContentConditionSelector() throws IOException,NoSuchFieldException,IllegalAccessException{
+        ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
+        SocketChannel channel = SocketChannel.open();
+        NetworkConnection connection = new NetworkConnection(channel);
+        Iterator<Message> itr = connection.iterator();
+        Selector mockedSelector = mock(Selector.class);
+        when(mockedSelector.selectNow()).thenReturn(0);
+        Field s = NetworkConnection.class.getDeclaredField("selector");
+        s.setAccessible(true);
+        s.set(connection,mockedSelector);
+        SelectionKey mockedKey = mock(SelectionKey.class);
+        doReturn(1).when(mockedKey).readyOps();
+        Field k = NetworkConnection.class.getDeclaredField("key");
+        k.setAccessible(true);
+        k.set(connection,mockedKey);
+        myBuff.put("HLO 2 -- 4 TestBCT 2 -- 5 Hello".getBytes());
+        Field b = NetworkConnection.class.getDeclaredField("buff");
+        b.setAccessible(true);
+        b.set(connection,myBuff);
+        SocketChannel mockedChannel = mock(SocketChannel.class);
+        when(mockedChannel.read((ByteBuffer)b.get(connection))).thenReturn(64);
+        Field c = NetworkConnection.class.getDeclaredField("channel");
+        c.setAccessible(true);
+        c.set(connection,mockedChannel);
+        assertFalse(itr.hasNext());
+    }
+
+    /**
+     * Test hasNext() method to cover conditions for selector.selectNow() branch
+     *
+     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
+     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
+     * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
+     */
+    @Test
+    public void testHasNextConditionOnSelectedKey() throws IOException,NoSuchFieldException,IllegalAccessException{
+        ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
+        SocketChannel channel = SocketChannel.open();
+        NetworkConnection connection = new NetworkConnection(channel);
+        Iterator<Message> itr = connection.iterator();
+        Selector mockedSelector = mock(Selector.class);
+        when(mockedSelector.selectNow()).thenReturn(1);
+        Field s = NetworkConnection.class.getDeclaredField("selector");
+        s.setAccessible(true);
+        s.set(connection,mockedSelector);
+        SelectionKey mockedKey = mock(SelectionKey.class);
+        doReturn(0).when(mockedKey).readyOps();
+        Field k = NetworkConnection.class.getDeclaredField("key");
+        k.setAccessible(true);
+        k.set(connection,mockedKey);
+        myBuff.put("HLO 2 -- 4 TestBCT 2 -- 5 Hello".getBytes());
+        Field b = NetworkConnection.class.getDeclaredField("buff");
+        b.setAccessible(true);
+        b.set(connection,myBuff);
+        SocketChannel mockedChannel = mock(SocketChannel.class);
+        when(mockedChannel.read((ByteBuffer)b.get(connection))).thenReturn(64);
+        Field c = NetworkConnection.class.getDeclaredField("channel");
+        c.setAccessible(true);
+        c.set(connection,mockedChannel);
+        assertThrows(AssertionError.class,() -> itr.hasNext());
+    }
+
 }

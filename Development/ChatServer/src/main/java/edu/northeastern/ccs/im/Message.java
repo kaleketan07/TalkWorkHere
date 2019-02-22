@@ -55,9 +55,7 @@ public class Message {
 	 * @param srcName Argument for the message; at present this is the name used to
 	 *                log-in to the IM server.
 	 */
-	private Message(MessageType handle, String srcName) {
-		this(handle, srcName, null);
-	}
+	private Message(MessageType handle, String srcName) { this(handle, srcName, null); }
 
 	/**
 	 * Create a new message to continue the logout process.
@@ -65,9 +63,7 @@ public class Message {
 	 * @param myName The name of the client that sent the quit message.
 	 * @return Instance of Message that specifies the process is logging out.
 	 */
-	public static Message makeQuitMessage(String myName) {
-		return new Message(MessageType.QUIT, myName, null);
-	}
+	public static Message makeQuitMessage(String myName) { return new Message(MessageType.QUIT, myName, null); }
 
 	/**
 	 * Create a new message broadcasting an announcement to the world.
@@ -76,9 +72,7 @@ public class Message {
 	 * @param text   Text of the message that will be sent to all users
 	 * @return Instance of Message that transmits text to all logged in users.
 	 */
-	public static Message makeBroadcastMessage(String myName, String text) {
-		return new Message(MessageType.BROADCAST, myName, text);
-	}
+	public static Message makeBroadcastMessage(String myName, String text) { return new Message(MessageType.BROADCAST, myName, text); }
 
 	/**
 	 * Create a new message stating the name with which the user would like to
@@ -87,9 +81,7 @@ public class Message {
 	 * @param text Name the user wishes to use as their screen name.
 	 * @return Instance of Message that can be sent to the server to try and login.
 	 */
-	protected static Message makeHelloMessage(String text) {
-		return new Message(MessageType.HELLO, null, text);
-	}
+	protected static Message makeHelloMessage(String text) { return new Message(MessageType.HELLO, null, text); }
 
 	/**
 	 * Given a handle, name and text, return the appropriate message instance or an
@@ -120,54 +112,42 @@ public class Message {
 	 * @param myName Name of the user who has just logged in.
 	 * @return Instance of Message specifying a new friend has just logged in.
 	 */
-	public static Message makeSimpleLoginMessage(String myName) {
-		return new Message(MessageType.HELLO, myName);
-	}
+	public static Message makeSimpleLoginMessage(String myName) { return new Message(MessageType.HELLO, myName); }
 
 	/**
 	 * Return the name of the sender of this message.
 	 * 
 	 * @return String specifying the name of the message originator.
 	 */
-	public String getName() {
-		return msgSender;
-	}
+	public String getName() { return msgSender; }
 
 	/**
 	 * Return the text of this message.
 	 * 
 	 * @return String equal to the text sent by this message.
 	 */
-	public String getText() {
-		return msgText;
-	}
+	public String getText() { return msgText; }
 
 	/**
 	 * Determine if this message is broadcasting text to everyone.
 	 * 
 	 * @return True if the message is a broadcast message; false otherwise.
 	 */
-	public boolean isBroadcastMessage() {
-		return (msgType == MessageType.BROADCAST);
-	}
+	public boolean isBroadcastMessage() { return (msgType == MessageType.BROADCAST); }
 
 	/**
 	 * Determine if this message is sent by a new client to log-in to the server.
 	 * 
 	 * @return True if the message is an initialization message; false otherwise
 	 */
-	public boolean isInitialization() {
-		return (msgType == MessageType.HELLO);
-	}
+	public boolean isInitialization() { return (msgType == MessageType.HELLO); }
 
 	/**
 	 * Determine if this message is a message signing off from the IM server.
 	 * 
 	 * @return True if the message is sent when signing off; false otherwise
 	 */
-	public boolean terminate() {
-		return (msgType == MessageType.QUIT);
-	}
+	public boolean terminate() { return (msgType == MessageType.QUIT); }
 
 	/**
 	 * Representation of this message as a String. This begins with the message

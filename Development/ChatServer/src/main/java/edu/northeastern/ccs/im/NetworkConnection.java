@@ -155,9 +155,7 @@ public class NetworkConnection implements Iterable<Message> {
 	  private class MessageIterator implements Iterator<Message> {
 
 	    /** Default constructor. */
-	    public MessageIterator() {
-	      // nothing to do here
-	    }
+	    public MessageIterator() { /*nothing to do here*/ }
 
 	    @Override
 	    public boolean hasNext() {
@@ -221,9 +219,7 @@ public class NetworkConnection implements Iterable<Message> {
 	    
 	    @Override
 	    public Message next() {
-	      if (messages.isEmpty()) {
-	        throw new NoSuchElementException("No next line has been typed in at the keyboard");
-	      }
+	      if (messages.isEmpty()) { throw new NoSuchElementException("No next line has been typed in at the keyboard"); }
 	      Message msg = messages.remove();
 	      ChatLogger.info(msg.toString());
 	      return msg;

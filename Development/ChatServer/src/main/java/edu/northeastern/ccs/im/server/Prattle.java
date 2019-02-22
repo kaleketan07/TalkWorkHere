@@ -123,8 +123,10 @@ public abstract class Prattle {
 						SelectionKey key = it.next();
 						it.remove();
 						// Assert certain things I really hope is true
-						assert key.isAcceptable();
-						assert key.channel() == serverSocket;
+						if(key.isAcceptable())
+							throw new AssertionError();
+						if(key.channel() == serverSocket)
+							throw new AssertionError();
 						// Create new thread to handle client for which we just received request.
 						createClientThread(serverSocket, threadPool);
 					}

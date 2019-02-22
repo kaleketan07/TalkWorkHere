@@ -1,0 +1,46 @@
+##### file backups
+*~
+*.*~
+##### log file
+*.lck
+*.log
+*.log.*
+
+##### eclipse files #####
+.checkstyle
+.classpath
+.metadata/
+.project
+.recommenders/
+.settings/
+.sonarlint/
+target/
+*.class
+bin/
+
+# Compiled class file
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Temporary files
+*.tmp

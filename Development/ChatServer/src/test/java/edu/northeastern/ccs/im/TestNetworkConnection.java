@@ -3,6 +3,8 @@ package edu.northeastern.ccs.im;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -353,6 +355,34 @@ public class TestNetworkConnection {
         k.setAccessible(true);
         k.set(connection,mockedKey);
         myBuff.put("HLO 2 -- 4 TestBCT 2 -- 5 Hello".getBytes());
+        Field b = NetworkConnection.class.getDeclaredField("buff");
+        b.setAccessible(true);
+        b.set(connection,myBuff);
+        SocketChannel mockedChannel = mock(SocketChannel.class);
+        when(mockedChannel.read((ByteBuffer)b.get(connection))).thenReturn(64);
+        Field c = NetworkConnection.class.getDeclaredField("channel");
+        c.setAccessible(true);
+        c.set(connection,mockedChannel);
+        assertThrows(AssertionError.class,() -> itr.hasNext());
+    }
+
+    @Test
+    public void testIterateReadArgumentAssert() throws IOException,NoSuchFieldException,IllegalAccessException{
+        ByteBuffer myBuff = ByteBuffer.allocate(64*1024);
+        SocketChannel channel = SocketChannel.open();
+        NetworkConnection connection = new NetworkConnection(channel);
+        Iterator<Message> itr = connection.iterator();
+        Selector mockedSelector = mock(Selector.class);
+        when(mockedSelector.selectNow()).thenReturn(1);
+        Field s = NetworkConnection.class.getDeclaredField("selector");
+        s.setAccessible(true);
+        s.set(connection,mockedSelector);
+        SelectionKey mockedKey = mock(SelectionKey.class);
+        doReturn(1).when(mockedKey).readyOps();
+        Field k = NetworkConnection.class.getDeclaredField("key");
+        k.setAccessible(true);
+        k.set(connection,mockedKey);
+        myBuff.put("HLO - --".getBytes());
         Field b = NetworkConnection.class.getDeclaredField("buff");
         b.setAccessible(true);
         b.set(connection,myBuff);

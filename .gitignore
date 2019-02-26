@@ -44,3 +44,6 @@ target/
 
 # Temporary files
 *.tmp
+
+# local configuration
+config.properties

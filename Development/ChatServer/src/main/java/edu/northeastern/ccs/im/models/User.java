@@ -111,8 +111,7 @@ public class User {
 	}
 
 	public String toString(){
-		return getUserId()+" "+getFirstName()+" "+getLastName()+" "+
-				getUserName()+" "+getUserPassword();
+		return getUserId()+" "+getFirstName()+" "+getLastName();
 	}
 	
 }

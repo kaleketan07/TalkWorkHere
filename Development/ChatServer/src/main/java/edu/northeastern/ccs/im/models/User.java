@@ -7,7 +7,7 @@ package edu.northeastern.ccs.im.models;
  */
 public class User {
 	
-	private Integer userId;
+	private int userId;
 	private String firstName;
 	private String lastName;
 	private String userName;
@@ -21,10 +21,10 @@ public class User {
 	 * @param userName to have the user name of the user
 	 * @param userPassword to have the user password name of the user
 	 */
-	public User(Integer userId, String firstName, String lastName, String userName, String userPassword) {
+	public User(int userId, String firstName, String lastName, String userName, String userPassword) {
 		this.userId = userId;
 		this.firstName = firstName;
-		this.lastName	 = lastName;
+		this.lastName = lastName;
 		this.userName = userName;
 		this.userPassword = userName;
 		
@@ -34,7 +34,7 @@ public class User {
 	 * 
 	 * @return the userId integer value
 	 */
-	public Integer getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
@@ -42,7 +42,7 @@ public class User {
 	 * 
 	 * @param userId Integer value to set userId for user
 	 */
-	public void setUserId(Integer userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 	

@@ -11,6 +11,7 @@ import edu.northeastern.ccs.im.models.User;
  */
 public interface UserDao {
 	
+	
 	//Get user by userId integer value
 	User getUser(int userId);
 	
@@ -19,6 +20,12 @@ public interface UserDao {
     
     //Get a specific user based on username and password
     User getUserByUserNameAndPassword(String username, String password);
+    
+    //Get specific user by username
+    User getUserByUserName(String username);
+    
+    //Create a User entry in database
+    boolean createUser(User u);
     
     // insert a User into database
     boolean insertUser(User u);

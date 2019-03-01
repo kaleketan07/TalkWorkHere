@@ -2,7 +2,6 @@ package edu.northeastern.ccs.im.services;
 
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
-import edu.northeastern.ccs.im.exceptions.UniqueFieldException;
 import edu.northeastern.ccs.im.models.User;
 
 import java.io.IOException;
@@ -20,8 +19,18 @@ public class UserService implements UserDao {
     private Set<User> userSet = new HashSet<>();
     private DBConnection conn;
     private PreparedStatement pstmt = null;
-    private DBUtils utils = new DBUtils();
-
+    private DBUtils utils = null;
+    private ResultSet result;
+    private static final UserService USER_SERVICE_INSTANCE;
+    static{
+        UserService tmp = null;
+        try{
+            tmp = new UserService();
+        }catch (IOException | SQLException | ClassNotFoundException e){
+            throw new IllegalArgumentException("Problem initializing a static variable for UserService");
+        }
+        USER_SERVICE_INSTANCE = tmp;
+    }
 
     // Columns for user_profile
     private static final String USER_NAME = "username";
@@ -38,8 +47,14 @@ public class UserService implements UserDao {
      * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception
      */
-    UserService() throws ClassNotFoundException, SQLException, IOException {
+    private UserService() throws ClassNotFoundException, SQLException, IOException {
         conn = new DBConnection();
+        utils = new DBUtils();
+        result = null;
+    }
+
+    public static UserService getInstance(){
+        return USER_SERVICE_INSTANCE;
     }
 
     /**
@@ -53,8 +68,9 @@ public class UserService implements UserDao {
         final String GET_USER_BY_ID =
                 "SELECT * FROM user_profile WHERE user_id = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_ID);
-        pstmt = utils.setUserDetails(pstmt,userId);
-        try(ResultSet result = pstmt.executeQuery()) {
+        pstmt = utils.setPreparedStatementArgs(pstmt,userId);
+        try{
+            result = pstmt.executeQuery();
             result.first();
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
@@ -79,7 +95,8 @@ public class UserService implements UserDao {
     public Set<User> getAllUsers() throws SQLException {
         final String GET_ALL_USERS = "SELECT * FROM user_profile";
         pstmt = conn.getPreparedStatement(GET_ALL_USERS);
-        try(ResultSet result = pstmt.executeQuery()) {
+        try{
+            result = pstmt.executeQuery();
             while(result.next()) {
                 int id = result.getInt(USER_ID);
                 String fName = result.getString(FIRST_NAME);
@@ -110,10 +127,11 @@ public class UserService implements UserDao {
         final String GET_USER_USERNAME_PSWD =
                 "SELECT * FROM user_profile WHERE username = ? AND user_password = ?";
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
-        pstmt = utils.setUserDetails(pstmt,username,password);
-        try(ResultSet result = pstmt.executeQuery()){
-            if(result == null){
-                throw new NullPointerException();
+        pstmt = utils.setPreparedStatementArgs(pstmt,username,password);
+        try{
+            result = pstmt.executeQuery();
+            if(!result.first()){
+                throw new SQLException();
             }
             result.first();
             int id = result.getInt(USER_ID);
@@ -137,8 +155,9 @@ public class UserService implements UserDao {
     public User getUserByUserName(String username) throws SQLException{
         final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
-        pstmt = utils.setUserDetails(pstmt,username);
-        try(ResultSet result = pstmt.executeQuery()) {
+        pstmt = utils.setPreparedStatementArgs(pstmt,username);
+        try{
+            result = pstmt.executeQuery();
             result.first();
             int id = result.getInt(USER_ID);
             String fName = result.getString(FIRST_NAME);
@@ -163,37 +182,34 @@ public class UserService implements UserDao {
         final String CREATE_USER =
                 "INSERT INTO user_profile (first_name, last_name, username, user_password) VALUES (?,?,?,?)";
         pstmt = conn.getPreparedStatement(CREATE_USER);
-        pstmt = utils.setUserDetails(pstmt,u.getFirstName(),u.getLastName(),
+        pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),
                                         u.getUserName(),u.getUserPassword());
-        int result = pstmt.executeUpdate();
+        int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return (result>0);
+        return (qResult>0);
     }
 
 
     /**
      * This function takes in a user object whose fields have new values, but the username
-     * and the user_id should match of a previous old user. If it does not, it throws a UniqueFieldException.
+     * and the user_id should match of a previous old user. If it does not, it throws a SQLException
      * The function overwrites all other overwrite-able fields of the user.
      *
      * @param u The user object with new values in the fields
      * @return True if the update was successful, false otherwise
      * @throws SQLException returns the vendor specific error code for a wrong sql query
-     * @throws UniqueFieldException this is thrown when the user id of the new user is not the same
-     *                              as the old user that needs to be updated.
+
      */
     @Override
-    public boolean updateUser(User u) throws SQLException,UniqueFieldException{
+    public boolean updateUser(User u) throws SQLException{
         user = getUserByUserName(u.getUserName());
-        if (user.getUserId() != u.getUserId())
-            throw new UniqueFieldException("Username or ID cannot be changed");
         final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
                 "last_name = ?, user_password = ? WHERE username = ? ";
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        pstmt = utils.setUserDetails(pstmt,u.getFirstName(),u.getLastName(),u.getUserPassword(),user.getUserName());
-        int result = pstmt.executeUpdate();
+        pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),u.getUserPassword(),user.getUserName());
+        int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return result>0;
+        return qResult>0;
     }
 
 
@@ -209,9 +225,10 @@ public class UserService implements UserDao {
         final String DELETE_USER =
                 "DELETE FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(DELETE_USER);
-        pstmt = utils.setUserDetails(pstmt,u.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt,u.getUserName());
         int result = pstmt.executeUpdate();
         pstmt.close();
         return result>0;
     }
+
 }

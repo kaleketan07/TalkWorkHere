@@ -1,9 +1,6 @@
 package edu.northeastern.ccs.im.services;
-
 import java.sql.SQLException;
 import java.util.Set;
-
-import edu.northeastern.ccs.im.exceptions.UniqueFieldException;
 import edu.northeastern.ccs.im.models.User;
 
 /**
@@ -31,7 +28,7 @@ public interface UserDao {
     
 
     // update a User details in database
-    boolean updateUser(User u) throws SQLException, UniqueFieldException;
+    boolean updateUser(User u) throws SQLException;
     
     // delete a User from database
     boolean deleteUser(User u) throws SQLException;

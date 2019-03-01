@@ -17,7 +17,7 @@ public class TestDBConnection {
      *
      * @throws ClassNotFoundException - Thrown if the MySQL driver is not found
      * @throws SQLException           - Thrown if there is an exception while connecting to MySQL
-     *                                g@throws IOException - when config file is not found
+     * @throws IOException            - when config file is not found
      */
     @Test
     public void testConstructor() throws ClassNotFoundException, SQLException, IOException {

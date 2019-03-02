@@ -153,8 +153,8 @@
 			</activation>
 			<properties>
 				<sonar.host.url>
-					<!-- https://5500sonar-2.cciscloud.com -->
-					http://localhost:9000
+					https://5500sonar-2.cciscloud.com
+					<!-- http://localhost:9000 -->
 				</sonar.host.url>
 			</properties>
 		</profile>

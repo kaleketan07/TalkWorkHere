@@ -26,23 +26,44 @@ public class TestUserService {
 
     private User testUser ;
     private UserService us;
-    private  DBConnection mockedDBConnection;
-    private DBUtils mockedDBUtils;
-    private PreparedStatement mockedPreparedStatement;
-    private  ResultSet mockedRS;
+
     /**
-     * Init mocks.
+     * The Mocked db connection.
+     */
+    @Mock
+    DBConnection mockedDBConnection;
+
+    /**
+     * The Mocked db utils.
+     */
+    @Mock
+    DBUtils mockedDBUtils;
+
+    /**
+     * The Mocked prepared statement.
+     */
+    @Mock
+    PreparedStatement mockedPreparedStatement;
+
+    /**
+     * The Mocked ResultSet
+     */
+    @Mock
+    ResultSet mockedRS;
+
+
+    /**
+     * Initialise the mock objects and define their behaviors here.
+     * This also sets the required reflected fields in the UserService class with
+     * the mocked objects.
      *
      * @throws SQLException the sql exception
      */
     @BeforeEach
     public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException,
             IOException, ClassNotFoundException {
+        MockitoAnnotations.initMocks(this);
         us = UserService.getInstance();
-        mockedDBConnection = mock(DBConnection.class);
-        mockedDBUtils = mock(DBUtils.class);
-        mockedPreparedStatement = mock(PreparedStatement.class);
-        mockedRS = mock(ResultSet.class);
         testUser = new User(99,"ABC","BCD","AB","QWERTY");
         when(mockedDBConnection.getPreparedStatement(Mockito.anyString())).thenReturn(mockedPreparedStatement);
         when(mockedDBUtils.setPreparedStatementArgs(Mockito.any(PreparedStatement.class),
@@ -71,6 +92,9 @@ public class TestUserService {
         ut.set(us,mockedDBUtils);
     }
 
+    /**
+     * Tear down. Set all mocks to null
+     */
     @AfterEach
     public void tearDown(){
         mockedDBConnection = null;

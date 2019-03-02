@@ -12,6 +12,7 @@ import java.util.Set;
 /**
  * This class is used for performing all user related services, which include all DAO services for a
  * user. This class contains methods to add, update, delete and get users from the database.
+ * @author Kunal
  */
 public class UserService implements UserDao {
 

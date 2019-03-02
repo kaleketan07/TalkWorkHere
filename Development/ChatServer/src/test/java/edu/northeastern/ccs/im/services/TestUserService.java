@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * The class for testing user services DAO.
+ * @author Kunal
  */
 public class TestUserService {
 

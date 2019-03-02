@@ -3,6 +3,10 @@ package edu.northeastern.ccs.im.db;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * The type Db Utils. This class is used for DB related helper functions
+ * @author Kunal
+ */
 public class DBUtils {
 
     /**

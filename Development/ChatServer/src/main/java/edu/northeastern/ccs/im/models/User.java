@@ -26,7 +26,7 @@ public class User {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
-		this.userPassword = userName;
+		this.userPassword = userPassword;
 		
 	}
 	
@@ -110,6 +110,9 @@ public class User {
 		this.userPassword = userPassword;
 	}
 
+	public String toString(){
+		return getUserId()+" "+getFirstName()+" "+getLastName();
+	}
 	
 }
 

@@ -2,11 +2,10 @@ package edu.northeastern.ccs.im.models;
 
 /**
  * Class for User object with its data members
- * @author rahul
  *
+ * @author rahul
  */
 public class User {
-	
 	private int userId;
 	private String firstName;
 	private String lastName;
@@ -113,6 +112,5 @@ public class User {
 	public String toString(){
 		return getUserId()+" "+getFirstName()+" "+getLastName();
 	}
-	
 }
 

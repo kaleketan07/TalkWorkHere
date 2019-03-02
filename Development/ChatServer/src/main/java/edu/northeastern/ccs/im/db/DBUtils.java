@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 public class DBUtils {
 
-
     /**
      * Sets prepared statement arguments. This is used to prepare any preparedStatement with
      * any no. of arguments, this replaces the tedious use of preparedStmt.set() methods.

@@ -2,19 +2,21 @@ package edu.northeastern.ccs.im.services;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.models.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -22,41 +24,25 @@ import static org.mockito.Mockito.when;
  */
 public class TestUserService {
 
-    /**
-     * The Mocked db connection.
-     */
-    @Mock
-    DBConnection mockedDBConnection;
-
-    /**
-     * The Mocked db utils.
-     */
-    @Mock
-    DBUtils mockedDBUtils;
-
-    /**
-     * The Mocked prepared statement.
-     */
-    @Mock
-    PreparedStatement mockedPreparedStatement;
-
-    /**
-     * The Mocked ResultSet
-     */
-    @Mock
-    ResultSet mockedRS;
-
     private User testUser ;
-    private UserService us = null;
-
+    private UserService us;
+    private  DBConnection mockedDBConnection;
+    private DBUtils mockedDBUtils;
+    private PreparedStatement mockedPreparedStatement;
+    private  ResultSet mockedRS;
     /**
      * Init mocks.
      *
      * @throws SQLException the sql exception
      */
     @BeforeEach
-    public void initMocks() throws SQLException, NoSuchFieldException,IllegalAccessException {
-        MockitoAnnotations.initMocks(this);
+    public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException,
+            IOException, ClassNotFoundException {
+        us = UserService.getInstance();
+        mockedDBConnection = mock(DBConnection.class);
+        mockedDBUtils = mock(DBUtils.class);
+        mockedPreparedStatement = mock(PreparedStatement.class);
+        mockedRS = mock(ResultSet.class);
         testUser = new User(99,"ABC","BCD","AB","QWERTY");
         when(mockedDBConnection.getPreparedStatement(Mockito.anyString())).thenReturn(mockedPreparedStatement);
         when(mockedDBUtils.setPreparedStatementArgs(Mockito.any(PreparedStatement.class),
@@ -70,7 +56,7 @@ public class TestUserService {
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
         when(mockedRS.getInt("user_id")).thenReturn(99);
-        us = UserService.getInstance();
+        when(mockedRS.next()).thenReturn(true,false);
         Field rs = UserService.class.getDeclaredField("result");
         rs.setAccessible(true);
         rs.set(us,mockedRS);
@@ -85,18 +71,14 @@ public class TestUserService {
         ut.set(us,mockedDBUtils);
     }
 
-    /**
-     * Test if the mocks are initialized correctly.
-     *
-     * @throws SQLException the sql exception
-     */
-    @Test
-    public void testMockInit() throws SQLException{
-        Assertions.assertNotNull(mockedDBConnection);
-        Assertions.assertNotNull(mockedPreparedStatement);
-        Assertions.assertNotNull(mockedDBUtils);
-        Assertions.assertSame(mockedDBConnection.getPreparedStatement(""),mockedPreparedStatement);
+    @AfterEach
+    public void tearDown(){
+        mockedDBConnection = null;
+        mockedDBUtils = null;
+        mockedPreparedStatement = null;
+        mockedRS = null;
     }
+
 
     /**
      * Test get user function.
@@ -125,7 +107,8 @@ public class TestUserService {
      */
     @Test
     public void testGetUserByUserNameAndPassword() throws SQLException{
-        Assertions.assertEquals("99 ABC BCD",us.getUserByUserNameAndPassword("AB","QWERTY").toString());
+        Assertions.assertEquals("99 ABC BCD",
+                us.getUserByUserNameAndPassword("AB","QWERTY").toString());
     }
 
     /**
@@ -165,7 +148,6 @@ public class TestUserService {
      */
     @Test
     public void testGetAllUsers() throws SQLException,IllegalAccessException,NoSuchFieldException{
-        when(mockedRS.next()).thenReturn(true,false);
         Assertions.assertEquals(1,us.getAllUsers().size());
     }
 
@@ -176,7 +158,7 @@ public class TestUserService {
      */
     @Test
     public void testGetUserException()  throws SQLException{
-        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
         Assertions.assertThrows(SQLException.class, ()->us.getUser(99));
     }
 
@@ -187,7 +169,7 @@ public class TestUserService {
      */
     @Test
     public void testGetAllUsersException()  throws SQLException{
-        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
         Assertions.assertThrows(SQLException.class, ()->us.getAllUsers());
     }
 
@@ -198,7 +180,7 @@ public class TestUserService {
      */
     @Test
     public void testGetUserByUsernameException()  throws SQLException{
-        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
         Assertions.assertThrows(SQLException.class, ()->us.getUserByUserName("AB"));
     }
 
@@ -209,7 +191,7 @@ public class TestUserService {
      */
     @Test
     public void testGetUserByUsernameAndPasswordException()  throws SQLException{
-        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
         Assertions.assertThrows(SQLException.class, ()->us.getUserByUserNameAndPassword("AB","BA"));
     }
 
@@ -255,6 +237,24 @@ public class TestUserService {
     public void testGetUserByUsernameAndPasswordUserNotPresent() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertThrows(SQLException.class, ()->us.getUserByUserNameAndPassword("AB","QWERTY"));
+    }
+
+    @Test
+    public void testDeleteUserForFalse() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.deleteUser(testUser));
+    }
+
+    @Test
+    public void testUpdateUserFalse() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.updateUser(testUser));
+    }
+
+    @Test
+    public void testCreateUserFalse() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.createUser(testUser));
     }
 
 }

@@ -21,16 +21,7 @@ public class UserService implements UserDao {
     private PreparedStatement pstmt = null;
     private DBUtils utils = null;
     private ResultSet result;
-    private static final UserService USER_SERVICE_INSTANCE;
-    static{
-        UserService tmp = null;
-        try{
-            tmp = new UserService();
-        }catch (IOException | SQLException | ClassNotFoundException e){
-            throw new IllegalArgumentException("Problem initializing a static variable for UserService");
-        }
-        USER_SERVICE_INSTANCE = tmp;
-    }
+    private static  UserService userServiceInstance;
 
     // Columns for user_profile
     private static final String USER_NAME = "username";
@@ -53,8 +44,10 @@ public class UserService implements UserDao {
         result = null;
     }
 
-    public static UserService getInstance(){
-        return USER_SERVICE_INSTANCE;
+    public static UserService getInstance() throws SQLException,IOException,ClassNotFoundException{
+        if(userServiceInstance== null)
+            userServiceInstance = new UserService();
+        return userServiceInstance;
     }
 
     /**
@@ -226,9 +219,9 @@ public class UserService implements UserDao {
                 "DELETE FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(DELETE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt,u.getUserName());
-        int result = pstmt.executeUpdate();
+        int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return result>0;
+        return qResult>0;
     }
 
 }

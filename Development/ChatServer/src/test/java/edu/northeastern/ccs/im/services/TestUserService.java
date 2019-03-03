@@ -65,7 +65,7 @@ public class TestUserService {
             IOException, ClassNotFoundException {
         MockitoAnnotations.initMocks(this);
         us = UserService.getInstance();
-        testUser = new User(99,"ABC","BCD","AB","QWERTY");
+        testUser = new User("ABC","BCD","AB","QWERTY");
         when(mockedDBConnection.getPreparedStatement(Mockito.anyString())).thenReturn(mockedPreparedStatement);
         when(mockedDBUtils.setPreparedStatementArgs(Mockito.any(PreparedStatement.class),
                 Mockito.anyVararg()))
@@ -77,7 +77,6 @@ public class TestUserService {
         when(mockedRS.getString("last_name")).thenReturn("BCD");
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
-        when(mockedRS.getInt("user_id")).thenReturn(99);
         when(mockedRS.next()).thenReturn(true,false);
         Field rs = UserService.class.getDeclaredField("result");
         rs.setAccessible(true);
@@ -104,17 +103,6 @@ public class TestUserService {
         mockedRS = null;
     }
 
-
-    /**
-     * Test get user function.
-     *
-     * @throws SQLException           the sql exception
-     */
-    @Test
-    public void testGetUser() throws SQLException{
-        Assertions.assertEquals("99 ABC BCD",us.getUser(99).toString());
-    }
-
     /**
      * Test get user by user name.
      *
@@ -122,7 +110,7 @@ public class TestUserService {
      */
     @Test
     public void testGetUserByUserName() throws SQLException{
-        Assertions.assertEquals("99 ABC BCD",us.getUserByUserName("AB").toString());
+        Assertions.assertEquals("AB : ABC BCD",us.getUserByUserName("AB").toString());
     }
 
     /**
@@ -132,7 +120,7 @@ public class TestUserService {
      */
     @Test
     public void testGetUserByUserNameAndPassword() throws SQLException{
-        Assertions.assertEquals("99 ABC BCD",
+        Assertions.assertEquals("AB : ABC BCD",
                 us.getUserByUserNameAndPassword("AB","QWERTY").toString());
     }
 
@@ -174,17 +162,6 @@ public class TestUserService {
     @Test
     public void testGetAllUsers() throws SQLException,IllegalAccessException,NoSuchFieldException{
         Assertions.assertEquals(1,us.getAllUsers().size());
-    }
-
-    /**
-     * Test get user exception.
-     *
-     * @throws SQLException           the sql exception
-     */
-    @Test
-    public void testGetUserException()  throws SQLException{
-        when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
-        Assertions.assertThrows(SQLException.class, ()->us.getUser(99));
     }
 
     /**

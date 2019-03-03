@@ -9,9 +9,7 @@ import edu.northeastern.ccs.im.models.User;
  * @author rahul
  */
 public interface UserDao {
-  //Get user by userId integer value
-  User getUser(int userId) throws SQLException;
-
+  
   //Get all the users for the system
   Set<User> getAllUsers() throws SQLException;
 

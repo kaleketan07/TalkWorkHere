@@ -26,7 +26,6 @@ public class UserService implements UserDao {
 
     // Columns for user_profile
     private static final String USER_NAME = "username";
-    private static final String USER_ID = "user_id";
     private static final String USER_PSWD = "user_password";
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
@@ -52,34 +51,6 @@ public class UserService implements UserDao {
     }
 
     /**
-     * Gets all the user details of the user, given the user ID.
-     * @param userId the ID of the user
-     * @return A new user object with all the required details initialized.
-     * @throws SQLException returns the vendor specific error code for a wrong sql query
-     */
-    @Override
-    public User getUser(int userId) throws SQLException{
-        final String GET_USER_BY_ID =
-                "SELECT * FROM user_profile WHERE user_id = ?";
-        pstmt = conn.getPreparedStatement(GET_USER_BY_ID);
-        pstmt = utils.setPreparedStatementArgs(pstmt,userId);
-        try{
-            result = pstmt.executeQuery();
-            result.first();
-            String fName = result.getString(FIRST_NAME);
-            String lName = result.getString(LAST_NAME);
-            String uPwd = result.getString(USER_PSWD);
-            String uName = result.getString(USER_NAME);
-            user = new User(userId,fName,lName,uName,uPwd);
-        }catch(Exception e){
-            throw new SQLException(e);
-        }
-        pstmt.close();
-        return user;
-
-    }
-
-    /**
      * This functions adds all the available users in the database to a HashSet.
      *
      * @return The Set with all the users available in it
@@ -92,12 +63,11 @@ public class UserService implements UserDao {
         try{
             result = pstmt.executeQuery();
             while(result.next()) {
-                int id = result.getInt(USER_ID);
                 String fName = result.getString(FIRST_NAME);
                 String lName = result.getString(LAST_NAME);
                 String uName = result.getString(USER_NAME);
                 String uPwd = result.getString(USER_PSWD);
-                userSet.add(new User(id, fName, lName, uName, uPwd));
+                userSet.add(new User(fName, lName, uName, uPwd));
             }
         }catch(Exception e){
             throw new SQLException(e);
@@ -128,10 +98,9 @@ public class UserService implements UserDao {
                 throw new SQLException();
             }
             result.first();
-            int id = result.getInt(USER_ID);
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
-            user = new User(id,fName,lName,username,password);
+            user = new User(fName,lName,username,password);
         }catch(Exception e){
             throw new SQLException();
         }
@@ -153,11 +122,10 @@ public class UserService implements UserDao {
         try{
             result = pstmt.executeQuery();
             result.first();
-            int id = result.getInt(USER_ID);
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             String uPwd = result.getString(USER_PSWD);
-            user = new User(id,fName,lName,username,uPwd);
+            user = new User(fName,lName,username,uPwd);
         }catch(Exception e){
             throw new SQLException(e);
         }

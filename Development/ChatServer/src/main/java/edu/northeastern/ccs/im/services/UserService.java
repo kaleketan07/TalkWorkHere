@@ -16,7 +16,6 @@ import java.util.Set;
  */
 public class UserService implements UserDao {
 
-    private User user;
     private Set<User> userSet = new HashSet<>();
     private DBConnection conn;
     private PreparedStatement pstmt = null;
@@ -88,6 +87,7 @@ public class UserService implements UserDao {
      */
     @Override
     public User getUserByUserNameAndPassword(String username, String password) throws SQLException {
+        User user;
         final String GET_USER_USERNAME_PSWD =
                 "SELECT * FROM user_profile WHERE username = ? AND user_password = ?";
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
@@ -116,6 +116,7 @@ public class UserService implements UserDao {
      */
     @Override
     public User getUserByUserName(String username) throws SQLException{
+        User user;
         final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt,username);
@@ -156,6 +157,8 @@ public class UserService implements UserDao {
      * This function takes in a user object whose fields have new values, but the username
      * and the user_id should match of a previous old user. If it does not, it throws a SQLException
      * The function overwrites all other overwrite-able fields of the user.
+     * The SQLException is thrown when a request is made to update the username and that username
+     * is not found in the database OR when the new username matches another username in the database.
      *
      * @param u The user object with new values in the fields
      * @return True if the update was successful, false otherwise
@@ -164,7 +167,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean updateUser(User u) throws SQLException{
-        user = getUserByUserName(u.getUserName());
+        User user = getUserByUserName(u.getUserName());
         final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
                 "last_name = ?, user_password = ? WHERE username = ? ";
         pstmt = conn.getPreparedStatement(UPDATE_USER);

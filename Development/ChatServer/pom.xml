@@ -64,7 +64,7 @@
 				<version>3.0.0-M1</version>
 				<configuration>
 					<groupId>CS5500</groupId>
-					<artifactId>Chatter</artifactId>
+					<artifactId>client</artifactId>
 					<version>0.0.1</version>
 					<packaging>jar</packaging>
 					<file>lib/client-0.0.1-SNAPSHOT.jar</file>
@@ -166,6 +166,13 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.47</version>
 		</dependency>
+		<dependency>
+		    <groupId>CS5500</groupId>
+		    <artifactId>client</artifactId>
+		    <version>0.0.1</version>
+		    <scope>test</scope>
+		    <optional>true</optional>
+   		</dependency>
 	</dependencies>
 
 	<profiles>

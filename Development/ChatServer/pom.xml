@@ -67,7 +67,7 @@
 					<artifactId>Chatter</artifactId>
 					<version>0.0.1</version>
 					<packaging>jar</packaging>
-					<file>src/lib/client-0.0.1-SNAPSHOT.jar</file>
+					<file>lib/client-0.0.1-SNAPSHOT.jar</file>
 				</configuration>
 				<executions>
 					<execution>  

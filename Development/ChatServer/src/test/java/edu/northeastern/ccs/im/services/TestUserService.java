@@ -65,7 +65,7 @@ public class TestUserService {
             IOException, ClassNotFoundException {
         MockitoAnnotations.initMocks(this);
         us = UserService.getInstance();
-        testUser = new User("ABC","BCD","AB","QWERTY");
+        testUser = new User("ABC","BCD","AB","QWERTY", false);
         when(mockedDBConnection.getPreparedStatement(Mockito.anyString())).thenReturn(mockedPreparedStatement);
         when(mockedDBUtils.setPreparedStatementArgs(Mockito.any(PreparedStatement.class),
                 Mockito.anyVararg()))
@@ -77,6 +77,7 @@ public class TestUserService {
         when(mockedRS.getString("last_name")).thenReturn("BCD");
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
+        when(mockedRS.getBoolean("logged_in")).thenReturn(false);
         when(mockedRS.next()).thenReturn(true,false);
         Field rs = UserService.class.getDeclaredField("result");
         rs.setAccessible(true);

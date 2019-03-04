@@ -43,6 +43,7 @@ public class NetworkConnection implements Iterable<Message> {
      * The length of the message handle.
      */ // MEJ: why is this not in Message?
     private static final int HANDLE_LENGTH = 3;
+    private static final int SPACE_LENGTH = 1;
 
     /**
      * The minimum length of a message.
@@ -199,7 +200,7 @@ public class NetworkConnection implements Iterable<Message> {
                     Charset charset = Charset.forName(CHARSET_NAME);
                     CharsetDecoder decoder = charset.newDecoder();
                     // Convert the buffer to a format that we can actually use.
-                    CharBuffer charBuffer = decoder.decode(buff);
+                    CharBuffer charBuffer = modifyReceivedMessage(decoder.decode(buff));
                     // get rid of any extra whitespace at the beginning
                     // Start scanning the buffer for any and all messages.
                     int start = 0;
@@ -237,6 +238,65 @@ public class NetworkConnection implements Iterable<Message> {
             }
             // Do we now have any messages?
             return result;
+        }
+
+        /**
+         * This method converts the incoming message of BCT type to the required type
+         * based on the handle mentioned in the text. This method ignores all messages which are not of type BCT.
+         *
+         * @param oldBuffer - incoming message which needs to be manipulated
+         * @return newBuffer - manipulated message
+         */
+        private CharBuffer modifyReceivedMessage(CharBuffer oldBuffer) {
+            if(oldBuffer.subSequence(0,HANDLE_LENGTH).toString().equals("BCT")) {
+                CharBuffer newBuffer = CharBuffer.allocate(oldBuffer.length() - 4);
+                int oldBuffPosition = HANDLE_LENGTH + 1;
+                int senderNameLength = 0;
+                int numberSenderNameLength = 0;
+                int position = oldBuffPosition;
+                while (Character.isDigit(oldBuffer.get(position))) {
+                    senderNameLength = senderNameLength * DECIMAL_RADIX + Character.digit(oldBuffer.get(position), DECIMAL_RADIX);
+                    // Move to the next character
+                    numberSenderNameLength += 1;
+                    position += 1;
+                }
+
+                // Now read in the length of the message
+                position = oldBuffPosition + senderNameLength + numberSenderNameLength + 2*SPACE_LENGTH;
+                int messageLength = 0;
+                int numberMessageLength = 0;
+                while (Character.isDigit(oldBuffer.get(position))) {
+                    messageLength = messageLength * DECIMAL_RADIX + Character.digit(oldBuffer.get(position), DECIMAL_RADIX);
+                    // Move to the next character
+                    numberMessageLength += 1;
+                    position += 1;
+                }
+
+                if(messageLength > 2) {
+                    // user hss sent some message handle/text
+                    // copy message handle into new Buffer
+                    int handlePosition = oldBuffPosition + senderNameLength + numberMessageLength + numberSenderNameLength + 3*SPACE_LENGTH;
+                    newBuffer.put(oldBuffer.subSequence(handlePosition, handlePosition + HANDLE_LENGTH + SPACE_LENGTH));
+
+                    // copy the username
+                    newBuffer.put(oldBuffer.subSequence(oldBuffPosition, oldBuffPosition + senderNameLength + numberSenderNameLength + 2*SPACE_LENGTH));
+
+                    // add the new message length to the new buffer
+                    int newMessageLength = messageLength - HANDLE_LENGTH - SPACE_LENGTH;
+                    char[] arrMessageLength = Integer.toString(newMessageLength).toCharArray();
+                    newBuffer.put(arrMessageLength);
+                    // add the actual message text
+                    if(newMessageLength > 0) {
+                        newBuffer.put(' ');
+                        newBuffer.put(oldBuffer.subSequence(handlePosition + HANDLE_LENGTH + SPACE_LENGTH, handlePosition + HANDLE_LENGTH + SPACE_LENGTH + newMessageLength));
+                        // reset position of buffer
+                        newBuffer.position(0);
+                    }
+                    return newBuffer;
+                }
+            }
+            ChatLogger.warning("Did not modify the following message : " + oldBuffer.toString());
+            return oldBuffer;
         }
 
         @Override

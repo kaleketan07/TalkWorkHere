@@ -11,6 +11,7 @@ public class User {
 	private String lastName;
 	private String userName;
 	private String userPassword;
+	private boolean loggedIn;
 	
 	/**
 	 * 
@@ -18,16 +19,16 @@ public class User {
 	 * @param lastName to have the last name of the user
 	 * @param userName to have the user name of the user
 	 * @param userPassword to have the user password name of the user
+	 * @param loggedInStatus to set the loggedIn status of the user
 	 */
-	public User(String firstName, String lastName, String userName, String userPassword) {
+	public User(String firstName, String lastName, String userName, String userPassword, boolean loggedInStatus) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
 		this.userPassword = userPassword;
-		
+		this.loggedIn = loggedInStatus;
 	}
-	
-		
+
 	/**
 	 * 
 	 * @return firstName of the user
@@ -38,7 +39,7 @@ public class User {
 
 	/**
 	 * 
-	 * @param string value to set the firstName 
+	 * @param firstName value to set the firstName
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -54,7 +55,7 @@ public class User {
 
 	/**
 	 * 
-	 * @param string value to set the firssttName 
+	 * @param lastName value to set the firssttName
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
@@ -70,7 +71,7 @@ public class User {
 
 	/**
 	 * 
-	 * @param string value to set the userName 
+	 * @param userName value to set the userName
 	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
@@ -86,12 +87,33 @@ public class User {
 	
 	/**
 	 * 
-	 * @param string value to set the userPassword 
+	 * @param userPassword value to set the userPassword
 	 */
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
 
+	/**
+	 * set the loggedIn flag to the given parameter value
+	 * @param status - the true or false status of the user's loggedIn attribute
+	 */
+	public void setLoggedIn(boolean status) {
+		loggedIn = status;
+	}
+
+	/**
+	 * @return the loggedIn status of the user
+	 */
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+	/**
+	 * Overrides the toString method for the User object.
+	 *
+	 * @return - string representation of username, firstName and lastName.
+	 *
+	 */
 	public String toString(){
 		return getUserName()+" : "+getFirstName()+" "+getLastName();
 	}

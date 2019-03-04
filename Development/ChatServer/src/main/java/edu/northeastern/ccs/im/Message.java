@@ -32,7 +32,7 @@ public class Message {
     /**
      * The second argument used in the message.
      */
-    private String msgText;
+    private String msgTextOrPassword;
 
     /**
      * Create a new message that contains actual IM text. The type of distribution
@@ -49,7 +49,7 @@ public class Message {
         // message.
         msgSender = srcName;
         // Save the text of the message.
-        msgText = text;
+        msgTextOrPassword = text;
     }
 
     /**
@@ -98,23 +98,25 @@ public class Message {
     }
 
     /**
-     * Given a handle, name and text, return the appropriate message instance or an
+     * Given a handle, name and textOrPassword, return the appropriate message instance or an
      * instance from a subclass of message.
      *
      * @param handle  Handle of the message to be generated.
      * @param srcName Name of the originator of the message (may be null)
-     * @param text    Text sent in this message (may be null)
+     * @param textOrPassword    Text sent in this message (may be null)
      * @return Instance of Message (or its subclasses) representing the handle,
-     * name, & text.
+     * name, & textOrPassword.
      */
-    protected static Message makeMessage(String handle, String srcName, String text) {
+    protected static Message makeMessage(String handle, String srcName, String textOrPassword) {
         Message result = null;
         if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
             result = makeQuitMessage(srcName);
         } else if (handle.compareTo(MessageType.HELLO.toString()) == 0) {
             result = makeSimpleLoginMessage(srcName);
         } else if (handle.compareTo(MessageType.BROADCAST.toString()) == 0) {
-            result = makeBroadcastMessage(srcName, text);
+            result = makeBroadcastMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
+            result = makeLoginMessage(srcName, textOrPassword);
         }
         return result;
     }
@@ -128,6 +130,10 @@ public class Message {
      */
     public static Message makeSimpleLoginMessage(String myName) {
         return new Message(MessageType.HELLO, myName);
+    }
+
+    public static Message makeLoginMessage(String myName, String password) {
+        return new Message(MessageType.LOGIN, myName, password);
     }
 
     /**
@@ -144,8 +150,8 @@ public class Message {
      *
      * @return String equal to the text sent by this message.
      */
-    public String getText() {
-        return msgText;
+    public String getTextOrPassword() {
+        return msgTextOrPassword;
     }
 
     /**
@@ -165,6 +171,8 @@ public class Message {
     public boolean isInitialization() {
         return (msgType == MessageType.HELLO);
     }
+
+    public boolean isLoginMessage() { return (msgType == MessageType.LOGIN);}
 
     /**
      * Determine if this message is a message signing off from the IM server.
@@ -190,8 +198,8 @@ public class Message {
         } else {
             result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
         }
-        if (msgText != null) {
-            result += " " + msgText.length() + " " + msgText;
+        if (msgTextOrPassword != null) {
+            result += " " + msgTextOrPassword.length() + " " + msgTextOrPassword;
         } else {
             result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
         }

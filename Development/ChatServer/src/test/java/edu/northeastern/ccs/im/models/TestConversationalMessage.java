@@ -35,7 +35,7 @@ public class TestConversationalMessage {
 	 * Test for getMessageText()
 	 */
 	@Test
-	public void testgetMessageText() {
+	public void testGetMessageText() {
 		assertEquals(TESTMESSAGE.getMessageText(), "hello");
 	}
 	

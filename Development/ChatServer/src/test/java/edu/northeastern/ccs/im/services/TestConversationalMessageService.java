@@ -160,7 +160,7 @@ public class TestConversationalMessageService {
      */
     @Test
     public void testUpdateMessageDeleteFlag() throws SQLException {
-    	assertTrue(cs.updateMessageDeleteFlag("ABCBCD2018:05:05"));	
+    	assertTrue(cs.deleteMessage("ABCBCD2018:05:05"));	
      }
     
     /**
@@ -197,14 +197,14 @@ public class TestConversationalMessageService {
     }
     
     /**
-     * Test updateMessageDeleteFlag when SQLException is thrown.
+     * Test deleteMessage when SQLException is thrown.
      *
      * @throws SQLException           the sql exception
      */
     @Test
-    public void testUpdateDeleteMessage() throws SQLException{
+    public void testDeleteMessage() throws SQLException{
     	doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
-        Assertions.assertThrows(SQLException.class, ()->cs.updateMessageDeleteFlag("ABCBCD2018:05:05"));
+        Assertions.assertThrows(SQLException.class, ()->cs.deleteMessage("ABCBCD2018:05:05"));
     }
     
 }

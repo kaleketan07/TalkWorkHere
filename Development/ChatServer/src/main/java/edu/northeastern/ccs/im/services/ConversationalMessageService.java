@@ -165,7 +165,7 @@ public class ConversationalMessageService {
 	 * @param msgUniqueKey   	UniqueKey for the message to be deleted
 	 * @throws SQLException		the sql exception
 	 */
-	public boolean updateMessageDeleteFlag(String msgUniqueKey) throws SQLException {
+	public boolean deleteMessage(String msgUniqueKey) throws SQLException {
 		final String UPDATE_DELETE_FLAG = "UPDATE messages SET msg_deleted = 1 WHERE msg_uniquekey = ?";
         pstmt = conn.getPreparedStatement(UPDATE_DELETE_FLAG);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);

@@ -26,7 +26,7 @@ public class DBUtils {
                 stmt.setString(i++,(String) arg);
             else if(arg instanceof Integer)
                 stmt.setInt(i++,(int) arg);
-            else
+            else if(arg instanceof Timestamp)
             	 stmt.setTimestamp(i++ ,(Timestamp)arg);
         }
         return stmt;

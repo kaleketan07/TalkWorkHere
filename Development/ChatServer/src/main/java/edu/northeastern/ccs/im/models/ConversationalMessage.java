@@ -71,5 +71,11 @@ public class ConversationalMessage {
 		return messageTimeStamp;
 	}
 
-
+	/**
+	 * 
+	 * @return the string representation of the msg
+	 */
+	public String toString() {
+		return this.getMessageUniquekey();
+	}
 }

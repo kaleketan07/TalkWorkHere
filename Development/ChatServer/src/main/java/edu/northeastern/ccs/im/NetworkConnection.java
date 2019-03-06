@@ -43,7 +43,6 @@ public class NetworkConnection implements Iterable<Message> {
      * The length of the message handle.
      */ // MEJ: why is this not in Message?
     private static final int HANDLE_LENGTH = 3;
-    private static final int SPACE_LENGTH = 1;
 
     /**
      * The minimum length of a message.
@@ -84,6 +83,15 @@ public class NetworkConnection implements Iterable<Message> {
      * Queue of messages for this client.
      */
     private Queue<Message> messages;
+
+    /**
+     * Denotes the delimiter used by the user for incoming messages
+     */
+    private static final String DELIMITER = ";";
+    /**
+     * Denotes the space character used at multiple places
+     */
+    private static final String SPACE = " ";
 
     /**
      * Creates a new instance of this class. Since, by definition, this class sends
@@ -248,52 +256,50 @@ public class NetworkConnection implements Iterable<Message> {
          * @return newBuffer - manipulated message
          */
         private CharBuffer modifyReceivedMessage(CharBuffer oldBuffer) {
-            if(oldBuffer.subSequence(0,HANDLE_LENGTH).toString().equals("BCT")) {
-                CharBuffer newBuffer = CharBuffer.allocate(oldBuffer.length() - 4);
-                int oldBuffPosition = HANDLE_LENGTH + 1;
-                int senderNameLength = 0;
-                int numberSenderNameLength = 0;
-                int position = oldBuffPosition;
-                while (Character.isDigit(oldBuffer.get(position))) {
-                    senderNameLength = senderNameLength * DECIMAL_RADIX + Character.digit(oldBuffer.get(position), DECIMAL_RADIX);
-                    // Move to the next character
-                    numberSenderNameLength += 1;
-                    position += 1;
+            String oldBufferString = oldBuffer.toString();
+            if(oldBufferString.substring(0, HANDLE_LENGTH).equals("BCT")) {
+                // remove BCT
+                String nameAndText = oldBufferString.substring(4);
+                int positionText = 0;
+                while(nameAndText.charAt(positionText) != ' ') {
+                    positionText++;
                 }
-
-                // Now read in the length of the message
-                position = oldBuffPosition + senderNameLength + numberSenderNameLength + 2*SPACE_LENGTH;
-                int messageLength = 0;
-                int numberMessageLength = 0;
-                while (Character.isDigit(oldBuffer.get(position))) {
-                    messageLength = messageLength * DECIMAL_RADIX + Character.digit(oldBuffer.get(position), DECIMAL_RADIX);
-                    // Move to the next character
-                    numberMessageLength += 1;
-                    position += 1;
+                int nameStartPos = positionText + 1;
+                while(!Character.isDigit(nameAndText.charAt(positionText))) {
+                    positionText++;
                 }
-
-                if(messageLength > 2) {
-                    // user hss sent some message handle/text
-                    // copy message handle into new Buffer
-                    int handlePosition = oldBuffPosition + senderNameLength + numberMessageLength + numberSenderNameLength + 3*SPACE_LENGTH;
-                    newBuffer.put(oldBuffer.subSequence(handlePosition, handlePosition + HANDLE_LENGTH + SPACE_LENGTH));
-
-                    // copy the username
-                    newBuffer.put(oldBuffer.subSequence(oldBuffPosition, oldBuffPosition + senderNameLength + numberSenderNameLength + 2*SPACE_LENGTH));
-
-                    // add the new message length to the new buffer
-                    int newMessageLength = messageLength - HANDLE_LENGTH - SPACE_LENGTH;
-                    char[] arrMessageLength = Integer.toString(newMessageLength).toCharArray();
-                    newBuffer.put(arrMessageLength);
-                    // add the actual message text
-                    if(newMessageLength > 0) {
-                        newBuffer.put(' ');
-                        newBuffer.put(oldBuffer.subSequence(handlePosition + HANDLE_LENGTH + SPACE_LENGTH, handlePosition + HANDLE_LENGTH + SPACE_LENGTH + newMessageLength));
-                        // reset position of buffer
-                        newBuffer.position(0);
-                    }
-                    return newBuffer;
+                // get the name out
+                String name = nameAndText.substring(nameStartPos,positionText-1);
+                // we have found the start of the second parameter, now break it into a handle and
+                // different number of parameters based on the delimiter
+                while(nameAndText.charAt(positionText) != ' ') {
+                    positionText++;
                 }
+                // We now have the second parameter which is ||| separated
+                String message = nameAndText.substring(positionText+1);
+
+                //return the old buffer if the second parameter of the broadcast message is empty
+                if(message.equals("--"))
+                    return oldBuffer;
+
+                String[] userMessages = message.split(DELIMITER);
+                StringBuilder finalMessage = new StringBuilder();
+                finalMessage.append(userMessages[0]);
+                finalMessage.append(SPACE);
+                finalMessage.append(name.length());
+                finalMessage.append(SPACE);
+                finalMessage.append(name);
+                for(int i=1; i<userMessages.length; i++) {
+                    finalMessage.append(SPACE);
+                    finalMessage.append(userMessages[i].length());
+                    finalMessage.append(SPACE);
+                    finalMessage.append(userMessages[i]);
+                }
+                char[] finalMessageArray = finalMessage.toString().toCharArray();
+                CharBuffer newBuffer = CharBuffer.allocate(finalMessage.length());
+                newBuffer.put(finalMessageArray);
+                newBuffer.position(0);
+                return newBuffer;
             }
             ChatLogger.warning("Did not modify the following message : " + oldBuffer.toString());
             return oldBuffer;

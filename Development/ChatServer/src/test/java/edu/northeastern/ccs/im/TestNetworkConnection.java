@@ -282,7 +282,7 @@ public class TestNetworkConnection {
         Field k = NetworkConnection.class.getDeclaredField("key");
         k.setAccessible(true);
         k.set(connection, mockedKey);
-        myBuff.put("BCT 2 -- 8 LGN pass".getBytes());
+        myBuff.put("BCT 2 -- 8 LGN;pass".getBytes());
         Field b = NetworkConnection.class.getDeclaredField("buff");
         b.setAccessible(true);
         b.set(connection, myBuff);

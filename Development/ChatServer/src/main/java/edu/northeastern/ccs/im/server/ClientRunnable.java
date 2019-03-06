@@ -1,5 +1,7 @@
 package edu.northeastern.ccs.im.server;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -8,6 +10,8 @@ import java.util.concurrent.ScheduledFuture;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.UserService;
 
 /**
  * Instances of this class handle all of the incoming communication from a
@@ -70,11 +74,16 @@ public class ClientRunnable implements Runnable {
     private Queue<Message> waitingList;
 
     /**
+     * Stores the userService instance to be used across multiple conditions.
+     */
+    private UserService userService;
+
+    /**
      * Create a new thread with which we will communicate with this single client.
      *
      * @param network NetworkConnection used by this new client
      */
-    public ClientRunnable(NetworkConnection network) {
+    public ClientRunnable(NetworkConnection network)  {
         // Create the class we will use to send and receive communication
         connection = network;
         // Mark that we are not initialized
@@ -86,6 +95,13 @@ public class ClientRunnable implements Runnable {
         // Mark that the client is active now and start the timer until we
         // terminate for inactivity.
         timer = new ClientTimer();
+
+        // create user Service instance
+        try {
+            userService = UserService.getInstance();
+        } catch(ClassNotFoundException | SQLException | IOException e) {
+            ChatLogger.error("Exception occurred : " + e.getMessage());
+        }
     }
 
     /**
@@ -210,7 +226,11 @@ public class ClientRunnable implements Runnable {
         if (!initialized) {
             checkForInitialization();
         } else {
-            handleIncomingMessages();
+            try {
+                handleIncomingMessages();
+            } catch(SQLException e) {
+                ChatLogger.error("SQL Exception occurred - handleIncomingMessages : " + e);
+            }
             handleOutgoingMessages();
         }
         // Finally, check if this client have been inactive for too long and,
@@ -228,7 +248,7 @@ public class ClientRunnable implements Runnable {
      * Checks incoming messages and performs appropriate actions based on the type
      * of message.
      */
-    protected void handleIncomingMessages() {
+    protected void handleIncomingMessages() throws  SQLException{
         // Client has already been initialized, so we should first check
         // if there are any input
         // messages.
@@ -243,20 +263,38 @@ public class ClientRunnable implements Runnable {
                 // Reply with a quit message.
                 enqueueMessage(Message.makeQuitMessage(name));
             } else {
-                // Check if the message is legal formatted
-                if (messageChecks(msg)) {
-                    // Check for our "special messages"
-                    if (msg.isBroadcastMessage()) {
-                        // Check for our "special messages"
-                        Prattle.broadcastMessage(msg);
-                    }
+                processMessage(msg);
+            }
+        }
+    }
+
+    private void processMessage(Message msg) throws  SQLException{
+        // Check if the message is legal formatted
+        if (messageChecks(msg)) {
+            // Check for our "special messages"
+            if (msg.isBroadcastMessage()) {
+                // Check for our "special messages"
+                Prattle.broadcastMessage(msg);
+            }
+            if(msg.isLoginMessage()) {
+                // Login the user after checking in the user with this username-password combo exists
+                User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
+                if(currentUser == null) {
+                    ChatLogger.error("Incorrect username or password.");
                 } else {
-                    Message sendMsg;
-                    sendMsg = Message.makeBroadcastMessage(ServerConstants.BOUNCER_ID,
-                            "Last message was rejected because it specified an incorrect user name.");
-                    enqueueMessage(sendMsg);
+                    // since the user was found, set the loggedIn attribute to true in the database
+                    currentUser.setLoggedIn(true);
+                    boolean updated = userService.updateUser(currentUser);
+                    if(!updated) {
+                        ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
+                    }
                 }
             }
+        } else {
+            Message sendMsg;
+            sendMsg = Message.makeBroadcastMessage(ServerConstants.BOUNCER_ID,
+                    "Last message was rejected because it specified an incorrect user name.");
+            enqueueMessage(sendMsg);
         }
     }
 

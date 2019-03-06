@@ -28,6 +28,8 @@ public class DBUtils {
                 stmt.setInt(i++,(int) arg);
             else if(arg instanceof Timestamp)
             	 stmt.setTimestamp(i++ ,(Timestamp)arg);
+            else if(arg instanceof  Boolean)
+                stmt.setBoolean(i++, (boolean) arg);
         }
         return stmt;
     }

@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 import java.nio.channels.SocketChannel;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -100,10 +103,10 @@ public class TestClientRunnable {
      */
     @Test
     public void testHandleIncomingMessageWithoutBroadcastMessage() {
-
+        Message login = Message.makeSimpleLoginMessage(TestClientRunnable.SENDER_NAME);
         List<Message> messageList = new ArrayList<>();
         messageList.add(BROADCAST);
-        messageList.add(LOGIN);
+        messageList.add(login);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
@@ -125,7 +128,7 @@ public class TestClientRunnable {
      * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
      */
     @Test
-    public void testHandleIncomingMessageandEnqueueMessage() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public void testHandleIncomingMessageAndEnqueueMessage() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
         Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
         retrieveItems.setAccessible(true);
@@ -147,8 +150,6 @@ public class TestClientRunnable {
         clientRunnableObject.run();
 
         assertTrue(clientRunnableObject.isInitialized());
-
-
     }
 
 
@@ -188,12 +189,13 @@ public class TestClientRunnable {
     @Test
     public void testSetFutureMethod() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
+        Message login = Message.makeSimpleLoginMessage(TestClientRunnable.SENDER_NAME);
         Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
         retrieveItems.setAccessible(true);
         Message.class.getDeclaredMethods();
         List<Message> messageList = new ArrayList<>();
         Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
-        messageList.add(LOGIN);
+        messageList.add(login);
         messageList.add(helloMessage);
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
@@ -234,6 +236,87 @@ public class TestClientRunnable {
     }
 
     /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Login waitList
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForInvalidUser() throws NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        messageList.clear();
+        messageList.add(LOGIN);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Login in waitList and login successful
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        User u = Mockito.mock(User.class);
+        Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
+        Mockito.when(mockedUserService.updateUser(u)).thenReturn(true);
+        messageList.clear();
+        messageList.add(LOGIN);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Login in waitList and login successful
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserUnsuccessfulLogin() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        User u = Mockito.mock(User.class);
+        Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
+        Mockito.when(mockedUserService.updateUser(u)).thenReturn(false);
+        messageList.clear();
+        messageList.add(LOGIN);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
      * Testing checkForIntialization() Method using with Empty
      * message Iterator from network connection
      */
@@ -249,7 +332,6 @@ public class TestClientRunnable {
         assertEquals(clientRunnableObject.isInitialized(), false);
 
     }
-
 
     /**
      * Testing setUserName() using Null as input
@@ -443,9 +525,10 @@ public class TestClientRunnable {
     }
 
     //Private fields to be used in tests
+    private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);
     private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
-    private static final Message LOGIN = Message.makeSimpleLoginMessage(TestClientRunnable.SENDER_NAME);
     private static final int USER_ID = 120000;
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
+    private static final String PASS = "some_p@$$worD";
 }

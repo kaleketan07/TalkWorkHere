@@ -132,6 +132,12 @@ public class Message {
         return new Message(MessageType.HELLO, myName);
     }
 
+    /**
+     * This method creates a login message based on the given name and password
+     * @param myName - username of the user requesting a login
+     * @param password - password of the user used to validate the login
+     * @return a Message object of type login
+     */
     public static Message makeLoginMessage(String myName, String password) {
         return new Message(MessageType.LOGIN, myName, password);
     }
@@ -172,6 +178,10 @@ public class Message {
         return (msgType == MessageType.HELLO);
     }
 
+    /**
+     * This method verifies if the current message has the handle LGN (is a login message)
+     * @return true or false based on the comparison result
+     */
     public boolean isLoginMessage() { return (msgType == MessageType.LOGIN);}
 
     /**

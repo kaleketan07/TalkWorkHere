@@ -35,7 +35,7 @@ public class TestMessage {
     public void testMakeBroadcastMessage() {
         Message broadcastMessage = Message.makeBroadcastMessage(SENDER_NAME, MESSAGE_TEXT);
         assertEquals(SENDER_NAME, broadcastMessage.getName());
-        assertEquals(MESSAGE_TEXT, broadcastMessage.getText());
+        assertEquals(MESSAGE_TEXT, broadcastMessage.getTextOrPassword());
     }
 
     /**
@@ -45,7 +45,7 @@ public class TestMessage {
     @Test
     public void testMakeHelloMessage() {
         Message helloMessage = Message.makeHelloMessage(MESSAGE_TEXT);
-        assertEquals(MESSAGE_TEXT, helloMessage.getText());
+        assertEquals(MESSAGE_TEXT, helloMessage.getTextOrPassword());
     }
 
     /**
@@ -56,6 +56,19 @@ public class TestMessage {
     public void testMakeMessageForQuit() {
         Message message = Message.makeMessage(BYE, SENDER_NAME, "");
         assertEquals(SENDER_NAME, message.getName());
+    }
+
+    /**
+     * Test LoginMessage and toString method to return the expected
+     * output for a login message
+     */
+    @Test
+    private void testLoginMessage() {
+        Message message = Message.makeLoginMessage(SENDER_NAME, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(LGN);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
     }
 
     /**
@@ -76,7 +89,18 @@ public class TestMessage {
     public void testMakeMessageForBroadcast() {
         Message message = Message.makeMessage(BCT, SENDER_NAME, MESSAGE_TEXT);
         assertEquals(SENDER_NAME, message.getName());
-        assertEquals(MESSAGE_TEXT, message.getText());
+        assertEquals(MESSAGE_TEXT, message.getTextOrPassword());
+    }
+
+    /**
+     * Test to check if makeMessage creates the correct object
+     * based on the first parameter passed - Login.
+     */
+    @Test
+    public void testMakeMessageForLogin() {
+        Message message = Message.makeMessage(LGN, SENDER_NAME, PASS);
+        assertEquals(SENDER_NAME, message.getName());
+        assertEquals(PASS, message.getTextOrPassword());
     }
 
     /**
@@ -154,9 +178,9 @@ public class TestMessage {
      */
     @Test
     public void testToStringSenderNotNullTextNull() {
-        Message message = Message.makeSimpleLoginMessage(SENDER_NAME);
+        Message message = Message.makeQuitMessage(SENDER_NAME);
         StringBuilder strBuild = new StringBuilder();
-        strBuild.append(HLO);
+        strBuild.append(BYE);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
@@ -209,7 +233,9 @@ public class TestMessage {
     private static final String HLO = "HLO";
     private static final String BYE = "BYE";
     private static final String BCT = "BCT";
+    private static final String LGN = "LGN";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
+    private static final String PASS = "some_p@$$worD";
 }

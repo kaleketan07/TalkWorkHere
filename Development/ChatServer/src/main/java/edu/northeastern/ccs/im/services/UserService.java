@@ -19,7 +19,7 @@ public class UserService implements UserDao {
     private Set<User> userSet = new HashSet<>();
     private DBConnection conn;
     private PreparedStatement pstmt = null;
-    private DBUtils utils = null;
+    private DBUtils utils;
     private ResultSet result;
     private static  UserService userServiceInstance;
 
@@ -28,6 +28,7 @@ public class UserService implements UserDao {
     private static final String USER_PSWD = "user_password";
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
+    private static final String LOGGED_IN = "logged_in";
 
     /**
      * Instantiates an user object for UserServices. This constructor will initialize
@@ -66,7 +67,8 @@ public class UserService implements UserDao {
                 String lName = result.getString(LAST_NAME);
                 String uName = result.getString(USER_NAME);
                 String uPwd = result.getString(USER_PSWD);
-                userSet.add(new User(fName, lName, uName, uPwd));
+                boolean loggedInStatus = result.getBoolean(LOGGED_IN);
+                userSet.add(new User(fName, lName, uName, uPwd, loggedInStatus));
             }
         }catch(Exception e){
             throw new SQLException(e);
@@ -100,7 +102,8 @@ public class UserService implements UserDao {
             result.first();
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
-            user = new User(fName,lName,username,password);
+            boolean loggedIn = result.getBoolean(LOGGED_IN);
+            user = new User(fName,lName,username,password, loggedIn);
         }catch(Exception e){
             throw new SQLException();
         }
@@ -126,7 +129,8 @@ public class UserService implements UserDao {
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             String uPwd = result.getString(USER_PSWD);
-            user = new User(fName,lName,username,uPwd);
+            boolean loggedIn = result.getBoolean(LOGGED_IN);
+            user = new User(fName,lName,username,uPwd, loggedIn);
         }catch(Exception e){
             throw new SQLException(e);
         }
@@ -143,10 +147,10 @@ public class UserService implements UserDao {
     @Override
     public boolean createUser(User u) throws SQLException {
         final String CREATE_USER =
-                "INSERT INTO user_profile (first_name, last_name, username, user_password) VALUES (?,?,?,?)";
+                "INSERT INTO user_profile (first_name, last_name, username, user_password, logged_in) VALUES (?,?,?,?,?)";
         pstmt = conn.getPreparedStatement(CREATE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),
-                                        u.getUserName(),u.getUserPassword());
+                                        u.getUserName(),u.getUserPassword(), u.isLoggedIn());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return (qResult>0);
@@ -169,9 +173,9 @@ public class UserService implements UserDao {
     public boolean updateUser(User u) throws SQLException{
         User user = getUserByUserName(u.getUserName());
         final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
-                "last_name = ?, user_password = ? WHERE username = ? ";
+                "last_name = ?, user_password = ?, logged_in = ? WHERE username = ? ";
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),u.getUserPassword(),user.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),u.getUserPassword(), u.isLoggedIn(),user.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return qResult>0;
@@ -195,5 +199,4 @@ public class UserService implements UserDao {
         pstmt.close();
         return qResult>0;
     }
-
 }

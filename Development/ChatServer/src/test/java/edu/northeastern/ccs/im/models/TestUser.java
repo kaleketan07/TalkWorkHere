@@ -1,6 +1,8 @@
 package edu.northeastern.ccs.im.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +42,26 @@ public class TestUser {
 		ALICE.setUserPassword(RUBY);
 		assertEquals(ALICE.getUserPassword(), RUBY);
 	}
-	
-	
-	private static final User ALICE = new User("Alice", "Bob", "alicebob", "password");
+
+	/**
+	 * Test the setter and getter for loggedIn attribute when set to true
+	 */
+	@Test
+	public void testSetLoggedInTrue() {
+		ALICE.setLoggedIn(true);
+		assertTrue(ALICE.isLoggedIn());
+	}
+
+	/**
+	 * Test the setter and getter for loggedIn attribute when set to false
+	 */
+	@Test
+	public void testSetLoggedInFalse() {
+		ALICE.setLoggedIn(false);
+		assertFalse(ALICE.isLoggedIn());
+	}
+
+	private static final User ALICE = new User("Alice", "Bob", "alicebob", "password", false);
 	private static final String RUBY = "RUBY";
 	private static final String ALICERUBY = "aliceruby";
 }

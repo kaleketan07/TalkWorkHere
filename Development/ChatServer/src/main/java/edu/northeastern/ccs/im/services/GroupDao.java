@@ -1,13 +1,11 @@
 package edu.northeastern.ccs.im.services;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 import edu.northeastern.ccs.im.models.Group;
-import edu.northeastern.ccs.im.models.Member;
 import edu.northeastern.ccs.im.models.User;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface GroupDao provides an interface for the users of the application to access the Group schema.
  * 

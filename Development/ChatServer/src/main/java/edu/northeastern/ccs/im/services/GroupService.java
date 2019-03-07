@@ -26,11 +26,11 @@ public class GroupService implements GroupDao {
     private static  GroupService groupServiceInstance;
 	
     private static final String USER_NAME = "username";
-    private static final String USER_ID = "user_id";
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
     private static final String GROUP_NAME = "group_name";
     private static final String MODERATOR_NAME = "moderator_name";
+    private static final String LOGGED_IN = "logged_in";
     
 	
     /**
@@ -142,11 +142,11 @@ public class GroupService implements GroupDao {
             }
             while(result.next()) {
             	result.first();
-                int id = result.getInt(USER_ID);
                 String fName = result.getString(FIRST_NAME);
                 String lName = result.getString(LAST_NAME);
                 String uName = result.getString(USER_NAME);
-                User user = new User(fName,lName,uName, "");	// do we need a constructor without password here?
+                boolean stat = result.getBoolean(LOGGED_IN);
+                User user = new User(fName,lName,uName, "", stat);	// do we need a constructor without password here?
                 users.add(user);
             }
             
@@ -272,7 +272,7 @@ public class GroupService implements GroupDao {
 		}
 		return descGroups;
 	}
-
+ 
 
 	/* (non-Javadoc)
 	 * @see edu.northeastern.ccs.im.services.GroupDao#addGroupToGroup(java.lang.String, java.lang.String)

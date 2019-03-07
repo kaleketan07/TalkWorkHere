@@ -264,7 +264,7 @@ public class TestGroupService {
     @Test
     public void testGetMemberUsers() throws SQLException{
         Set<User> testUserSet = new HashSet<>();
-        User testUser = new User("ABC","BCD","AB","QWERTY");
+        User testUser = new User("ABC","BCD","AB","QWERTY",true);
         testUserSet.add(testUser);
         Assertions.assertEquals(testUserSet.size(),testGS.getMemberUsers("ABC").size());
     }

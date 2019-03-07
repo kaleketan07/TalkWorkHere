@@ -1,9 +1,5 @@
 package edu.northeastern.ccs.im.server;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 
 import java.lang.reflect.Field;
@@ -28,6 +24,8 @@ import org.mockito.Mockito;
 
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TestClientRunnable class contains all the unit tests for the java class ClientRunnable
@@ -522,6 +520,23 @@ public class TestClientRunnable {
         Message.class.getDeclaredMethods();
         Message helloMessage = (Message) retrieveItems.invoke(Message.class, "hello");
         method.invoke(clientRunnableObject, helloMessage);
+    }
+
+    /**
+     * This test verifies if the correct client is returned based on the given username
+     */
+    @Test
+    public void testGetClientByUsername() {
+        ClientRunnable senderClient = ClientRunnable.getClientByUsername(SENDER_NAME);
+        assertEquals(SENDER_NAME, senderClient.getName());
+    }
+
+    /**
+     * This test verifies if null is returned based on the given username
+     */
+    @Test
+    public void testGetClientByUsernameNonExistingUser() {
+        assertNull(ClientRunnable.getClientByUsername("someRandomUsername"));
     }
 
     //Private fields to be used in tests

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.db.DBConnection; 
@@ -111,11 +112,11 @@ public class GroupService implements GroupDao {
         return (qResult>0);
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) 
 	 * @see edu.northeastern.ccs.im.services.GroupDao#deleteGroup(edu.northeastern.ccs.im.models.Group)
 	 */
 	@Override
-	public boolean deleteGroup(String groupName, String userName) throws SQLException {
+	public boolean deleteGroup(String groupName) throws SQLException {
 		final String DELETE_GROUP =
                 "DELETE FROM groups WHERE group_name = ?";
         pstmt = conn.getPreparedStatement(DELETE_GROUP);
@@ -146,7 +147,7 @@ public class GroupService implements GroupDao {
                 String fName = result.getString(FIRST_NAME);
                 String lName = result.getString(LAST_NAME);
                 String uName = result.getString(USER_NAME);
-                User user = new User(id,fName,lName,uName, "");	// do we need a constructor without password here?
+                User user = new User(fName,lName,uName, "");	// do we need a constructor without password here?
                 users.add(user);
             }
             
@@ -243,6 +244,10 @@ public class GroupService implements GroupDao {
 	 * @see edu.northeastern.ccs.im.services.GroupDao#addUserToGroup(java.lang.String, java.lang.String)
 	 */
 	public boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+		Set<User> users = getMemberUsers(hostGroupName);
+		for(User u : users) {
+			if (u.getUserName().equals(guestUserName)) return false;
+		}
 		final String ADD_USER_TO_GROUP = "INSERT INTO membership_users (host_group_name, guest_user_name) VALUES (?,?)"; 
         pstmt = conn.getPreparedStatement(ADD_USER_TO_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);

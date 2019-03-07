@@ -27,6 +27,7 @@ import static org.mockito.Mockito.*;
  */
 public class TestGroupService {
 
+    /** The test GS. */
     private GroupService testGS;
 
     /**
@@ -47,9 +48,7 @@ public class TestGroupService {
     @Mock
     PreparedStatement mockedPreparedStatement;
 
-    /**
-     * The Mocked ResultSet
-     */
+    /** The Mocked ResultSet. */
     @Mock
     ResultSet mockedRS;
 
@@ -60,6 +59,10 @@ public class TestGroupService {
      * the mocked objects.
      *
      * @throws SQLException the sql exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
      */
     @BeforeEach
     public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException,
@@ -105,22 +108,42 @@ public class TestGroupService {
         mockedRS = null;
     }
 
+    /**
+     * Test create group with true.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testCreateGroupWithTrue() throws SQLException{
         Assertions.assertTrue(testGS.createGroup("ABC","ALICE"));
     }
 
+    /**
+     * Test create group with false.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testCreateGroupWithFalse() throws SQLException{
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(testGS.createGroup("ABC","ALICE"));
     }
 
+    /**
+     * Test delete group with true.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testDeleteGroupWithTrue() throws SQLException{
         Assertions.assertTrue(testGS.deleteGroup("ABC"));
     }
 
+    /**
+     * Test delete group with false.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testDeleteGroupWithFalse() throws SQLException{
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
@@ -128,18 +151,33 @@ public class TestGroupService {
     }
 
 
+    /**
+     * Test get group SQL exception.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetGroupSQLException() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertThrows(SQLException.class, ()->testGS.getGroup("ABC"));
     }
 
+    /**
+     * Test get group try catch condition.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetGroupTryCatchCondition() throws SQLException{
         doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
         Assertions.assertThrows(SQLException.class,()->testGS.getGroup("ABC"));
     }
 
+    /**
+     * Test get group.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetGroup() throws SQLException{
         //Will write this test once I have a better understanding of
@@ -150,6 +188,11 @@ public class TestGroupService {
 
     }
 
+    /**
+     * Test get member groups. Should test getting member groups of a group
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetMemberGroups() throws SQLException{
         Set<String> testGroupSet = new HashSet<>();
@@ -157,18 +200,33 @@ public class TestGroupService {
         Assertions.assertEquals(testGroupSet.size(),testGS.getMemberGroups("ABC").size());
     }
 
+    /**
+     * Test get member groups check exception.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetMemberGroupsCheckException() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertThrows(SQLException.class,()->testGS.getMemberGroups("ABC"));
     }
 
+    /**
+     * Test get member groups cover try catch block.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetMemberGroupsCoverTryCatchBlock() throws SQLException{
         doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
         Assertions.assertThrows(SQLException.class,()->testGS.getMemberGroups("ABC"));
     }
 
+    /**
+     * Test getting all groups.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetAllGroups() throws SQLException{
         Set<String> testGroupSet = new HashSet<>();
@@ -176,18 +234,33 @@ public class TestGroupService {
         Assertions.assertEquals(testGroupSet.size(),testGS.getAllGroups().size());
     }
 
+    /**
+     * Test get all groups check exception.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetAllGroupsCheckException() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertThrows(SQLException.class,()->testGS.getAllGroups());
     }
 
+    /**
+     * Test get all groups cover try catch block.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetAllGroupsCoverTryCatchBlock() throws SQLException{
         doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
         Assertions.assertThrows(SQLException.class,()->testGS.getAllGroups());
     }
 
+    /**
+     * Test get member users.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetMemberUsers() throws SQLException{
         Set<User> testUserSet = new HashSet<>();
@@ -196,34 +269,134 @@ public class TestGroupService {
         Assertions.assertEquals(testUserSet.size(),testGS.getMemberUsers("ABC").size());
     }
 
+    /**
+     * Test get members users check exception.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetMembersUsersCheckException() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertThrows(SQLException.class,()->testGS.getMemberUsers("ABC"));
     }
 
+    /**
+     * Test get member users cover try catch block.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testGetMemberUsersCoverTryCatchBlock() throws SQLException{
         doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
         Assertions.assertThrows(SQLException.class,()->testGS.getMemberUsers("ABC"));
     }
 
+    /**
+     * Test is moderator for true.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testIsModeratorForTrue() throws SQLException{
         Assertions.assertTrue(testGS.isModerator("ABC","Alice"));
     }
 
+    /**
+     * Test is moderator check exception.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testIsModeratorCheckException() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertThrows(SQLException.class,()->testGS.isModerator("ABC","Alice"));
     }
 
+    /**
+     * Test is moderator cover try catch block.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testIsModeratorCoverTryCatchBlock() throws SQLException{
         doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
         Assertions.assertThrows(SQLException.class,()->testGS.isModerator("ABC","Alice"));
     }
+    
+    /**
+     * Test add user to group with existing user.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddUserToGroupWithExistingUser() throws SQLException{
+        Assertions.assertFalse(testGS.addUserToGroup("ABC", "AB"));
+    }
+    
+    /**
+     * Test add user to group with non existing user.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddUserToGroupWithNonExistingUser() throws SQLException{
+        Assertions.assertTrue(testGS.addUserToGroup("ABC", "ABC"));
+    }
+    
+    /**
+     * Test add user to group with no queries affected.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddUserToGroupWithNoQueriesAffected() throws SQLException{
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+    	Assertions.assertFalse(testGS.addUserToGroup("ABC", "ABC"));
+    }
+    
+    /**
+     * Test add group to group with host in descendants of guest.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupWithHostInDescendantsOfGuest() throws SQLException{
+    	Assertions.assertFalse(testGS.addGroupToGroup("Group201", "ABC"));
+    }
+    
+    /**
+     * Test add group to group with host not in descendants of guest.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupWithHostNotInDescendantsOfGuest() throws SQLException{
+    	Assertions.assertTrue(testGS.addGroupToGroup("BCD", "ABC"));
+    }
 
+    /**
+     * Test add group to group with no queries affected.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupWithNoQueriesAffected() throws SQLException{
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+    	Assertions.assertFalse(testGS.addGroupToGroup("ABC", "ABC"));
+    }
+    
+    /**
+     * Test add group to group with nested groups.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupWithNestedGroups() throws SQLException{
+    	when(mockedRS.next()).thenReturn(true,true,false,true,true,false);
+    	when(mockedRS.getString("group_name")).thenReturn("Group201", "Group202");
+        when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
+    	Assertions.assertTrue(testGS.addGroupToGroup("ABC", "ABC"));
+    }
+    
 
 }

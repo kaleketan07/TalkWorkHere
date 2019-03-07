@@ -43,7 +43,7 @@ public interface GroupDao {
 	 * @return true, if successful else return false
 	 * @throws SQLException the SQL exception
 	 */
-	boolean deleteGroup(String groupName, String userName) throws SQLException;
+	boolean deleteGroup(String groupName) throws SQLException;
 	
 	/**
 	 * Gets the member users.

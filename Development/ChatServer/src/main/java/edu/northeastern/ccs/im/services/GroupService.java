@@ -10,7 +10,6 @@ import java.util.Set;
 import edu.northeastern.ccs.im.db.DBConnection; 
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.models.Group;
-import edu.northeastern.ccs.im.models.Member;
 import edu.northeastern.ccs.im.models.User;
 
 /**
@@ -104,7 +103,7 @@ public class GroupService implements GroupDao {
 	@Override
 	public boolean createGroup(String groupName, String modName) throws SQLException {
 		final String CREATE_GROUP =
-                "INSERT INTO groups (group_name, moderator_name) VALUES (?,?)"; // what should the 
+                "INSERT INTO groups (group_name, moderator_name) VALUES (?,?)";
         pstmt = conn.getPreparedStatement(CREATE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName, modName);
         int qResult = pstmt.executeUpdate();
@@ -116,7 +115,7 @@ public class GroupService implements GroupDao {
 	 * @see edu.northeastern.ccs.im.services.GroupDao#deleteGroup(edu.northeastern.ccs.im.models.Group)
 	 */
 	@Override
-	public boolean deleteGroup(String groupName) throws SQLException {
+	public boolean deleteGroup(String groupName, String userName) throws SQLException {
 		final String DELETE_GROUP =
                 "DELETE FROM groups WHERE group_name = ?";
         pstmt = conn.getPreparedStatement(DELETE_GROUP);
@@ -135,7 +134,7 @@ public class GroupService implements GroupDao {
 		final String FETCH_MEMBER_USERS = "WITH cte AS (SELECT * FROM prattle.groups JOIN prattle.membership_users ON prattle.groups.group_name = prattle.membership_users.host_group_name WHERE prattle.groups.group_name = ?) SELECT user_id, username, first_name, last_name FROM cte JOIN prattle.user_profile ON cte.guest_user_name = prattle.user_profile.username;"; 
 		pstmt = conn.getPreparedStatement(FETCH_MEMBER_USERS);
 	    pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
-	    Set<User> users = new HashSet<User>();
+	    Set<User> users = new HashSet<>(); 
 	    try{
 	    	result = pstmt.executeQuery();
             if(!result.first()){
@@ -238,13 +237,58 @@ public class GroupService implements GroupDao {
 	}
 
 
+	
+	
 	/* (non-Javadoc)
-	 * @see edu.northeastern.ccs.im.services.GroupDao#addMember(edu.northeastern.ccs.im.models.Member)
+	 * @see edu.northeastern.ccs.im.services.GroupDao#addUserToGroup(java.lang.String, java.lang.String)
+	 */
+	public boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+		final String ADD_USER_TO_GROUP = "INSERT INTO membership_users (host_group_name, guest_user_name) VALUES (?,?)"; 
+        pstmt = conn.getPreparedStatement(ADD_USER_TO_GROUP);
+        pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
+        int qResult = pstmt.executeUpdate();
+        pstmt.close();
+        return (qResult>0);
+	} 
+	
+	
+	
+	/**
+	 * Gets the flat list of groups present in this group.
+	 *
+	 * @param group the group in which we are searching for groups
+	 * @param descGroups the set of descendant groups 
+	 * @return the flat list (set) of groups present in this group
+	 * @throws SQLException the SQL exception
+	 */
+	private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) throws SQLException {
+		descGroups.add(group.getGroupName());
+		for(Group g : group.memberGroups) {
+			descGroups = getFlatListOfGroups(g, descGroups);
+		}
+		return descGroups;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see edu.northeastern.ccs.im.services.GroupDao#addGroupToGroup(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean addMember(Member m) {
-		// coming soon
-		return false;
+	public boolean addGroupToGroup(String hostGroupName, String guestGroupName) throws SQLException {
+		Group grp = getGroup(guestGroupName);
+		Set<String> descendantGroups = new HashSet<>();
+		descendantGroups = getFlatListOfGroups(grp, descendantGroups);
+		if (descendantGroups.contains(hostGroupName)) {
+			return false;
+		}
+		else {
+			final String ADD_GROUP_TO_GROUP = "INSERT INTO membership_users (host_group_name, guest_group_name) VALUES (?,?)"; 
+	        pstmt = conn.getPreparedStatement(ADD_GROUP_TO_GROUP);
+	        pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestGroupName);
+	        int qResult = pstmt.executeUpdate();
+	        pstmt.close();
+	        return (qResult>0);
+		}
 	}
 
 }

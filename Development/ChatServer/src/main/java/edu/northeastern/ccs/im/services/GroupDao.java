@@ -7,6 +7,7 @@ import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.Member;
 import edu.northeastern.ccs.im.models.User;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Interface GroupDao provides an interface for the users of the application to access the Group schema.
  * 
@@ -38,10 +39,11 @@ public interface GroupDao {
 	 * Delete group.
 	 *
 	 * @param groupName the group name
+	 * @param userName the user name
 	 * @return true, if successful else return false
 	 * @throws SQLException the SQL exception
 	 */
-	boolean deleteGroup(String groupName) throws SQLException;
+	boolean deleteGroup(String groupName, String userName) throws SQLException;
 	
 	/**
 	 * Gets the member users.
@@ -81,6 +83,24 @@ public interface GroupDao {
 	boolean isModerator(String groupName, String userName) throws SQLException; 
 
 	
-	boolean addMember(Member m);
+	/**
+	 * Adds the user to this group.
+	 *
+	 * @param hostGroupName the host group name
+	 * @param guestUserName the guest user name
+	 * @return true, if successful
+	 * @throws SQLException the SQL exception
+	 */
+	boolean addUserToGroup (String hostGroupName, String guestUserName) throws SQLException;
+
 	
+	/**
+	 * Adds the group to group.
+	 *
+	 * @param hostGroupName the host group name
+	 * @param guestGroupName the guest group name
+	 * @return true, if successful
+	 * @throws SQLException the SQL exception
+	 */
+	boolean addGroupToGroup (String hostGroupName, String guestGroupName) throws SQLException;
 }

@@ -16,7 +16,6 @@ import java.util.Set;
  */
 public class UserService implements UserDao {
 
-    private User user;
     private Set<User> userSet = new HashSet<>();
     private DBConnection conn;
     private PreparedStatement pstmt = null;
@@ -26,7 +25,6 @@ public class UserService implements UserDao {
 
     // Columns for user_profile
     private static final String USER_NAME = "username";
-    private static final String USER_ID = "user_id";
     private static final String USER_PSWD = "user_password";
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
@@ -52,34 +50,6 @@ public class UserService implements UserDao {
     }
 
     /**
-     * Gets all the user details of the user, given the user ID.
-     * @param userId the ID of the user
-     * @return A new user object with all the required details initialized.
-     * @throws SQLException returns the vendor specific error code for a wrong sql query
-     */
-    @Override
-    public User getUser(int userId) throws SQLException{
-        final String GET_USER_BY_ID =
-                "SELECT * FROM user_profile WHERE user_id = ?";
-        pstmt = conn.getPreparedStatement(GET_USER_BY_ID);
-        pstmt = utils.setPreparedStatementArgs(pstmt,userId);
-        try{
-            result = pstmt.executeQuery();
-            result.first();
-            String fName = result.getString(FIRST_NAME);
-            String lName = result.getString(LAST_NAME);
-            String uPwd = result.getString(USER_PSWD);
-            String uName = result.getString(USER_NAME);
-            user = new User(userId,fName,lName,uName,uPwd);
-        }catch(Exception e){
-            throw new SQLException(e);
-        }
-        pstmt.close();
-        return user;
-
-    }
-
-    /**
      * This functions adds all the available users in the database to a HashSet.
      *
      * @return The Set with all the users available in it
@@ -92,12 +62,11 @@ public class UserService implements UserDao {
         try{
             result = pstmt.executeQuery();
             while(result.next()) {
-                int id = result.getInt(USER_ID);
                 String fName = result.getString(FIRST_NAME);
                 String lName = result.getString(LAST_NAME);
                 String uName = result.getString(USER_NAME);
                 String uPwd = result.getString(USER_PSWD);
-                userSet.add(new User(id, fName, lName, uName, uPwd));
+                userSet.add(new User(fName, lName, uName, uPwd));
             }
         }catch(Exception e){
             throw new SQLException(e);
@@ -118,6 +87,7 @@ public class UserService implements UserDao {
      */
     @Override
     public User getUserByUserNameAndPassword(String username, String password) throws SQLException {
+        User user;
         final String GET_USER_USERNAME_PSWD =
                 "SELECT * FROM user_profile WHERE username = ? AND user_password = ?";
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
@@ -128,10 +98,9 @@ public class UserService implements UserDao {
                 throw new SQLException();
             }
             result.first();
-            int id = result.getInt(USER_ID);
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
-            user = new User(id,fName,lName,username,password);
+            user = new User(fName,lName,username,password);
         }catch(Exception e){
             throw new SQLException();
         }
@@ -147,17 +116,17 @@ public class UserService implements UserDao {
      */
     @Override
     public User getUserByUserName(String username) throws SQLException{
+        User user;
         final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt,username);
         try{
             result = pstmt.executeQuery();
             result.first();
-            int id = result.getInt(USER_ID);
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             String uPwd = result.getString(USER_PSWD);
-            user = new User(id,fName,lName,username,uPwd);
+            user = new User(fName,lName,username,uPwd);
         }catch(Exception e){
             throw new SQLException(e);
         }
@@ -188,6 +157,8 @@ public class UserService implements UserDao {
      * This function takes in a user object whose fields have new values, but the username
      * and the user_id should match of a previous old user. If it does not, it throws a SQLException
      * The function overwrites all other overwrite-able fields of the user.
+     * The SQLException is thrown when a request is made to update the username and that username
+     * is not found in the database OR when the new username matches another username in the database.
      *
      * @param u The user object with new values in the fields
      * @return True if the update was successful, false otherwise
@@ -196,7 +167,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean updateUser(User u) throws SQLException{
-        user = getUserByUserName(u.getUserName());
+        User user = getUserByUserName(u.getUserName());
         final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
                 "last_name = ?, user_password = ? WHERE username = ? ";
         pstmt = conn.getPreparedStatement(UPDATE_USER);

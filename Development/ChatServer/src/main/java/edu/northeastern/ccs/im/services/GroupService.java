@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.db.DBConnection; 
@@ -84,13 +83,13 @@ public class GroupService implements GroupDao {
 		            g.setModeratorName(modName);
 		            Set<User> users = getMemberUsers(groupName); 
 		            Set<Group> groups = new HashSet<>();
-		            g.memberUsers = users;
+		            g.setMemberUsers(users); 
 		            Set<String> memberGroupNames = getMemberGroups(groupName);
 		            for(String group:memberGroupNames) {
 		            	Group temp = getGroup(group);
 		            	groups.add(temp);
 		            }
-		            g.memberGroups = groups;
+		            g.setMemberGroups(groups);
 			}catch(Exception e){
 		           throw new SQLException();
 		    }
@@ -115,7 +114,7 @@ public class GroupService implements GroupDao {
 	/* (non-Javadoc) 
 	 * @see edu.northeastern.ccs.im.services.GroupDao#deleteGroup(edu.northeastern.ccs.im.models.Group)
 	 */
-	@Override
+	@Override 
 	public boolean deleteGroup(String groupName) throws SQLException {
 		final String DELETE_GROUP =
                 "DELETE FROM groups WHERE group_name = ?";
@@ -268,7 +267,7 @@ public class GroupService implements GroupDao {
 	 */
 	private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) throws SQLException {
 		descGroups.add(group.getGroupName());
-		for(Group g : group.memberGroups) {
+		for(Group g : group.getMemberGroups()) {
 			descGroups = getFlatListOfGroups(g, descGroups);
 		}
 		return descGroups;

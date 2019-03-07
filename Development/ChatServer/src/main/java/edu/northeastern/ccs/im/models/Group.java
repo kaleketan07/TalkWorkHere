@@ -1,6 +1,5 @@
 package edu.northeastern.ccs.im.models;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,15 +26,15 @@ public class Group implements Member {
 	private String moderatorName;
 	
 	/** The member users. */
-	public Set<User> memberUsers;
+	private Set<User> memberUsers;
 	
 	/** The member groups. */
-	public Set<Group> memberGroups;
+	private Set<Group> memberGroups;
 	
 	/**
 	 * Gets the group name.
 	 *
-	 * @return the group name
+	 * @return the group name 
 	 */
 	public String getGroupName() {
 		return this.groupName;
@@ -66,5 +65,41 @@ public class Group implements Member {
 	 */
 	public void setModeratorName(String name) {
 		this.moderatorName = name;
+	}
+	
+	/**
+	 * Gets the member users.
+	 *
+	 * @return the member users
+	 */
+	public Set<User> getMemberUsers() {
+		return this.memberUsers;
+	}
+	
+	/**
+	 * Gets the member groups.
+	 *
+	 * @return the member groups
+	 */
+	public Set<Group> getMemberGroups() {
+		return this.memberGroups;
+	}
+	
+	/**
+	 * Sets the member users.
+	 *
+	 * @param users the new member users
+	 */
+	public void setMemberUsers(Set<User> users) {
+		this.memberUsers = users;
+	}
+	
+	/**
+	 * Sets the member groups.
+	 *
+	 * @param groups the new member groups
+	 */
+	public void setMemberGroups(Set<Group> groups) {
+		this.memberGroups = groups;
 	}
 }

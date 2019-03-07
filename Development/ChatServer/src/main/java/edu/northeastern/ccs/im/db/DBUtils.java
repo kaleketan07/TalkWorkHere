@@ -2,6 +2,7 @@ package edu.northeastern.ccs.im.db;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  * The type Db Utils. This class is used for DB related helper functions
@@ -25,6 +26,8 @@ public class DBUtils {
                 stmt.setString(i++,(String) arg);
             else if(arg instanceof Integer)
                 stmt.setInt(i++,(int) arg);
+            else if(arg instanceof Timestamp)
+            	 stmt.setTimestamp(i++ ,(Timestamp)arg);
             else if(arg instanceof  Boolean)
                 stmt.setBoolean(i++, (boolean) arg);
         }

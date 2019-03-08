@@ -2,7 +2,9 @@ package edu.northeastern.ccs.im.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -77,6 +79,13 @@ public class ClientRunnable implements Runnable {
      * Stores the userService instance to be used across multiple conditions.
      */
     private UserService userService;
+
+    /**
+     * This static data structure stores the client runnable instances
+     * associated with their usernames for easy lookup during messaging.
+     *
+     */
+    private static Map<String,ClientRunnable> userClients = new HashMap<>();
 
     /**
      * Create a new thread with which we will communicate with this single client.
@@ -158,10 +167,19 @@ public class ClientRunnable implements Runnable {
         boolean result = false;
         // Now make sure this name is legal.
         if (userName != null) {
-            // Optimistically set this users ID number.
-            setName(userName);
-            userId = hashCode();
-            result = true;
+            if(userClients.getOrDefault(userName, null) == null) {
+                // Optimistically set this users ID number.
+                setName(userName);
+                userId = hashCode();
+                result = true;
+                userClients.put(userName, this);
+            } else {
+                // Optimistically set this users ID number.
+                setName("invalid-" + userName);
+                userId = -1;
+                result = true;
+                ChatLogger.error("There is already a user with this username connected to the portal.");
+            }
         } else {
             // Clear this name; we cannot use it. *sigh*
             userId = -1;
@@ -342,5 +360,15 @@ public class ClientRunnable implements Runnable {
         Prattle.removeClient(this);
         // And remove the client from our client pool.
         runnableMe.cancel(false);
+    }
+
+    /**
+     * This method gets the client runnable instance based on the username provided
+     *
+     * @param username - key on which the corresponding instance is to be found
+     * @return null (if there no entry for the key) or the corresponding ClientRunnable instance
+     */
+    public static ClientRunnable getClientByUsername(String username) {
+        return userClients.getOrDefault(username,null);
     }
 }

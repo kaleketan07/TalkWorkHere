@@ -1,9 +1,5 @@
 package edu.northeastern.ccs.im.server;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 
 import java.lang.reflect.Field;
@@ -28,6 +24,8 @@ import org.mockito.Mockito;
 
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TestClientRunnable class contains all the unit tests for the java class ClientRunnable
@@ -58,6 +56,30 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
 
     }
+
+    /**
+     * Test to check weather run() changes the status of the initialized data member
+     * to true in the first run with using a message iterator with one message
+     */
+    @Test
+    public void testRunSameClient() {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        ClientRunnable clientRunnableObject2 = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+
+        assertTrue(clientRunnableObject.isInitialized());
+
+    }
+
+
 
 
     /**
@@ -522,6 +544,23 @@ public class TestClientRunnable {
         Message.class.getDeclaredMethods();
         Message helloMessage = (Message) retrieveItems.invoke(Message.class, "hello");
         method.invoke(clientRunnableObject, helloMessage);
+    }
+
+    /**
+     * This test verifies if the correct client is returned based on the given username
+     */
+    @Test
+    public void testGetClientByUsername() {
+        ClientRunnable senderClient = ClientRunnable.getClientByUsername(SENDER_NAME);
+        assertEquals(SENDER_NAME, senderClient.getName());
+    }
+
+    /**
+     * This test verifies if null is returned based on the given username
+     */
+    @Test
+    public void testGetClientByUsernameNonExistingUser() {
+        assertNull(ClientRunnable.getClientByUsername("someRandomUsername"));
     }
 
     //Private fields to be used in tests

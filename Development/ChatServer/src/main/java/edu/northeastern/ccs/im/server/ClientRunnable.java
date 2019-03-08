@@ -167,11 +167,19 @@ public class ClientRunnable implements Runnable {
         boolean result = false;
         // Now make sure this name is legal.
         if (userName != null) {
-            // Optimistically set this users ID number.
-            setName(userName);
-            userId = hashCode();
-            result = true;
-            userClients.put(userName, this);
+            if(userClients.getOrDefault(userName, null) == null) {
+                // Optimistically set this users ID number.
+                setName(userName);
+                userId = hashCode();
+                result = true;
+                userClients.put(userName, this);
+            } else {
+                // Optimistically set this users ID number.
+                setName("invalid-" + userName);
+                userId = -1;
+                result = true;
+                ChatLogger.error("There is already a user with this username connected to the portal.");
+            }
         } else {
             // Clear this name; we cannot use it. *sigh*
             userId = -1;

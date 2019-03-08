@@ -9,9 +9,7 @@ import java.lang.reflect.Method;
 import java.nio.channels.SocketChannel;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -19,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.UserService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -37,6 +37,24 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestClientRunnable {
 
+    /**
+     * Sets up the static fields "invalidCounter" and "userClients" before each test,
+     * so that they can be reused.
+     *
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @BeforeEach
+    public void setUp() throws IllegalAccessException,NoSuchFieldException{
+        Field hm = ClientRunnable.class.getDeclaredField("userClients");
+        hm.setAccessible(true);
+        Map<String,ClientRunnable> userClientsEmpty = new HashMap<>();
+        userClientsEmpty.clear();
+        hm.set(null,userClientsEmpty);
+        Field ic = ClientRunnable.class.getDeclaredField("invalidCounter");
+        ic.setAccessible(true);
+        ic.set(null,0);
+    }
 
     /**
      * Test to check weather run() changes the status of the initialized data member
@@ -72,11 +90,8 @@ public class TestClientRunnable {
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
-        ClientRunnable clientRunnableObject2 = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
-
         assertTrue(clientRunnableObject.isInitialized());
-
     }
 
 
@@ -551,6 +566,19 @@ public class TestClientRunnable {
      */
     @Test
     public void testGetClientByUsername() {
+        List<Message> ml = new ArrayList<>();
+        Message quit = Message.makeQuitMessage(SENDER_NAME);
+        ml.add(BROADCAST);
+        ml.add(BROADCAST);
+        ml.add(quit);
+        Iterator<Message> messageIter = ml.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertNotEquals(clientRunnableObject.getUserId(), -1);
+        assertEquals(clientRunnableObject.getName(), SENDER_NAME);
         ClientRunnable senderClient = ClientRunnable.getClientByUsername(SENDER_NAME);
         assertEquals(SENDER_NAME, senderClient.getName());
     }
@@ -561,6 +589,30 @@ public class TestClientRunnable {
     @Test
     public void testGetClientByUsernameNonExistingUser() {
         assertNull(ClientRunnable.getClientByUsername("someRandomUsername"));
+    }
+
+    @Test
+    public void testSetUserNameForAlreadyExistingUsers(){
+        List<Message> ml = new ArrayList<>();
+        ml.add(BROADCAST);
+        Iterator<Message> messageIter = ml.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        assertNotEquals(clientRunnableObject.getUserId(), -1);
+        assertEquals(clientRunnableObject.getName(), SENDER_NAME);
+
+        List<Message> ml2 = new ArrayList<>();
+        ml2.add(BROADCAST);
+        Iterator<Message> messageIter2 = ml2.iterator();
+        NetworkConnection networkConnectionMock2 = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock2.iterator()).thenReturn(messageIter2);
+        ClientRunnable clientRunnableObject2 = new ClientRunnable(networkConnectionMock2);
+        clientRunnableObject2.run();
+        assertEquals(clientRunnableObject2.getUserId(), -1);
+        assertNotEquals(clientRunnableObject2.getName(), SENDER_NAME);
+        assertEquals("invalid-"+SENDER_NAME+"1",clientRunnableObject2.getName());
     }
 
     //Private fields to be used in tests

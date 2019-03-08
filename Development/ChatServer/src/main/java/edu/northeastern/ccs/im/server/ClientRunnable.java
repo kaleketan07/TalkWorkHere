@@ -88,6 +88,22 @@ public class ClientRunnable implements Runnable {
     private static Map<String,ClientRunnable> userClients = new HashMap<>();
 
     /**
+     * This static counter is going to be used for making every "invalid"
+     * connection unique, so we can add all invalid connections of a user to
+     * the hashmap and send out error messages together
+     */
+    private static int invalidCounter = 0;
+
+    /**
+     * Used for incrementing the invalidCounter, defined a separate method here
+     * on account of invalidCounter being a static field
+     * @param invalidCounter the static counter
+     */
+    private static void incrementInvalidCounter(int invalidCounter) {
+        ClientRunnable.invalidCounter = invalidCounter+1;
+    }
+
+    /**
      * Create a new thread with which we will communicate with this single client.
      *
      * @param network NetworkConnection used by this new client
@@ -174,8 +190,8 @@ public class ClientRunnable implements Runnable {
                 result = true;
                 userClients.put(userName, this);
             } else {
-                // Optimistically set this users ID number.
-                setName("invalid-" + userName);
+                incrementInvalidCounter(invalidCounter);
+                setName("invalid-" + userName + invalidCounter);
                 userId = -1;
                 result = true;
                 ChatLogger.error("There is already a user with this username connected to the portal.");

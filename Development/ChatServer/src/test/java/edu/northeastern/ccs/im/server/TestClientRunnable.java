@@ -591,6 +591,11 @@ public class TestClientRunnable {
         assertNull(ClientRunnable.getClientByUsername("someRandomUsername"));
     }
 
+    /**
+     * Test set user name for already existing users. This takes into account
+     * a different connection with different message queue but with same sender name
+     * and checks whether the duplicate user name is set to invalid-USERNAME-counter format
+     */
     @Test
     public void testSetUserNameForAlreadyExistingUsers(){
         List<Message> ml = new ArrayList<>();

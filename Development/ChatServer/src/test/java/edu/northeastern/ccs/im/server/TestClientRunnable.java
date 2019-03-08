@@ -617,7 +617,7 @@ public class TestClientRunnable {
         clientRunnableObject2.run();
         assertEquals(clientRunnableObject2.getUserId(), -1);
         assertNotEquals(clientRunnableObject2.getName(), SENDER_NAME);
-        assertEquals("invalid-"+SENDER_NAME+"1",clientRunnableObject2.getName());
+        assertEquals("invalid-"+SENDER_NAME+"-1",clientRunnableObject2.getName());
     }
 
     //Private fields to be used in tests

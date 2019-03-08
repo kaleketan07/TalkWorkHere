@@ -191,7 +191,7 @@ public class ClientRunnable implements Runnable {
                 userClients.put(userName, this);
             } else {
                 incrementInvalidCounter(invalidCounter);
-                setName("invalid-" + userName + invalidCounter);
+                setName("invalid-" + userName +"-"+ invalidCounter);
                 userId = -1;
                 result = true;
                 ChatLogger.error("There is already a user with this username connected to the portal.");

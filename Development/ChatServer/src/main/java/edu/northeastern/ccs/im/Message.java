@@ -107,7 +107,7 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword.
      */
-    protected static Message makeMessage(String handle, String srcName, String textOrPassword) {
+    protected static Message makeMessage(String handle, String srcName, String textOrPassword, String thirdArg) {
         Message result = null;
         if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
             result = makeQuitMessage(srcName);

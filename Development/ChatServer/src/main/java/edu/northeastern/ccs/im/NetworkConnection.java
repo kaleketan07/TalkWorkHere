@@ -208,7 +208,7 @@ public class NetworkConnection implements Iterable<Message> {
                     Charset charset = Charset.forName(CHARSET_NAME);
                     CharsetDecoder decoder = charset.newDecoder();
                     // Convert the buffer to a format that we can actually use.
-                    CharBuffer charBuffer = modifyReceivedMessage(decoder.decode(buff));
+                    CharBuffer charBuffer = decoder.decode(buff);
                     // get rid of any extra whitespace at the beginning
                     // Start scanning the buffer for any and all messages.
                     int start = 0;
@@ -228,8 +228,12 @@ public class NetworkConnection implements Iterable<Message> {
                         charBuffer.position(charBuffer.position() + 2);
                         // Read in the second argument containing the message
                         String message = readArgument(charBuffer);
+                        // Skip past the leading space
+                        charBuffer.position(charBuffer.position() + 2);
+                        // Read in the second argument containing the message
+                        String thirdArg = readArgument(charBuffer);
                         // Add this message into our queue
-                        Message newMsg = Message.makeMessage(handle, sender, message);
+                        Message newMsg = Message.makeMessage(handle, sender, message, thirdArg);
                         messages.add(newMsg);
                         // And move the position to the start of the next character
                         start = charBuffer.position() + 1;
@@ -246,63 +250,6 @@ public class NetworkConnection implements Iterable<Message> {
             }
             // Do we now have any messages?
             return result;
-        }
-
-        /**
-         * This method converts the incoming message of BCT type to the required type
-         * based on the handle mentioned in the text. This method ignores all messages which are not of type BCT.
-         *
-         * @param oldBuffer - incoming message which needs to be manipulated
-         * @return newBuffer - manipulated message
-         */
-        private CharBuffer modifyReceivedMessage(CharBuffer oldBuffer) {
-            String oldBufferString = oldBuffer.toString();
-            if(oldBufferString.substring(0, HANDLE_LENGTH).equals("BCT")) {
-                // remove BCT
-                String nameAndText = oldBufferString.substring(4);
-                int positionText = 0;
-                while(nameAndText.charAt(positionText) != ' ') {
-                    positionText++;
-                }
-                int nameStartPos = positionText + 1;
-                while(!Character.isDigit(nameAndText.charAt(positionText))) {
-                    positionText++;
-                }
-                // get the name out
-                String name = nameAndText.substring(nameStartPos,positionText-1);
-                // we have found the start of the second parameter, now break it into a handle and
-                // different number of parameters based on the delimiter
-                while(nameAndText.charAt(positionText) != ' ') {
-                    positionText++;
-                }
-                // We now have the second parameter which is ||| separated
-                String message = nameAndText.substring(positionText+1);
-
-                //return the old buffer if the second parameter of the broadcast message is empty
-                if(message.equals("--"))
-                    return oldBuffer;
-
-                String[] userMessages = message.split(DELIMITER);
-                StringBuilder finalMessage = new StringBuilder();
-                finalMessage.append(userMessages[0]);
-                finalMessage.append(SPACE);
-                finalMessage.append(name.length());
-                finalMessage.append(SPACE);
-                finalMessage.append(name);
-                for(int i=1; i<userMessages.length; i++) {
-                    finalMessage.append(SPACE);
-                    finalMessage.append(userMessages[i].length());
-                    finalMessage.append(SPACE);
-                    finalMessage.append(userMessages[i]);
-                }
-                char[] finalMessageArray = finalMessage.toString().toCharArray();
-                CharBuffer newBuffer = CharBuffer.allocate(finalMessage.length());
-                newBuffer.put(finalMessageArray);
-                newBuffer.position(0);
-                return newBuffer;
-            }
-            ChatLogger.warning("Did not modify the following message : " + oldBuffer.toString());
-            return oldBuffer;
         }
 
         @Override

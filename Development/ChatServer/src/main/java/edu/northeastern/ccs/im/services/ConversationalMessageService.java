@@ -176,6 +176,23 @@ public class ConversationalMessageService {
         }
         pstmt.close();
         return true;
-	}	
+	}
+
+    /**
+     * This method updates the msg_sent field in the table to 1 if the message was
+     * actually enqueued in the user's channel (i.e. Message was sent).
+     *
+     * @param msgUniqueKey the msg unique key
+     * @return True if the update was successful, false if no rows were changed
+     * @throws SQLException the sql exception
+     */
+    public boolean updateIfMessageSent(String msgUniqueKey) throws SQLException{
+	    final String UPDATE_SENT_FLAG = "UPDATE messages SET msg_sent = 1 WHERE msg_uniquekey = ?";
+	    pstmt = conn.getPreparedStatement(UPDATE_SENT_FLAG);
+	    pstmt = utils.setPreparedStatementArgs(pstmt,msgUniqueKey);
+	    int qResult = pstmt.executeUpdate();
+	    pstmt.close();
+	    return qResult>0;
+    }
 
 }

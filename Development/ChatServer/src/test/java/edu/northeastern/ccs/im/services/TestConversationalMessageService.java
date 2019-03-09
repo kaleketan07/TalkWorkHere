@@ -206,5 +206,16 @@ public class TestConversationalMessageService {
     	doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
         Assertions.assertThrows(SQLException.class, ()->cs.deleteMessage("ABCBCD2018:05:05"));
     }
+
+    @Test
+    public void testUpdateIfMessageSent() throws SQLException{
+        Assertions.assertTrue(cs.updateIfMessageSent("SomeUniqueKey"));
+    }
+
+    @Test
+    public void testUpdateIfMessageSentForFalseCondition() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(cs.updateIfMessageSent("SomeUniqueKey"));
+    }
     
 }

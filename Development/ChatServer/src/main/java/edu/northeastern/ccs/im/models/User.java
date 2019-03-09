@@ -1,5 +1,12 @@
 package edu.northeastern.ccs.im.models;
 
+import edu.northeastern.ccs.im.Message;
+import edu.northeastern.ccs.im.server.ClientRunnable;
+import edu.northeastern.ccs.im.services.ConversationalMessageService;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
  * Class for User object with its data members
  *
@@ -12,7 +19,16 @@ public class User {
 	private String userName;
 	private String userPassword;
 	private boolean loggedIn;
-	
+	private static ConversationalMessageService cms;
+	private ClientRunnable clientRunnable;
+
+	public static void setCms() throws IOException,SQLException,ClassNotFoundException {
+		cms = ConversationalMessageService.getInstance();
+	}
+
+	public static ConversationalMessageService getCms(){
+		return cms;
+	}
 	/**
 	 * 
 	 * @param firstName to have the first name of the user
@@ -27,6 +43,7 @@ public class User {
 		this.userName = userName;
 		this.userPassword = userPassword;
 		this.loggedIn = loggedInStatus;
+		this.clientRunnable = null;
 	}
 
 	/**
@@ -55,7 +72,7 @@ public class User {
 
 	/**
 	 * 
-	 * @param lastName value to set the firssttName
+	 * @param lastName value to set the firstName
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
@@ -116,6 +133,26 @@ public class User {
 	 */
 	public String toString(){
 		return getUserName()+" : "+getFirstName()+" "+getLastName();
+	}
+
+	/**
+	 * Send the received message to the user who is supposed to receive it. This method will
+	 * first check if the user is online by checking if there is a ClientRunnable present for
+	 * this instance and then enqueue the message if present accordingly.
+	 * @param msg The message to be sent to this user
+	 */
+	public void userSendMessage(Message msg) throws SQLException, IOException,ClassNotFoundException {
+		String src = msg.getName();
+		String msgText = msg.getTextOrPassword();
+		String msgUniqueKey;
+		setCms();
+		ConversationalMessageService cMessageService = getCms();
+		clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
+		msgUniqueKey = cMessageService.insertConversationalMessage(src,this.getUserName(),msgText);
+		if(clientRunnable != null){
+			cMessageService.updateIfMessageSent(msgUniqueKey);
+			clientRunnable.enqueueMessage(msg);
+		}
 	}
 }
 

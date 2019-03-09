@@ -326,6 +326,86 @@ public class TestClientRunnable {
     }
 
     /**
+     * Test handleIncomingMessage() empty message Iterator form network connect    ion
+     * which also tests the handleOutgoingMessage() with Login in waitList and     login successful
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserUnsuccessfulRegister() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        User u = new User("rahul", "bhat", null, null, true);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u);
+        messageList.clear();
+        messageList.add(REGISTER);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Register Message as the message type
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserSuccessFulRegister() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+        messageList.clear();
+        messageList.add(REGISTER2);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Register Message as the message type
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserRegisterPasswordFail() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+       NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+       clientRunnableObject.run();
+       UserService mockedUserService = Mockito.mock(UserService.class);
+       Field userService = ClientRunnable.class.getDeclaredField("userService");
+       userService.setAccessible(true);
+	   userService.set(clientRunnableObject, mockedUserService);
+	   Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+	   messageList.clear();
+	   messageList.add(REGISTER);
+	   messageIter = messageList.iterator();
+	   Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+	   clientRunnableObject.run();
+    }
+    
+
+    /**
      * Test handleIncomingMessage() empty message Iterator form network connection
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
@@ -622,6 +702,8 @@ public class TestClientRunnable {
 
     //Private fields to be used in tests
     private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);
+    private static final Message REGISTER = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, TestClientRunnable.PASS);
+    private static final Message REGISTER2 = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, "");
     private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
     private static final int USER_ID = 120000;
     private static final String SENDER_NAME = "Alice";

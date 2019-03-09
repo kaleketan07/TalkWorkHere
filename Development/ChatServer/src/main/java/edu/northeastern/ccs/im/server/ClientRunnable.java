@@ -324,12 +324,12 @@ public class ClientRunnable implements Runnable {
                     }
                 }
             }else if(msg.isRegisterMessage()) {
-                // Register the user after checking weather the user already exists or no
+                // Register the user after checking whether the user already exists or no
                 User currentUser = userService.getUserByUserName(msg.getName());
                 if(currentUser != null) {
                     ChatLogger.error("Username already exists.");
                 } else {
-                    // since the user was found, set the loggedIn attribute to true in the database
+                    // since the user was not found, a new user with this name may be created
                     if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 	userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
                     }

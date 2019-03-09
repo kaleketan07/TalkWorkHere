@@ -354,10 +354,10 @@ public class TestClientRunnable {
 
     /**
      * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Login in waitList and login successful
+     * which also tests the handleOutgoingMessage() with Register Message as the message type
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserSuccessFullRegister() throws SQLException, NoSuchFieldException, IllegalAccessException {
+    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserSuccessFulRegister() throws SQLException, NoSuchFieldException, IllegalAccessException {
 
         List<Message> messageList = new ArrayList<>();
         messageList.add(BROADCAST);
@@ -380,7 +380,7 @@ public class TestClientRunnable {
 
     /**
      * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Login in waitList and login successful
+     * which also tests the handleOutgoingMessage() with Register Message as the message type
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserRegisterPasswordFail() throws SQLException, NoSuchFieldException, IllegalAccessException {

@@ -323,9 +323,20 @@ public class ClientRunnable implements Runnable {
                         ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
                     }
                 }
+            }else if(msg.isRegisterMessage()) {
+                // Register the user after checking weather the user already exists or no
+                User currentUser = userService.getUserByUserName(msg.getName());
+                if(currentUser != null) {
+                    ChatLogger.error("Username already exists.");
+                } else {
+                    // since the user was found, set the loggedIn attribute to true in the database
+                    if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
+                	userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+                    }
+                }
             } else {
                 ChatLogger.warning("Message not one of the required types " + msg);
-            }
+          }
         } else {
             Message sendMsg;
             sendMsg = Message.makeBroadcastMessage(ServerConstants.BOUNCER_ID,

@@ -19,8 +19,14 @@ public enum MessageType {
      * Message whose contents is broadcast to all connected users.
      */
     BROADCAST("BCT"),
-
-    LOGIN("LGN");
+    /**
+     * Message whose contents are to login a given user 
+     */
+    LOGIN("LGN"),
+	/**
+     * Message whose contents are to register a given user 
+     */
+    REGISTER("REG");
     /**
      * Store the short name of this message type.
      */

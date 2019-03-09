@@ -33,6 +33,10 @@ public class Message {
      * The second argument used in the message.
      */
     private String msgTextOrPassword;
+    /**
+     * The third argument used in the message.
+     */
+    private String msgReceiverOrPassword;
 
     /**
      * Create a new message that contains actual IM text. The type of distribution
@@ -51,7 +55,27 @@ public class Message {
         // Save the text of the message.
         msgTextOrPassword = text;
     }
-
+    
+    /**
+     * Create a new message that contains actual IM text. The type of distribution
+     * is defined by the handle and we must also set the name of the message sender,
+     * message recipient, and the text to send.
+     *
+     * @param handle  Handle for the type of message being created.
+     * @param srcName Name of the individual sending this message
+     * @param text    Text of the instant message
+     */
+    private Message(MessageType handle, String srcName, String textorpassword, String receiverorPassword) {
+        msgType = handle;
+        // Save the properly formatted identifier for the user sending the
+        // message.
+        msgSender = srcName;
+        // Save the text of the message.
+        msgTextOrPassword = textorpassword;
+        // Save the receiver or password
+        msgReceiverOrPassword = receiverorPassword;
+    }
+    
     /**
      * Create a new message that contains a command sent the server that requires a
      * single argument. This message contains the given handle and the single
@@ -107,7 +131,7 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword.
      */
-    protected static Message makeMessage(String handle, String srcName, String textOrPassword, String thirdArg) {
+    protected static Message makeMessage(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
         Message result = null;
         if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
             result = makeQuitMessage(srcName);
@@ -117,6 +141,8 @@ public class Message {
             result = makeBroadcastMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
             result = makeLoginMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
+                result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
         }
         return result;
     }
@@ -141,6 +167,17 @@ public class Message {
     public static Message makeLoginMessage(String myName, String password) {
         return new Message(MessageType.LOGIN, myName, password);
     }
+    
+    /**
+     * 
+     * This method creates a register message based on the given name and password
+     * @param myName - username of the user requesting a register
+     * @param password - password of the user requesting a register
+     * @return a Message object of type register
+     */
+    public static Message makeRegisterMessage(String myName, String password, String confirmPassword) {
+        return new Message(MessageType.REGISTER, myName, password, confirmPassword);
+    }
 
     /**
      * Return the name of the sender of this message.
@@ -159,7 +196,16 @@ public class Message {
     public String getTextOrPassword() {
         return msgTextOrPassword;
     }
-
+    
+    /**
+     * Return the text of this message.
+     *
+     * @return String equal to the receiver/Password sent by this message.
+     */
+    public String getReceiverOrPassword() {
+        return msgReceiverOrPassword;
+    }
+    
     /**
      * Determine if this message is broadcasting text to everyone.
      *
@@ -184,6 +230,13 @@ public class Message {
      */
     public boolean isLoginMessage() { return (msgType == MessageType.LOGIN);}
 
+    /**
+     * This method verifies if the current message has the handle REG (is a register message)
+     * @return true or false based on the comparison result
+     */
+    public boolean isRegisterMessage() { return (msgType == MessageType.REGISTER);}
+
+    
     /**
      * Determine if this message is a message signing off from the IM server.
      *
@@ -210,6 +263,11 @@ public class Message {
         }
         if (msgTextOrPassword != null) {
             result += " " + msgTextOrPassword.length() + " " + msgTextOrPassword;
+        } else {
+            result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
+        }
+        if (msgReceiverOrPassword != null) {
+            result += " " + msgReceiverOrPassword.length() + " " + msgReceiverOrPassword;
         } else {
             result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
         }

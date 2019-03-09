@@ -69,6 +69,7 @@ public class TestMessage {
         strBuild.append(LGN);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(PASS));
+        assertEquals(message.toString(), strBuild.toString());
     }
 
     /**
@@ -101,7 +102,23 @@ public class TestMessage {
         Message message = Message.makeMessage(LGN, SENDER_NAME, PASS, "");
         assertEquals(SENDER_NAME, message.getName());
         assertEquals(PASS, message.getTextOrPassword());
+        assertTrue(message.isLoginMessage());
+        assertFalse(message.isRegisterMessage());
     }
+
+    /**
+	 * Test to check if makeMessage creates the correct object
+	 * based on the first parameter passed - Register.
+	 */
+	@Test
+	public void testMakeMessageForRegister() {
+	    Message message = Message.makeMessage(REG, SENDER_NAME, PASS,PASS);
+		assertEquals(SENDER_NAME, message.getName());
+		assertEquals(PASS, message.getTextOrPassword());
+	    assertEquals(PASS, message.getReceiverOrPassword());
+	    assertFalse(message.isLoginMessage());
+	    assertTrue(message.isRegisterMessage());
+	 }
 
     /**
      * Test to check if makeMessage returns null when the first parameter
@@ -183,6 +200,7 @@ public class TestMessage {
         strBuild.append(BYE);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(NULL_OUTPUT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
     }
 
@@ -197,6 +215,22 @@ public class TestMessage {
         strBuild.append(BCT);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(MESSAGE_TEXT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+    }
+
+    /**
+     * Test toString method to return the expected output when
+     * ReceiverorPassword not null
+     */
+    @Test
+    public void testToStringReceiveOrPasswordNotNull() {
+        Message message = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(REG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(PASS));
         assertEquals(strBuild.toString(), message.toString());
     }
 
@@ -211,6 +245,7 @@ public class TestMessage {
         strBuild.append(HLO);
         strBuild.append(toStringHelper(NULL_OUTPUT));
         strBuild.append(toStringHelper(MESSAGE_TEXT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
     }
 
@@ -234,6 +269,7 @@ public class TestMessage {
     private static final String BYE = "BYE";
     private static final String BCT = "BCT";
     private static final String LGN = "LGN";
+    private static final String REG = "REG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

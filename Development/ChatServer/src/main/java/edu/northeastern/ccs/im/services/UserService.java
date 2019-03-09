@@ -123,16 +123,18 @@ public class UserService implements UserDao {
         final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt,username);
-        try{
-            result = pstmt.executeQuery();
-            result.first();
-            String fName = result.getString(FIRST_NAME);
-            String lName = result.getString(LAST_NAME);
-            String uPwd = result.getString(USER_PSWD);
-            boolean loggedIn = result.getBoolean(LOGGED_IN);
-            user = new User(fName,lName,username,uPwd, loggedIn);
-        }catch(Exception e){
-            throw new SQLException(e);
+        result = pstmt.executeQuery();
+        if(result.first()) 
+        {
+	        String fName = result.getString(FIRST_NAME);
+	        String lName = result.getString(LAST_NAME);
+	        String uPwd = result.getString(USER_PSWD);
+	        boolean loggedIn = result.getBoolean(LOGGED_IN);
+	        user = new User(fName,lName,username,uPwd, loggedIn);
+        }
+        else 
+        {
+        	user = null;
         }
         pstmt.close();
         return user;

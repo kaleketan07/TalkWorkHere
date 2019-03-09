@@ -209,7 +209,7 @@ public class TestNetworkConnection {
         Field k = NetworkConnection.class.getDeclaredField("key");
         k.setAccessible(true);
         k.set(connection, mockedKey);
-        myBuff.put("HLO 2 -- 4 TestBCT 2 -- 5 Hello".getBytes());
+        myBuff.put("HLO 2 -- 4 Test 2 --BCT 2 -- 5 Hello 2 --".getBytes());
         Field b = NetworkConnection.class.getDeclaredField("buff");
         b.setAccessible(true);
         b.set(connection, myBuff);
@@ -219,117 +219,6 @@ public class TestNetworkConnection {
         c.setAccessible(true);
         c.set(connection, mockedChannel);
         assertTrue(itr.hasNext());
-    }
-
-    /**
-     * Test modifyReceived message method which modifies an incoming BCT message
-     * to the handle mentioned in the text field.
-     *
-     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
-     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
-     * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
-     */
-    @Test
-    public void testIteratorModifyReceivedMessageWithoutText() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ByteBuffer myBuff = ByteBuffer.allocate(64 * 1024);
-        SocketChannel channel = SocketChannel.open();
-        NetworkConnection connection = new NetworkConnection(channel);
-        Iterator<Message> itr = connection.iterator();
-        Selector mockedSelector = mock(Selector.class);
-        when(mockedSelector.selectNow()).thenReturn(1);
-        Field s = NetworkConnection.class.getDeclaredField("selector");
-        s.setAccessible(true);
-        s.set(connection, mockedSelector);
-        SelectionKey mockedKey = mock(SelectionKey.class);
-        doReturn(1).when(mockedKey).readyOps();
-        Field k = NetworkConnection.class.getDeclaredField("key");
-        k.setAccessible(true);
-        k.set(connection, mockedKey);
-        myBuff.put("BCT 4 user 2 --".getBytes());
-        Field b = NetworkConnection.class.getDeclaredField("buff");
-        b.setAccessible(true);
-        b.set(connection, myBuff);
-        SocketChannel mockedChannel = mock(SocketChannel.class);
-        when(mockedChannel.read((ByteBuffer) b.get(connection))).thenReturn(64);
-        Field c = NetworkConnection.class.getDeclaredField("channel");
-        c.setAccessible(true);
-        c.set(connection, mockedChannel);
-        assertTrue(itr.hasNext());
-        assertEquals("--", itr.next().getTextOrPassword());
-    }
-
-    /**
-     * Test modifyReceived message method which modifies an incoming BCT message
-     * to the handle mentioned in the text field.
-     *
-     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
-     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
-     * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
-     */
-    @Test
-    public void testIteratorModifyReceivedMessage() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ByteBuffer myBuff = ByteBuffer.allocate(64 * 1024);
-        SocketChannel channel = SocketChannel.open();
-        NetworkConnection connection = new NetworkConnection(channel);
-        Iterator<Message> itr = connection.iterator();
-        Selector mockedSelector = mock(Selector.class);
-        when(mockedSelector.selectNow()).thenReturn(1);
-        Field s = NetworkConnection.class.getDeclaredField("selector");
-        s.setAccessible(true);
-        s.set(connection, mockedSelector);
-        SelectionKey mockedKey = mock(SelectionKey.class);
-        doReturn(1).when(mockedKey).readyOps();
-        Field k = NetworkConnection.class.getDeclaredField("key");
-        k.setAccessible(true);
-        k.set(connection, mockedKey);
-        myBuff.put("BCT 2 -- 8 LGN;pass".getBytes());
-        Field b = NetworkConnection.class.getDeclaredField("buff");
-        b.setAccessible(true);
-        b.set(connection, myBuff);
-        SocketChannel mockedChannel = mock(SocketChannel.class);
-        when(mockedChannel.read((ByteBuffer) b.get(connection))).thenReturn(64);
-        Field c = NetworkConnection.class.getDeclaredField("channel");
-        c.setAccessible(true);
-        c.set(connection, mockedChannel);
-        assertTrue(itr.hasNext());
-        assertEquals("pass", itr.next().getTextOrPassword());
-    }
-
-    /**
-     * Test modifyReceived message method which modifies an incoming BCT message
-     * to the handle mentioned in the text field.
-     *
-     * @throws IOException            the io exception that can be encountered when opening a SocketChannel
-     * @throws NoSuchFieldException   the no such field exception to be used while using java Reflection
-     * @throws IllegalAccessException the illegal access exception to be used while using java Reflection
-     */
-    @Test
-    public void testIteratorModifyReceivedMessageNoBCT() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ByteBuffer myBuff = ByteBuffer.allocate(64 * 1024);
-        SocketChannel channel = SocketChannel.open();
-        NetworkConnection connection = new NetworkConnection(channel);
-        Iterator<Message> itr = connection.iterator();
-        Selector mockedSelector = mock(Selector.class);
-        when(mockedSelector.selectNow()).thenReturn(1);
-        Field s = NetworkConnection.class.getDeclaredField("selector");
-        s.setAccessible(true);
-        s.set(connection, mockedSelector);
-        SelectionKey mockedKey = mock(SelectionKey.class);
-        doReturn(1).when(mockedKey).readyOps();
-        Field k = NetworkConnection.class.getDeclaredField("key");
-        k.setAccessible(true);
-        k.set(connection, mockedKey);
-        myBuff.put("HLO 4 abcf 2 --".getBytes());
-        Field b = NetworkConnection.class.getDeclaredField("buff");
-        b.setAccessible(true);
-        b.set(connection, myBuff);
-        SocketChannel mockedChannel = mock(SocketChannel.class);
-        when(mockedChannel.read((ByteBuffer) b.get(connection))).thenReturn(64);
-        Field c = NetworkConnection.class.getDeclaredField("channel");
-        c.setAccessible(true);
-        c.set(connection, mockedChannel);
-        assertTrue(itr.hasNext());
-        assertEquals("abcf", itr.next().getName());
     }
 
     /**

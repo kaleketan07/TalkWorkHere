@@ -310,7 +310,7 @@ public class ClientRunnable implements Runnable {
                 // Check for our "special messages"
                 Prattle.broadcastMessage(msg);
             }
-            if(msg.isLoginMessage()) {
+            else if(msg.isLoginMessage()) {
                 // Login the user after checking in the user with this username-password combo exists
                 User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
                 if(currentUser == null) {
@@ -323,6 +323,8 @@ public class ClientRunnable implements Runnable {
                         ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
                     }
                 }
+            } else {
+                ChatLogger.warning("Message not one of the required types " + msg);
             }
         } else {
             Message sendMsg;

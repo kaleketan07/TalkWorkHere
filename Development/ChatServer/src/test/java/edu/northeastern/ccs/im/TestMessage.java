@@ -54,7 +54,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForQuit() {
-        Message message = Message.makeMessage(BYE, SENDER_NAME, "");
+        Message message = Message.makeMessage(BYE, SENDER_NAME, "", "");
         assertEquals(SENDER_NAME, message.getName());
     }
 
@@ -77,7 +77,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForHello() {
-        Message message = Message.makeMessage(HLO, SENDER_NAME, "");
+        Message message = Message.makeMessage(HLO, SENDER_NAME, "", "");
         assertEquals(SENDER_NAME, message.getName());
     }
 
@@ -87,7 +87,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForBroadcast() {
-        Message message = Message.makeMessage(BCT, SENDER_NAME, MESSAGE_TEXT);
+        Message message = Message.makeMessage(BCT, SENDER_NAME, MESSAGE_TEXT, "");
         assertEquals(SENDER_NAME, message.getName());
         assertEquals(MESSAGE_TEXT, message.getTextOrPassword());
     }
@@ -98,7 +98,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForLogin() {
-        Message message = Message.makeMessage(LGN, SENDER_NAME, PASS);
+        Message message = Message.makeMessage(LGN, SENDER_NAME, PASS, "");
         assertEquals(SENDER_NAME, message.getName());
         assertEquals(PASS, message.getTextOrPassword());
     }
@@ -109,7 +109,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForEmptyString() {
-        assertNull(Message.makeMessage("", SENDER_NAME, MESSAGE_TEXT));
+        assertNull(Message.makeMessage("", SENDER_NAME, MESSAGE_TEXT, ""));
     }
 
     /**

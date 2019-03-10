@@ -15,6 +15,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestUser {
+
+
+	/**
+	 * Test user to string method.
+	 */
+	@Test
+	public void testUserToStringMethod(){
+		assertEquals("tomharris : Tom Harris",TOM.toString());
+	}
+
 	/**
 	 * Test the set and get method for UserName
 	 */
@@ -69,10 +79,7 @@ public class TestUser {
 		assertFalse(ALICE.isLoggedIn());
 	}
 
-	@Test
-	public void testUserToStringMethod(){
-		assertEquals("alicebob : Alice Bob",ALICE.toString());
-	}
+
 
 	/**
 	 * Test user send message when ClientRunnable is Null
@@ -130,7 +137,7 @@ public class TestUser {
 				"Hello, Alice",true);
 	}
 
-
+	private static final User TOM = new User("Tom","Harris", "tomharris","123",false);
 	private static final User ALICE = new User("Alice", "Bob", "alicebob", "password", false);
 	private static final String RUBY = "RUBY";
 	private static final String ALICERUBY = "aliceruby";

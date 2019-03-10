@@ -81,6 +81,11 @@ public class ClientRunnable implements Runnable {
      * Stores the userService instance to be used across multiple conditions.
      */
     private UserService userService;
+    
+    /**
+     * Stores the groupService instance to be used across multiple conditions.
+     */
+    private GroupService groupService; 
 
     /**
      * Stores the groupService instance to be used across multiple conditions.
@@ -363,6 +368,18 @@ public class ClientRunnable implements Runnable {
                     	ChatLogger.error("CurrentUser is not the moderator of the group.");
                     }
                 }
+            } else if (msg.isCreateGroupMessage()) {
+            		// Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+            		Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
+            		if (existingGroup != null) {
+            			ChatLogger.error("Groupname already exists! Please use a different group name.");
+            		} else {
+            			User currentUser = userService.getUserByUserName(msg.getName());
+                        if(currentUser == null) {
+                            ChatLogger.error("Please log in to the system first!");
+                        } 
+            			groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
+            		}
             } else {
                 ChatLogger.warning("Message not one of the required types " + msg);
           }

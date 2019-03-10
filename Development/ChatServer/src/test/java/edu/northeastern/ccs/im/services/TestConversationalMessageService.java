@@ -110,7 +110,7 @@ public class TestConversationalMessageService {
      */
     @Test
     public void testInsertConversationalMessage() throws SQLException {
-    	String ret = cs.insertConversationalMessage("ABC", "BCD", "hello");
+    	String ret = cs.insertConversationalMessage("ABC", "BCD", "hello", false);
     	assertTrue(ret.contains("ABCBCD"));    	
     }
      
@@ -206,5 +206,5 @@ public class TestConversationalMessageService {
     	doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
         Assertions.assertThrows(SQLException.class, ()->cs.deleteMessage("ABCBCD2018:05:05"));
     }
-    
+
 }

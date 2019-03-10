@@ -71,30 +71,27 @@ public class GroupService implements GroupDao {
 			final String GET_GROUP = "SELECT * FROM groups WHERE group_name = ?";
 			pstmt = conn.getPreparedStatement(GET_GROUP);
 			pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
-			try{
-					result = pstmt.executeQuery();
-		            if(!result.first()){
-		                throw new SQLException();
-		            }
-		            result.first();
-		            String gName = result.getString(GROUP_NAME);
-		            String modName = result.getString(MODERATOR_NAME);
-		            g.setGroupName(gName);
-		            g.setModeratorName(modName);
-		            Set<User> users = getMemberUsers(groupName); 
-		            Set<Group> groups = new HashSet<>();
-		            g.setMemberUsers(users); 
-		            Set<String> memberGroupNames = getMemberGroups(groupName);
-		            for(String group:memberGroupNames) {
-		            	Group temp = getGroup(group);
-		            	groups.add(temp);
-		            }
-		            g.setMemberGroups(groups);
-			}catch(Exception e){
-		           throw new SQLException();
-		    }
-		        pstmt.close();
-		return g;
+			result = pstmt.executeQuery();
+            if(result.first()){
+	            result.first();
+	            String gName = result.getString(GROUP_NAME);
+	            String modName = result.getString(MODERATOR_NAME);
+	            g.setGroupName(gName);
+	            g.setModeratorName(modName);
+	            Set<User> users = getMemberUsers(groupName); 
+	            Set<Group> groups = new HashSet<>();
+	            g.setMemberUsers(users); 
+	            Set<String> memberGroupNames = getMemberGroups(groupName);
+	            for(String group:memberGroupNames) {
+	            	Group temp = getGroup(group);
+	            	groups.add(temp);
+	            }
+	            g.setMemberGroups(groups);
+            } else {
+            	g = null;
+            }
+            pstmt.close();
+            return g;
 	}
 
 	/* (non-Javadoc)

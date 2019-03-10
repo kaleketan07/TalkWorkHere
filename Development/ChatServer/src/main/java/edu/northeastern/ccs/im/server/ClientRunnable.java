@@ -263,25 +263,25 @@ public class ClientRunnable implements Runnable {
      * @see java.lang.Thread#run()
      */
     public void run() {
-        // The client must be initialized before we can do anything else
-        if (!initialized) {
-            checkForInitialization();
-        } else {
-            try {
+        try {
+            // The client must be initialized before we can do anything else
+            if (!initialized) {
+                checkForInitialization();
+            } else {
                 handleIncomingMessages();
-            } catch(SQLException e) {
-                ChatLogger.error("SQL Exception occurred - handleIncomingMessages : " + e);
+                handleOutgoingMessages();
             }
-            handleOutgoingMessages();
-        }
-        // Finally, check if this client have been inactive for too long and,
-        // when they have, terminate the client.
-        if (timer.isBehind()) {
-            ChatLogger.error("Timing out or forcing off a user " + name);
-            terminate = true;
-        }
-        if (terminate) {
-            terminateClient();
+            // Finally, check if this client have been inactive for too long and,
+            // when they have, terminate the client.
+            if (timer.isBehind()) {
+                ChatLogger.error("Timing out or forcing off a user " + name);
+                terminate = true;
+            }
+            if (terminate) {
+                terminateClient();
+            }
+        } catch(SQLException e) {
+            ChatLogger.error("SQL Exception occurred - run() : " + e);
         }
     }
 
@@ -401,9 +401,24 @@ public class ClientRunnable implements Runnable {
      * Terminate a client that we wish to remove. This termination could happen at
      * the client's request or due to system need.
      */
-    public void terminateClient() {
+    public void terminateClient() throws SQLException {
         // Once the communication is done, close this connection.
         connection.close();
+
+        // logout user if already logged in
+        User currentUser = userService.getUserByUserName(this.getName());
+        if(currentUser == null) {
+            ChatLogger.error("Incorrect username or password.");
+        } else {
+            userClients.remove(this.getName());
+            if(currentUser.isLoggedIn()) {
+                currentUser.setLoggedIn(false);
+                boolean updated = userService.updateUser(currentUser);
+                if(!updated) {
+                    ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
+                }
+            }
+        }
         // Remove the client from our client listing.
         Prattle.removeClient(this);
         // And remove the client from our client pool.

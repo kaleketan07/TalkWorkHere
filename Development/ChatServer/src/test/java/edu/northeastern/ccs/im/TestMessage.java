@@ -118,6 +118,19 @@ public class TestMessage {
 	    assertEquals(PASS, message.getReceiverOrPassword());
 	    assertFalse(message.isLoginMessage());
 	    assertTrue(message.isRegisterMessage());
+	    assertFalse(message.isCreateGroupMessage());
+	 }
+	
+	/**
+     * Test condition in makeMessage for type CreateGroupMessage 
+     */
+	@Test
+	public void testMakeMessageForCreateGroupMessage() {
+		Message message = Message.makeMessage(CRG, SENDER_NAME, GROUP_NAME, "");
+		assertEquals(SENDER_NAME, message.getName());
+		assertEquals(GROUP_NAME, message.getTextOrPassword());
+	    assertFalse(message.isLoginMessage());
+	    assertTrue(message.isCreateGroupMessage());
 	 }
 
     /**
@@ -249,17 +262,8 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
     }
     
-    /**
-     * Test condition in makeMessage for type CreateGroupMessage 
-     */
-    @Test
-    private void testCreateGroupMessage() {
-    	Message message = Message.makeMessage(CRG, SENDER_NAME, GROUP_NAME, "");
-		assertEquals(SENDER_NAME, message.getName());
-		assertEquals(GROUP_NAME, message.getTextOrPassword());
-	    assertFalse(message.isLoginMessage());
-	    assertTrue(message.isCreateGroupMessage());
-    }
+    
+
 
     /**
      * A private helper method to generate toString output for the given

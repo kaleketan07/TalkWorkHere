@@ -233,6 +233,21 @@ public class TestMessage {
         strBuild.append(toStringHelper(PASS));
         assertEquals(strBuild.toString(), message.toString());
     }
+    
+    /**
+     * Test toString method to return the expected output when
+     * ReceiverorPassword not null
+     */
+    @Test
+    public void testMakeMessageDeleteGroupCondition() {
+    	Message message = Message.makeMessage(DEG, SENDER_NAME, PASS, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(DEG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+    }
 
     /**
      * Test toString method to return the expected output when
@@ -270,6 +285,7 @@ public class TestMessage {
     private static final String BCT = "BCT";
     private static final String LGN = "LGN";
     private static final String REG = "REG";
+    private static final String DEG = "DEG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

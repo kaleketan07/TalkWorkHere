@@ -12,7 +12,9 @@ import java.util.concurrent.ScheduledFuture;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.GroupService;
 import edu.northeastern.ccs.im.services.UserService;
 
 /**
@@ -79,6 +81,12 @@ public class ClientRunnable implements Runnable {
      * Stores the userService instance to be used across multiple conditions.
      */
     private UserService userService;
+
+    /**
+     * Stores the groupService instance to be used across multiple conditions.
+     */
+    private GroupService groupService; 
+
 
     /**
      * This static data structure stores the client runnable instances
@@ -332,6 +340,27 @@ public class ClientRunnable implements Runnable {
                     // since the user was not found, a new user with this name may be created
                     if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 	userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+                    }
+                }
+            }else if(msg.isDeleteGroupMessage()) {
+                // Delete the group after getting the valid moderator name and valid group name 
+                User currentUser = userService.getUserByUserName(msg.getName());
+                Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
+                //if user does not exist
+                if(currentUser == null) {
+                    ChatLogger.error("Username does not exist.");
+                }
+                // if group does not exist
+                else if (currentGroup == null){
+                	ChatLogger.error("Group does not exist.");
+                }
+                else {
+                    // if the user is in fact the moderator of the group only then delete the group
+                    if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
+                    	groupService.deleteGroup(currentGroup.getGroupName());
+                    }
+                    else {
+                    	ChatLogger.error("CurrentUser is not the moderator of the group.");
                     }
                 }
             } else {

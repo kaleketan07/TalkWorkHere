@@ -143,6 +143,8 @@ public class Message {
             result = makeLoginMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
                 result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
+        } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
+            result = makeDeleteGroupMessage(srcName, textOrPassword);    
         }
         return result;
     }
@@ -178,7 +180,17 @@ public class Message {
     public static Message makeRegisterMessage(String myName, String password, String confirmPassword) {
         return new Message(MessageType.REGISTER, myName, password, confirmPassword);
     }
-
+    /**
+     * 
+     * This method creates a delete group message based on the given group_name and moderator
+     * @param userName - username of the user(moderator) requesting a register
+     * @param groupName - groupName of the group to be deleted
+     * @return a Message object of type delete_group
+     */
+    public static Message makeDeleteGroupMessage(String userName, String groupName) {
+        return new Message(MessageType.DELETE_GROUP, userName, groupName);
+    }
+    
     /**
      * Return the name of the sender of this message.
      *
@@ -235,6 +247,12 @@ public class Message {
      * @return true or false based on the comparison result
      */
     public boolean isRegisterMessage() { return (msgType == MessageType.REGISTER);}
+    
+    /**
+     * This method verifies if the current message has the handle DEG (is a delete_group message)
+     * @return true or false based on the comparison result
+     */
+    public boolean isDeleteGroupMessage() { return (msgType == MessageType.DELETE_GROUP);}
 
     
     /**

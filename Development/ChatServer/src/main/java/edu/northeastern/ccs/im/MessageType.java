@@ -26,7 +26,11 @@ public enum MessageType {
 	/**
      * Message whose contents are to register a given user 
      */
-    REGISTER("REG");
+    REGISTER("REG"),
+	/**
+     * Message whose contents are to delete a given group 
+     */
+    DELETE_GROUP("DEG");
     /**
      * Store the short name of this message type.
      */

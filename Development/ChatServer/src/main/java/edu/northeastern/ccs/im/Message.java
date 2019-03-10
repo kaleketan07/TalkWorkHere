@@ -147,6 +147,8 @@ public class Message {
             result = makeDeleteGroupMessage(srcName, textOrPassword);    
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
         	result = makeCreateGroupMessage(srcName, textOrPassword);  
+        } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
+        	result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return result;
     }
@@ -203,7 +205,19 @@ public class Message {
     public static Message makeCreateGroupMessage(String myName, String groupName) {
         return new Message(MessageType.CREATE_GROUP, myName, groupName);
     }
-
+    
+    
+    /**
+     * This method creates a message to add a user to group.
+     *
+     * @param myName the name of the sender
+     * @param userName the user name that is to be added in the group
+     * @param groupName the group name in which the user will be added
+     * @return the message object with handle Add user to group
+     */
+    public static Message makeAddUserToGroupMessage(String myName, String userName, String groupName) {
+    	return new Message(MessageType.ADD_USER_GROUP, myName, userName, groupName);
+    }
     /**
      * Return the name of the sender of this message.
      *
@@ -274,6 +288,13 @@ public class Message {
      * @return true or false based on the comparison result
      */
     public boolean isCreateGroupMessage() { return (msgType == MessageType.CREATE_GROUP);}
+    
+    /**
+     * This method verifies if the current message has the handle ADG (is a add user to group message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isAddUserToGroupMessage() {return (msgType == MessageType.ADD_USER_GROUP);}
     
     /**
      * Determine if this message is a message signing off from the IM server.

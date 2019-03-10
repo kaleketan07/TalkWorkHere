@@ -34,7 +34,11 @@ public enum MessageType {
     /**
     * Message whose contents are to create a group with the passed parameters 
     */
-	  CREATE_GROUP("CRG");
+	  CREATE_GROUP("CRG"),
+	  /**
+	    * Message whose contents are to add a user to a group with the passed parameters 
+	    */ 
+	  ADD_USER_GROUP("ADG");
     /**
      * Store the short name of this message type.
      */

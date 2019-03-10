@@ -398,6 +398,33 @@ public class ClientRunnable implements Runnable {
     }
   
     /**
+     * Handle add user to group message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleAddUserToGroupMessage(Message msg) throws SQLException {
+    	User currentUser = userService.getUserByUserName(msg.getName());
+    	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+    	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
+    	if (currentUser == null) {
+    		ChatLogger.error("Please register first");
+    	}
+    	else if (currentGroup == null) {
+    		ChatLogger.error("The group you are trying to add to does not exist!");
+    	}
+    	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
+    		ChatLogger.error("You do not have the permissions to perform this operation");
+    	} 
+    	else if (guestUser == null) {
+    		ChatLogger.error("The user you are trying to add does not exist");
+    	}
+    	else {
+    		groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName());
+    	}
+    }
+    
+    /**
      * This method handles different types of messages and delegates works to its respective methods
      *
      * @param msg - The incoming message
@@ -408,16 +435,17 @@ public class ClientRunnable implements Runnable {
         if (msg.isBroadcastMessage()) {
             // Check for our "special messages"
             Prattle.broadcastMessage(msg);
-        }
-        else if(msg.isLoginMessage()) {
+        } else if(msg.isLoginMessage()) {
             handleLoginMessage(msg);
-        }else if(msg.isRegisterMessage()) {
+        } else if(msg.isRegisterMessage()) {
             handleRegisterMessage(msg);
         } else if (msg.isCreateGroupMessage()) {
             handleCreateGroupMessage(msg);
         } else if(msg.isDeleteGroupMessage()) {
             handleDeleteGroupMessage(msg);
-        }  else {
+        } else if(msg.isAddUserToGroupMessage()) {
+        	handleAddUserToGroupMessage(msg);
+        } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }
     }

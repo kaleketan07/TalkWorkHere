@@ -219,16 +219,12 @@ public class GroupService implements GroupDao {
 		pstmt = conn.getPreparedStatement(GET_MODERATOR_NAME);
 		pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
 		String modName;
-		try{
-	    	result = pstmt.executeQuery();
-            if(!result.first()){
-                throw new SQLException();
-            }
-            result.first();
-            modName = result.getString(MODERATOR_NAME);
-        }catch(Exception e){
-            throw new SQLException();
+    	result = pstmt.executeQuery();
+        if(!result.first()){
+            return false;
         }
+        result.first();
+        modName = result.getString(MODERATOR_NAME);
         pstmt.close(); 
 		return userName.equals(modName);
 	}

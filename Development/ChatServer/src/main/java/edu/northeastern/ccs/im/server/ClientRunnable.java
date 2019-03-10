@@ -2,7 +2,9 @@ package edu.northeastern.ccs.im.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -77,6 +79,29 @@ public class ClientRunnable implements Runnable {
      * Stores the userService instance to be used across multiple conditions.
      */
     private UserService userService;
+
+    /**
+     * This static data structure stores the client runnable instances
+     * associated with their usernames for easy lookup during messaging.
+     *
+     */
+    private static Map<String,ClientRunnable> userClients = new HashMap<>();
+
+    /**
+     * This static counter is going to be used for making every "invalid"
+     * connection unique, so we can add all invalid connections of a user to
+     * the hashmap and send out error messages together
+     */
+    private static int invalidCounter = 0;
+
+    /**
+     * Used for incrementing the invalidCounter, defined a separate method here
+     * on account of invalidCounter being a static field
+     * @param invalidCounter the static counter
+     */
+    private static void incrementInvalidCounter(int invalidCounter) {
+        ClientRunnable.invalidCounter = invalidCounter+1;
+    }
 
     /**
      * Create a new thread with which we will communicate with this single client.
@@ -158,10 +183,19 @@ public class ClientRunnable implements Runnable {
         boolean result = false;
         // Now make sure this name is legal.
         if (userName != null) {
-            // Optimistically set this users ID number.
-            setName(userName);
-            userId = hashCode();
-            result = true;
+            if(userClients.getOrDefault(userName, null) == null) {
+                // Optimistically set this users ID number.
+                setName(userName);
+                userId = hashCode();
+                result = true;
+                userClients.put(userName, this);
+            } else {
+                incrementInvalidCounter(invalidCounter);
+                setName("invalid-" + userName +"-"+ invalidCounter);
+                userId = -1;
+                result = true;
+                ChatLogger.error("There is already a user with this username connected to the portal.");
+            }
         } else {
             // Clear this name; we cannot use it. *sigh*
             userId = -1;
@@ -300,9 +334,20 @@ public class ClientRunnable implements Runnable {
                         ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
                     }
                 }
+            }else if(msg.isRegisterMessage()) {
+                // Register the user after checking whether the user already exists or no
+                User currentUser = userService.getUserByUserName(msg.getName());
+                if(currentUser != null) {
+                    ChatLogger.error("Username already exists.");
+                } else {
+                    // since the user was not found, a new user with this name may be created
+                    if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
+                	userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+                    }
+                }
             } else {
                 ChatLogger.warning("Message not one of the required types " + msg);
-            }
+          }
         } else {
             Message sendMsg;
             sendMsg = Message.makeBroadcastMessage(ServerConstants.BOUNCER_ID,
@@ -367,5 +412,15 @@ public class ClientRunnable implements Runnable {
         Prattle.removeClient(this);
         // And remove the client from our client pool.
         runnableMe.cancel(false);
+    }
+
+    /**
+     * This method gets the client runnable instance based on the username provided
+     *
+     * @param username - key on which the corresponding instance is to be found
+     * @return null (if there no entry for the key) or the corresponding ClientRunnable instance
+     */
+    public static ClientRunnable getClientByUsername(String username) {
+        return userClients.getOrDefault(username,null);
     }
 }

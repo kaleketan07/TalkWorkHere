@@ -302,6 +302,11 @@ public class ClientRunnable implements Runnable {
         }
     }
 
+    /**
+     * Handles the register message
+     * @param msg - the incoming register message
+     * @throws SQLException - the exception thrown by the database queries and calls
+     */
     private void handleRegisterMessage(Message msg) throws SQLException {
         // Register the user after checking whether the user already exists or no
         User currentUser = userService.getUserByUserName(msg.getName());
@@ -315,6 +320,11 @@ public class ClientRunnable implements Runnable {
         }
     }
 
+    /**
+     * Handles the login message
+     * @param msg - the incoming login message
+     * @throws SQLException - thrown by the database queries and calls
+     */
     private void handleLoginMessage(Message msg) throws  SQLException {
         // Login the user after checking in the user with this username-password combo exists
         User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
@@ -330,6 +340,12 @@ public class ClientRunnable implements Runnable {
         }
     }
 
+    /**
+     * This method handles different types of messages and delegates works to its respective methods
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
     private void handleMessageByType(Message msg) throws SQLException {
         // Check for our "special messages"
         if (msg.isBroadcastMessage()) {
@@ -344,6 +360,12 @@ public class ClientRunnable implements Runnable {
             ChatLogger.warning("Message not one of the required types " + msg);
         }
     }
+
+    /**
+     * This method handles the incoming message
+     * @param msg the incoming message
+     * @throws SQLException - Exception thrown from the database
+     */
      private void processMessage(Message msg) throws  SQLException {
         // Check if the message is legal formatted
         if (messageChecks(msg)) {

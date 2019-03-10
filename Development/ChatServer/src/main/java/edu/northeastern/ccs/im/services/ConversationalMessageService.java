@@ -61,14 +61,16 @@ public class ConversationalMessageService {
      * @return String 			UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
      * @throws SQLException		the sql exception
      */
-	public String insertConversationalMessage(String msgSource,String msgDestination,String msgText) throws SQLException {
+	public String insertConversationalMessage(String msgSource,String msgDestination,String msgText, boolean setFlag)
+            throws SQLException {
 		final String CREATE_MESSAGE =
-                "INSERT INTO messages (msg_src, msg_dest, msg_text, msg_timestamp, msg_uniquekey) VALUES (?,?,?,?,?)";
+                "INSERT INTO messages (msg_src, msg_dest, msg_text, msg_timestamp, msg_uniquekey, msg_sent) " +
+                        "VALUES (?,?,?,?,?,?)";
         pstmt = conn.getPreparedStatement(CREATE_MESSAGE);
         long time = System.currentTimeMillis();        
         Timestamp sqlTimestamp = new Timestamp(time);
         String uniqueKey = msgSource + msgDestination + sqlTimestamp;
-        pstmt = utils.setPreparedStatementArgs(pstmt, msgSource , msgDestination, msgText, sqlTimestamp , uniqueKey);
+        pstmt = utils.setPreparedStatementArgs(pstmt, msgSource , msgDestination, msgText, sqlTimestamp , uniqueKey, setFlag);
         pstmt.executeUpdate();
         pstmt.close();
         return uniqueKey;
@@ -178,21 +180,5 @@ public class ConversationalMessageService {
         return true;
 	}
 
-    /**
-     * This method updates the msg_sent field in the table to 1 if the message was
-     * actually enqueued in the user's channel (i.e. Message was sent).
-     *
-     * @param msgUniqueKey the msg unique key
-     * @return True if the update was successful, false if no rows were changed
-     * @throws SQLException the sql exception
-     */
-    public boolean updateIfMessageSent(String msgUniqueKey) throws SQLException{
-	    final String UPDATE_SENT_FLAG = "UPDATE messages SET msg_sent = 1 WHERE msg_uniquekey = ?";
-	    pstmt = conn.getPreparedStatement(UPDATE_SENT_FLAG);
-	    pstmt = utils.setPreparedStatementArgs(pstmt,msgUniqueKey);
-	    int qResult = pstmt.executeUpdate();
-	    pstmt.close();
-	    return qResult>0;
-    }
 
 }

@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im.models;
 
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.server.ClientRunnable;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
@@ -20,15 +21,15 @@ public class User {
 	private String userPassword;
 	private boolean loggedIn;
 	private static ConversationalMessageService cms;
+	static {
+		try{
+			cms = ConversationalMessageService.getInstance();
+		}catch (ClassNotFoundException|IOException|SQLException e){
+            ChatLogger.error("Conversational Message Service failed to initialize.");
+		}
+	}
 	private ClientRunnable clientRunnable;
 
-	public static void setCms() throws IOException,SQLException,ClassNotFoundException {
-		cms = ConversationalMessageService.getInstance();
-	}
-
-	public static ConversationalMessageService getCms(){
-		return cms;
-	}
 	/**
 	 * 
 	 * @param firstName to have the first name of the user
@@ -144,15 +145,13 @@ public class User {
 	public void userSendMessage(Message msg) throws SQLException, IOException,ClassNotFoundException {
 		String src = msg.getName();
 		String msgText = msg.getTextOrPassword();
-		String msgUniqueKey;
-		setCms();
-		ConversationalMessageService cMessageService = getCms();
+		boolean flag = false;
 		clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
-		msgUniqueKey = cMessageService.insertConversationalMessage(src,this.getUserName(),msgText);
 		if(clientRunnable != null){
-			cMessageService.updateIfMessageSent(msgUniqueKey);
+			flag = true;
 			clientRunnable.enqueueMessage(msg);
 		}
+		cms.insertConversationalMessage(src,this.getUserName(),msgText,flag);
 	}
 }
 

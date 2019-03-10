@@ -30,7 +30,7 @@ public enum MessageType {
 	  /**
     * Message whose contents are to delete a given group 
     */
-    DELETE_GROUP("DEG");
+    DELETE_GROUP("DEG"),
     /**
     * Message whose contents are to create a group with the passed parameters 
     */

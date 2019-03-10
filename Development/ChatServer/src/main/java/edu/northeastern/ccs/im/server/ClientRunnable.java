@@ -87,10 +87,7 @@ public class ClientRunnable implements Runnable {
      */
     private GroupService groupService; 
 
-    /**
-     * Stores the groupService instance to be used across multiple conditions.
-     */
-    private GroupService groupService; 
+  
 
 
     /**

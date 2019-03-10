@@ -294,17 +294,6 @@ public class ClientRunnable implements Runnable {
             if (msg.terminate()) {
                 // Stop sending the poor client message.
                 terminate = true;
-                User currentUser = userService.getUserByUserName(msg.getName());
-                if(currentUser == null) {
-                    ChatLogger.error("Incorrect username or password.");
-                } else {
-                    // since the user was found, set the loggedIn attribute to false in the database
-                    currentUser.setLoggedIn(false);
-                    boolean updated = userService.updateUser(currentUser);
-                    if(!updated) {
-                        ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
-                    }
-                }
                 // Reply with a quit message.
                 enqueueMessage(Message.makeQuitMessage(name));
             } else {
@@ -396,10 +385,13 @@ public class ClientRunnable implements Runnable {
     public void terminateClient() throws SQLException {
         // Once the communication is done, close this connection.
         connection.close();
+
+        // logout user if already logged in
         User currentUser = userService.getUserByUserName(this.getName());
         if(currentUser == null) {
             ChatLogger.error("Incorrect username or password.");
         } else {
+            userClients.remove(this.getName());
             if(currentUser.isLoggedIn()) {
                 currentUser.setLoggedIn(false);
                 boolean updated = userService.updateUser(currentUser);

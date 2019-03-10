@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import edu.northeastern.ccs.im.models.Member;
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.UserService;
 import org.junit.jupiter.api.AfterEach;
@@ -698,6 +699,94 @@ public class TestClientRunnable {
         assertEquals(clientRunnableObject2.getUserId(), -1);
         assertNotEquals(clientRunnableObject2.getName(), SENDER_NAME);
         assertEquals("invalid-"+SENDER_NAME+"-1",clientRunnableObject2.getName());
+    }
+
+    /**
+     * Verify logout for loggedIn user
+     */
+    @Test
+    public void testTerminateClientLogoutLoggedInUser() throws NoSuchFieldException, IllegalAccessException, SQLException {
+
+        List<Message> messageList = new ArrayList<>();
+        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
+        messageList.add(BROADCAST);
+        messageList.add(quitMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        UserService mockedService = Mockito.mock(UserService.class);
+        Field f = ClientRunnable.class.getDeclaredField("userService");
+        f.setAccessible(true);
+        f.set(clientRunnableObject, mockedService);
+        User loggedInUser = new User(null, null, SENDER_NAME, null, true);
+        Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
+        Mockito.when(mockedService.updateUser(Mockito.any())).thenReturn(true);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Verify logout for loggedIn user but DB update unsuccessful.
+     */
+    @Test
+    public void testTerminateClientLogoutLoggedInUserUpdateFailed() throws NoSuchFieldException, IllegalAccessException, SQLException {
+
+        List<Message> messageList = new ArrayList<>();
+        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
+        messageList.add(BROADCAST);
+        messageList.add(quitMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        UserService mockedService = Mockito.mock(UserService.class);
+        Field f = ClientRunnable.class.getDeclaredField("userService");
+        f.setAccessible(true);
+        f.set(clientRunnableObject, mockedService);
+        User loggedInUser = new User(null, null, SENDER_NAME, null, true);
+        Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
+        Mockito.when(mockedService.updateUser(Mockito.any())).thenReturn(false);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Verify logout for loggedOut user
+     */
+    @Test
+    public void testTerminateClientLogoutInvalidUser() throws NoSuchFieldException, IllegalAccessException, SQLException {
+
+        List<Message> messageList = new ArrayList<>();
+        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
+        messageList.add(BROADCAST);
+        messageList.add(quitMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        UserService mockedService = Mockito.mock(UserService.class);
+        Field f = ClientRunnable.class.getDeclaredField("userService");
+        f.setAccessible(true);
+        f.set(clientRunnableObject, mockedService);
+        Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     //Private fields to be used in tests

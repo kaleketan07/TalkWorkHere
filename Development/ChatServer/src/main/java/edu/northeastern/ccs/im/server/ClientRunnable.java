@@ -382,8 +382,8 @@ public class ClientRunnable implements Runnable {
             handleLoginMessage(msg);
         }else if(msg.isRegisterMessage()) {
             handleRegisterMessage(msg);
-        else if (msg.isCreateGroupMessage()) {
-            handleCreateGroupMessaage(msg);
+        } else if (msg.isCreateGroupMessage()) {
+            handleCreateGroupMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

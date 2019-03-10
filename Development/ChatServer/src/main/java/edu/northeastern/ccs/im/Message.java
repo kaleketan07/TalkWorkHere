@@ -142,7 +142,9 @@ public class Message {
         } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
             result = makeLoginMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
-                result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
+            result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
+        } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
+        	result = makeCreateGroupMessage(srcName, textOrPassword);  
         }
         return result;
     }
@@ -177,6 +179,18 @@ public class Message {
      */
     public static Message makeRegisterMessage(String myName, String password, String confirmPassword) {
         return new Message(MessageType.REGISTER, myName, password, confirmPassword);
+    }
+    
+    
+    /**
+     * This method creates a message to be sent for creating a group.
+     *
+     * @param myName the name of the sender
+     * @param groupName the desired group name for the new group
+     * @return the Message object of type Create Group
+     */
+    public static Message makeCreateGroupMessage(String myName, String groupName) {
+        return new Message(MessageType.CREATE_GROUP, myName, groupName);
     }
 
     /**
@@ -236,6 +250,13 @@ public class Message {
      */
     public boolean isRegisterMessage() { return (msgType == MessageType.REGISTER);}
 
+    
+    /**
+     * This method verifies if the current message has the handle CRG (is a create group message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isCreateGroupMessage() { return (msgType == MessageType.CREATE_GROUP);}
     
     /**
      * Determine if this message is a message signing off from the IM server.

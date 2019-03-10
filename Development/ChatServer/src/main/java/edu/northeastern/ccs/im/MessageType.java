@@ -26,7 +26,12 @@ public enum MessageType {
 	/**
      * Message whose contents are to register a given user 
      */
-    REGISTER("REG");
+    REGISTER("REG"),
+    /**
+     * Message whose contents are to create a group with the passed parameters 
+     */
+	CREATE_GROUP("CRG");
+	
     /**
      * Store the short name of this message type.
      */

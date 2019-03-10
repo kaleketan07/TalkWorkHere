@@ -235,8 +235,7 @@ public class TestMessage {
     }
     
     /**
-     * Test toString method to return the expected output when
-     * ReceiverorPassword not null
+     * Test makeMessage with Delete_Group as the handle 
      */
     @Test
     public void testMakeMessageDeleteGroupCondition() {

@@ -12,7 +12,9 @@ import java.util.concurrent.ScheduledFuture;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.GroupService;
 import edu.northeastern.ccs.im.services.UserService;
 
 /**
@@ -79,6 +81,11 @@ public class ClientRunnable implements Runnable {
      * Stores the userService instance to be used across multiple conditions.
      */
     private UserService userService;
+    
+    /**
+     * Stores the groupService instance to be used across multiple conditions.
+     */
+    private GroupService groupService; 
 
     /**
      * This static data structure stores the client runnable instances
@@ -339,7 +346,26 @@ public class ClientRunnable implements Runnable {
             }
         }
     }
-
+    
+    /**
+    * Handles the createGroupMessage
+    * @param msg - the incoming login message
+    * @throws SQLException - thrown by the database queries and calls
+    */
+    private void handleCreateGroupMessage(Message msg) throws SQLException{
+      // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+      Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
+      if (existingGroup != null) {
+        ChatLogger.error("Groupname already exists! Please use a different group name.");
+      } else {
+        User currentUser = userService.getUserByUserName(msg.getName());
+              if(currentUser == null) {
+                  ChatLogger.error("Please log in to the system first!");
+              } 
+        groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
+      }
+    }
+  
     /**
      * This method handles different types of messages and delegates works to its respective methods
      *
@@ -356,6 +382,8 @@ public class ClientRunnable implements Runnable {
             handleLoginMessage(msg);
         }else if(msg.isRegisterMessage()) {
             handleRegisterMessage(msg);
+        else if (msg.isCreateGroupMessage()) {
+            handleCreateGroupMessaage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

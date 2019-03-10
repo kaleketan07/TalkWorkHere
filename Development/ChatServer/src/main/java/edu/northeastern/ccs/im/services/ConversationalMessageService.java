@@ -25,7 +25,11 @@ public class ConversationalMessageService {
     private DBUtils utils = null;
     private ResultSet result;
     private static ConversationalMessageService conversationalMessageService;
-    
+    private static final String DB_COL_MSG_SRC = "msg_src";
+    private static final String DB_COL_MSG_DEST = "msg_dest";
+    private static final String DB_COL_MSG_TEXT = "msg_text";
+    private static final String DB_COL_MSG_TIMESTAMP = "msg_timestamp";
+    private static final String DB_COL_MSG_UNIQUEKEY = "msg_uniquekey";
 
     /**
      * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will initialize
@@ -86,24 +90,7 @@ public class ConversationalMessageService {
 		final String GET_MESSAGES_BETWEEN_SOURCE_DESTINATION = "SELECT * FROM messages WHERE msg_src = ? and msg_dest = ?";
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BETWEEN_SOURCE_DESTINATION);
         pstmt = utils.setPreparedStatementArgs(pstmt,msgSource, msgDestination);
-        List<ConversationalMessage> cm = new ArrayList<>();
-        try{
-            result = pstmt.executeQuery();
-            while(result.next()) {
-                String msgsrc = result.getString("msg_src");
-                String msgdest = result.getString("msg_dest");
-                String msgtext = result.getString("msg_text");
-                Timestamp msgtimestamp = result.getTimestamp("msg_timestamp");
-                String msguniquekey = result.getString("msg_uniquekey");
-                cm.add(new ConversationalMessage(msgsrc, msgdest, msgtext, msgtimestamp, msguniquekey));
-                
-            }
-        }catch(Exception e){
-            throw new SQLException(e);
-        }
-        pstmt.close();
-        return cm;
-        
+        return getMessages(pstmt);
 	}
 	
 	
@@ -116,22 +103,7 @@ public class ConversationalMessageService {
 		final String GET_MESSAGES_BY_SOURCE = "SELECT * FROM messages WHERE msg_src = ? ";
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BY_SOURCE);
         pstmt = utils.setPreparedStatementArgs(pstmt,msgSrc);
-        List<ConversationalMessage> cm = new ArrayList<>();
-        try{
-            result = pstmt.executeQuery();
-            while(result.next()) {
-            	String msgsrc = result.getString("msg_src");
-                String msgdest = result.getString("msg_dest");
-                String msgtext = result.getString("msg_text");
-                Timestamp msgtimestamp = result.getTimestamp("msg_timestamp");
-                String msguniquekey = result.getString("msg_uniquekey");
-                cm.add(new ConversationalMessage(msgsrc, msgdest, msgtext, msgtimestamp, msguniquekey));
-            }
-        }catch(Exception e){
-            throw new SQLException(e);
-        }
-        pstmt.close();
-        return cm;     
+        return getMessages(pstmt);
 	}
 		
 	/**
@@ -142,24 +114,8 @@ public class ConversationalMessageService {
 	public List<ConversationalMessage> getMessagebyDestination(String msgDest) throws SQLException {
 		final String GET_MESSAGES_BY_DESTINATION = "SELECT * FROM messages WHERE msg_dest= ? ";
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BY_DESTINATION);
-        pstmt = utils.setPreparedStatementArgs(pstmt,msgDest);
-        List<ConversationalMessage> cm = new ArrayList<>();
-        try{
-            result = pstmt.executeQuery();
-            while(result.next()) {
-            	String msgsrc = result.getString("msg_src");
-                String msgdest = result.getString("msg_dest");
-                String msgtext = result.getString("msg_text");
-                Timestamp msgtimestamp = result.getTimestamp("msg_timestamp");
-                String msguniquekey = result.getString("msg_uniquekey");
-                cm.add(new ConversationalMessage(msgsrc, msgdest, msgtext, msgtimestamp, msguniquekey));
-            }
-        }catch(Exception e){
-            throw new SQLException(e);
-        }
-        pstmt.close();
-        return cm;
-        
+        pstmt = utils.setPreparedStatementArgs(pstmt, msgDest);
+        return getMessages(pstmt);
 	}
 	
 	/**
@@ -181,4 +137,24 @@ public class ConversationalMessageService {
 	}
 
 
+    /**
+     * This is a helper methods to getMessages based on the preparedStatement provided
+     * @param pstmt - the prepared statement to be executed
+     * @return the list of messages which satisfy the given condition in the preparedstatement
+     * @throws SQLException - thrown by database query and calls.
+     */
+    private List<ConversationalMessage> getMessages(PreparedStatement pstmt) throws SQLException {
+        List<ConversationalMessage> cm = new ArrayList<>();
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String msgsrc = result.getString(DB_COL_MSG_SRC);
+            String msgdest = result.getString(DB_COL_MSG_DEST);
+            String msgtext = result.getString(DB_COL_MSG_TEXT);
+            Timestamp msgtimestamp = result.getTimestamp(DB_COL_MSG_TIMESTAMP);
+            String msguniquekey = result.getString(DB_COL_MSG_UNIQUEKEY);
+            cm.add(new ConversationalMessage(msgsrc, msgdest, msgtext, msgtimestamp, msguniquekey));
+        }
+        pstmt.close();
+        return cm;
+    }
 }

@@ -85,15 +85,6 @@ public class NetworkConnection implements Iterable<Message> {
     private Queue<Message> messages;
 
     /**
-     * Denotes the delimiter used by the user for incoming messages
-     */
-    private static final String DELIMITER = ";";
-    /**
-     * Denotes the space character used at multiple places
-     */
-    private static final String SPACE = " ";
-
-    /**
      * Creates a new instance of this class. Since, by definition, this class sends
      * output over the network, we need to supply the non-blocking Socket instance
      * to which we will write.

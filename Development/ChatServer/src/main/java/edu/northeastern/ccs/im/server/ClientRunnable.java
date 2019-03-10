@@ -266,25 +266,25 @@ public class ClientRunnable implements Runnable {
      * @see java.lang.Thread#run()
      */
     public void run() {
-        // The client must be initialized before we can do anything else
-        if (!initialized) {
-            checkForInitialization();
-        } else {
-            try {
+        try {
+            // The client must be initialized before we can do anything else
+            if (!initialized) {
+                checkForInitialization();
+            } else {
                 handleIncomingMessages();
-            } catch(SQLException e) {
-                ChatLogger.error("SQL Exception occurred - handleIncomingMessages : " + e);
+                handleOutgoingMessages();
             }
-            handleOutgoingMessages();
-        }
-        // Finally, check if this client have been inactive for too long and,
-        // when they have, terminate the client.
-        if (timer.isBehind()) {
-            ChatLogger.error("Timing out or forcing off a user " + name);
-            terminate = true;
-        }
-        if (terminate) {
-            terminateClient();
+            // Finally, check if this client have been inactive for too long and,
+            // when they have, terminate the client.
+            if (timer.isBehind()) {
+                ChatLogger.error("Timing out or forcing off a user " + name);
+                terminate = true;
+            }
+            if (terminate) {
+                terminateClient();
+            }
+        } catch(SQLException e) {
+            ChatLogger.error("SQL Exception occurred - run() : " + e);
         }
     }
 
@@ -312,77 +312,127 @@ public class ClientRunnable implements Runnable {
         }
     }
 
-    private void processMessage(Message msg) throws  SQLException{
+    /**
+     * Handles the register message
+     * @param msg - the incoming register message
+     * @throws SQLException - the exception thrown by the database queries and calls
+     */
+    private void handleRegisterMessage(Message msg) throws SQLException {
+        // Register the user after checking whether the user already exists or no
+        User currentUser = userService.getUserByUserName(msg.getName());
+        if(currentUser != null) {
+            ChatLogger.error("Username already exists.");
+        } else {
+            // since the user was not found, a new user with this name may be created
+            if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
+                userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+            }
+        }
+    }
+
+    /**
+     * Handles the login message
+     * @param msg - the incoming login message
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void handleLoginMessage(Message msg) throws  SQLException {
+        // Login the user after checking in the user with this username-password combo exists
+        User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
+        if(currentUser == null) {
+            ChatLogger.error("Incorrect username or password.");
+        } else {
+            // since the user was found, set the loggedIn attribute to true in the database
+            currentUser.setLoggedIn(true);
+            boolean updated = userService.updateUser(currentUser);
+            if(!updated) {
+                ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
+            }
+        }
+    }
+    
+    /**
+    * Handles the createGroupMessage
+    * @param msg - the incoming login message
+    * @throws SQLException - thrown by the database queries and calls
+    */
+    private void handleCreateGroupMessage(Message msg) throws SQLException{
+      // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+      Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
+      if (existingGroup != null) {
+        ChatLogger.error("Groupname already exists! Please use a different group name.");
+      } else {
+        User currentUser = userService.getUserByUserName(msg.getName());
+              if(currentUser == null) {
+                  ChatLogger.error("Please log in to the system first!");
+              } 
+        groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
+      }
+    }
+  
+    /**
+    * Handles the handleDeleteGroupMessage
+    * @param msg - the incoming login message
+    * @throws SQLException - thrown by the database queries and calls
+    */
+    private void handleDeleteGroupMessage(Message msg) throws SQLException{
+      // Delete the group after getting the valid moderator name and valid group name 
+      User currentUser = userService.getUserByUserName(msg.getName());
+      Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
+      //if user does not exist
+      if(currentUser == null) {
+          ChatLogger.error("Username does not exist.");
+      }
+      // if group does not exist
+      else if (currentGroup == null){
+        ChatLogger.error("Group does not exist.");
+      }
+      else {
+          // if the user is in fact the moderator of the group only then delete the group
+          if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
+            groupService.deleteGroup(currentGroup.getGroupName());
+          }
+          else {
+            ChatLogger.error("CurrentUser is not the moderator of the group.");
+          }
+      }
+    }
+  
+    /**
+     * This method handles different types of messages and delegates works to its respective methods
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
+    private void handleMessageByType(Message msg) throws SQLException {
+        // Check for our "special messages"
+        if (msg.isBroadcastMessage()) {
+            // Check for our "special messages"
+            Prattle.broadcastMessage(msg);
+        }
+        else if(msg.isLoginMessage()) {
+            handleLoginMessage(msg);
+        }else if(msg.isRegisterMessage()) {
+            handleRegisterMessage(msg);
+        } else if (msg.isCreateGroupMessage()) {
+            handleCreateGroupMessage(msg);
+        } else if(msg.isDeleteGroupMessage()) {
+            handleDeleteGroupMessage(msg);
+        }  else {
+            ChatLogger.warning("Message not one of the required types " + msg);
+        }
+    }
+
+    /**
+     * This method handles the incoming message
+     * @param msg the incoming message
+     * @throws SQLException - Exception thrown from the database
+     */
+     private void processMessage(Message msg) throws  SQLException {
         // Check if the message is legal formatted
         if (messageChecks(msg)) {
-            // Check for our "special messages"
-            if (msg.isBroadcastMessage()) {
-                // Check for our "special messages"
-                Prattle.broadcastMessage(msg);
-            }
-            else if(msg.isLoginMessage()) {
-                // Login the user after checking in the user with this username-password combo exists
-                User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
-                if(currentUser == null) {
-                    ChatLogger.error("Incorrect username or password.");
-                } else {
-                    // since the user was found, set the loggedIn attribute to true in the database
-                    currentUser.setLoggedIn(true);
-                    boolean updated = userService.updateUser(currentUser);
-                    if(!updated) {
-                        ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
-                    }
-                }
-            }else if(msg.isRegisterMessage()) {
-                // Register the user after checking whether the user already exists or no
-                User currentUser = userService.getUserByUserName(msg.getName());
-                if(currentUser != null) {
-                    ChatLogger.error("Username already exists.");
-                } else {
-                    // since the user was not found, a new user with this name may be created
-                    if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
-                	userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                    }
-                }
-            }else if(msg.isDeleteGroupMessage()) {
-                // Delete the group after getting the valid moderator name and valid group name 
-                User currentUser = userService.getUserByUserName(msg.getName());
-                Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
-                //if user does not exist
-                if(currentUser == null) {
-                    ChatLogger.error("Username does not exist.");
-                }
-                // if group does not exist
-                else if (currentGroup == null){
-                	ChatLogger.error("Group does not exist.");
-                }
-                else {
-                    // if the user is in fact the moderator of the group only then delete the group
-                    if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
-                    	groupService.deleteGroup(currentGroup.getGroupName());
-                    }
-                    else {
-                    	ChatLogger.error("CurrentUser is not the moderator of the group.");
-                    }
-                }
-            } else if (msg.isCreateGroupMessage()) {
-            		// Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
-            		Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
-            		if (existingGroup != null) {
-            			ChatLogger.error("Groupname already exists! Please use a different group name.");
-            		} else {
-            			User currentUser = userService.getUserByUserName(msg.getName());
-                        if(currentUser == null) {
-                            ChatLogger.error("Please log in to the system first!");
-                        } 
-            			groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
-            		}
-            } else {
-                ChatLogger.warning("Message not one of the required types " + msg);
-          }
+            handleMessageByType(msg);
         } else {
-            Message sendMsg;
-            sendMsg = Message.makeBroadcastMessage(ServerConstants.BOUNCER_ID,
+            Message sendMsg = Message.makeBroadcastMessage(ServerConstants.BOUNCER_ID,
                     "Last message was rejected because it specified an incorrect user name.");
             enqueueMessage(sendMsg);
         }
@@ -425,9 +475,24 @@ public class ClientRunnable implements Runnable {
      * Terminate a client that we wish to remove. This termination could happen at
      * the client's request or due to system need.
      */
-    public void terminateClient() {
+    public void terminateClient() throws SQLException {
         // Once the communication is done, close this connection.
         connection.close();
+
+        // logout user if already logged in
+        User currentUser = userService.getUserByUserName(this.getName());
+        if(currentUser == null) {
+            ChatLogger.error("Incorrect username or password.");
+        } else {
+            userClients.remove(this.getName());
+            if(currentUser.isLoggedIn()) {
+                currentUser.setLoggedIn(false);
+                boolean updated = userService.updateUser(currentUser);
+                if(!updated) {
+                    ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
+                }
+            }
+        }
         // Remove the client from our client listing.
         Prattle.removeClient(this);
         // And remove the client from our client pool.

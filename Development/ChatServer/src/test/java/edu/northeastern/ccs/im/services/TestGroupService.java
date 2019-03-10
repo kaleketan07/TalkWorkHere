@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -151,26 +152,16 @@ public class TestGroupService {
     }
 
 
+    
     /**
-     * Test get group SQL exception.
+     * Test no group matching the group name passed.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testGetGroupSQLException() throws SQLException{
-        when(mockedRS.first()).thenReturn(false);
-        Assertions.assertThrows(SQLException.class, ()->testGS.getGroup("ABC"));
-    }
-
-    /**
-     * Test get group try catch condition.
-     *
-     * @throws SQLException the SQL exception
-     */
-    @Test
-    public void testGetGroupTryCatchCondition() throws SQLException{
-        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
-        Assertions.assertThrows(SQLException.class,()->testGS.getGroup("ABC"));
+    public void testNoGroupFetched() throws SQLException {
+    	when(mockedRS.first()).thenReturn(false);
+        assertNull(testGS.getGroup("ABC"));
     }
 
     /**

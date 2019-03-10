@@ -87,6 +87,9 @@ public class ClientRunnable implements Runnable {
      */
     private GroupService groupService; 
 
+  
+
+
     /**
      * This static data structure stores the client runnable instances
      * associated with their usernames for easy lookup during messaging.
@@ -367,6 +370,34 @@ public class ClientRunnable implements Runnable {
     }
   
     /**
+    * Handles the handleDeleteGroupMessage
+    * @param msg - the incoming login message
+    * @throws SQLException - thrown by the database queries and calls
+    */
+    private void handleDeleteGroupMessage(Message msg) throws SQLException{
+      // Delete the group after getting the valid moderator name and valid group name 
+      User currentUser = userService.getUserByUserName(msg.getName());
+      Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
+      //if user does not exist
+      if(currentUser == null) {
+          ChatLogger.error("Username does not exist.");
+      }
+      // if group does not exist
+      else if (currentGroup == null){
+        ChatLogger.error("Group does not exist.");
+      }
+      else {
+          // if the user is in fact the moderator of the group only then delete the group
+          if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
+            groupService.deleteGroup(currentGroup.getGroupName());
+          }
+          else {
+            ChatLogger.error("CurrentUser is not the moderator of the group.");
+          }
+      }
+    }
+  
+    /**
      * This method handles different types of messages and delegates works to its respective methods
      *
      * @param msg - The incoming message
@@ -384,7 +415,9 @@ public class ClientRunnable implements Runnable {
             handleRegisterMessage(msg);
         } else if (msg.isCreateGroupMessage()) {
             handleCreateGroupMessage(msg);
-        } else {
+        } else if(msg.isDeleteGroupMessage()) {
+            handleDeleteGroupMessage(msg);
+        }  else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }
     }

@@ -61,14 +61,16 @@ public class ConversationalMessageService {
      * @return String 			UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
      * @throws SQLException		the sql exception
      */
-	public String insertConversationalMessage(String msgSource,String msgDestination,String msgText) throws SQLException {
+	public String insertConversationalMessage(String msgSource,String msgDestination,String msgText, boolean setFlag)
+            throws SQLException {
 		final String CREATE_MESSAGE =
-                "INSERT INTO messages (msg_src, msg_dest, msg_text, msg_timestamp, msg_uniquekey) VALUES (?,?,?,?,?)";
+                "INSERT INTO messages (msg_src, msg_dest, msg_text, msg_timestamp, msg_uniquekey, msg_sent) " +
+                        "VALUES (?,?,?,?,?,?)";
         pstmt = conn.getPreparedStatement(CREATE_MESSAGE);
         long time = System.currentTimeMillis();        
         Timestamp sqlTimestamp = new Timestamp(time);
         String uniqueKey = msgSource + msgDestination + sqlTimestamp;
-        pstmt = utils.setPreparedStatementArgs(pstmt, msgSource , msgDestination, msgText, sqlTimestamp , uniqueKey);
+        pstmt = utils.setPreparedStatementArgs(pstmt, msgSource , msgDestination, msgText, sqlTimestamp , uniqueKey, setFlag);
         pstmt.executeUpdate();
         pstmt.close();
         return uniqueKey;
@@ -176,6 +178,7 @@ public class ConversationalMessageService {
         }
         pstmt.close();
         return true;
-	}	
+	}
+
 
 }

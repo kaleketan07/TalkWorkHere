@@ -145,7 +145,6 @@ public class Message {
                 result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
         } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
             result = makeDeleteGroupMessage(srcName, textOrPassword);    
-            result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
         	result = makeCreateGroupMessage(srcName, textOrPassword);  
         }

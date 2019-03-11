@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * methods work with our non-blocking Socket classes. This class could easily be
  * made to wait for network output (e.g., be made &quot;non-blocking&quot; in
  * technical parlance), but I have not worried about it yet.
- *
+ * <p>
  * This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
  * International License. To view a copy of this license, visit
  * http://creativecommons.org/licenses/by-sa/4.0/. It is based on work

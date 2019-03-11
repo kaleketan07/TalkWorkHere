@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 
 /**
  * The type Db Utils. This class is used for DB related helper functions
+ *
  * @author Kunal
  */
 public class DBUtils {
@@ -19,16 +20,16 @@ public class DBUtils {
      * @return the prepared statement arguments (currently can accept only String and Int)
      * @throws SQLException the sql exception
      */
-    public PreparedStatement setPreparedStatementArgs(PreparedStatement stmt, Object ... args) throws SQLException{
+    public PreparedStatement setPreparedStatementArgs(PreparedStatement stmt, Object... args) throws SQLException {
         int i = 1;
-        for(Object arg:args){
-            if(arg instanceof String)
-                stmt.setString(i++,(String) arg);
-            else if(arg instanceof Integer)
-                stmt.setInt(i++,(int) arg);
-            else if(arg instanceof Timestamp)
-            	 stmt.setTimestamp(i++ ,(Timestamp)arg);
-            else if(arg instanceof  Boolean)
+        for (Object arg : args) {
+            if (arg instanceof String)
+                stmt.setString(i++, (String) arg);
+            else if (arg instanceof Integer)
+                stmt.setInt(i++, (int) arg);
+            else if (arg instanceof Timestamp)
+                stmt.setTimestamp(i++, (Timestamp) arg);
+            else if (arg instanceof Boolean)
                 stmt.setBoolean(i++, (boolean) arg);
         }
         return stmt;

@@ -12,6 +12,7 @@ import java.util.Set;
 /**
  * This class is used for performing all user related services, which include all DAO services for a
  * user. This class contains methods to add, update, delete and get users from the database.
+ *
  * @author Kunal
  */
 public class UserService implements UserDao {
@@ -21,7 +22,7 @@ public class UserService implements UserDao {
     private PreparedStatement pstmt = null;
     private DBUtils utils;
     private ResultSet result;
-    private static  UserService userServiceInstance;
+    private static UserService userServiceInstance;
 
     // Columns for user_profile
     private static final String USER_NAME = "username";
@@ -44,8 +45,8 @@ public class UserService implements UserDao {
         result = null;
     }
 
-    public static UserService getInstance() throws SQLException,IOException,ClassNotFoundException{
-        if(userServiceInstance== null)
+    public static UserService getInstance() throws SQLException, IOException, ClassNotFoundException {
+        if (userServiceInstance == null)
             userServiceInstance = new UserService();
         return userServiceInstance;
     }
@@ -60,9 +61,9 @@ public class UserService implements UserDao {
     public Set<User> getAllUsers() throws SQLException {
         final String GET_ALL_USERS = "SELECT * FROM user_profile";
         pstmt = conn.getPreparedStatement(GET_ALL_USERS);
-        try{
+        try {
             result = pstmt.executeQuery();
-            while(result.next()) {
+            while (result.next()) {
                 String fName = result.getString(FIRST_NAME);
                 String lName = result.getString(LAST_NAME);
                 String uName = result.getString(USER_NAME);
@@ -70,7 +71,7 @@ public class UserService implements UserDao {
                 boolean loggedInStatus = result.getBoolean(LOGGED_IN);
                 userSet.add(new User(fName, lName, uName, uPwd, loggedInStatus));
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new SQLException(e);
         }
         pstmt.close();
@@ -93,18 +94,18 @@ public class UserService implements UserDao {
         final String GET_USER_USERNAME_PSWD =
                 "SELECT * FROM user_profile WHERE username = ? AND user_password = ?";
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
-        pstmt = utils.setPreparedStatementArgs(pstmt,username,password);
-        try{
+        pstmt = utils.setPreparedStatementArgs(pstmt, username, password);
+        try {
             result = pstmt.executeQuery();
-            if(!result.first()){
+            if (!result.first()) {
                 throw new SQLException();
             }
             result.first();
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             boolean loggedIn = result.getBoolean(LOGGED_IN);
-            user = new User(fName,lName,username,password, loggedIn);
-        }catch(Exception e){
+            user = new User(fName, lName, username, password, loggedIn);
+        } catch (Exception e) {
             throw new SQLException();
         }
         pstmt.close();
@@ -113,28 +114,26 @@ public class UserService implements UserDao {
 
     /**
      * Gets all the user details of the user, given the username
+     *
      * @param username the String username of the user used for logging in
      * @return A new user object with all the required details initialized.
      * @throws SQLException returns the vendor specific error code for a wrong sql query
      */
     @Override
-    public User getUserByUserName(String username) throws SQLException{
+    public User getUserByUserName(String username) throws SQLException {
         User user;
         final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
-        pstmt = utils.setPreparedStatementArgs(pstmt,username);
+        pstmt = utils.setPreparedStatementArgs(pstmt, username);
         result = pstmt.executeQuery();
-        if(result.first()) 
-        {
-	        String fName = result.getString(FIRST_NAME);
-	        String lName = result.getString(LAST_NAME);
-	        String uPwd = result.getString(USER_PSWD);
-	        boolean loggedIn = result.getBoolean(LOGGED_IN);
-	        user = new User(fName,lName,username,uPwd, loggedIn);
-        }
-        else 
-        {
-        	user = null;
+        if (result.first()) {
+            String fName = result.getString(FIRST_NAME);
+            String lName = result.getString(LAST_NAME);
+            String uPwd = result.getString(USER_PSWD);
+            boolean loggedIn = result.getBoolean(LOGGED_IN);
+            user = new User(fName, lName, username, uPwd, loggedIn);
+        } else {
+            user = null;
         }
         pstmt.close();
         return user;
@@ -142,6 +141,7 @@ public class UserService implements UserDao {
 
     /**
      * Creates a new user and inserts these user details in the database
+     *
      * @param u is the User object with all the required fields initialized
      * @return True if the mysql query is successfully run and user is added to the database
      * @throws SQLException returns the vendor specific error code for a wrong sql query
@@ -151,11 +151,11 @@ public class UserService implements UserDao {
         final String CREATE_USER =
                 "INSERT INTO user_profile (first_name, last_name, username, user_password, logged_in) VALUES (?,?,?,?,?)";
         pstmt = conn.getPreparedStatement(CREATE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),
-                                        u.getUserName(),u.getUserPassword(), u.isLoggedIn());
+        pstmt = utils.setPreparedStatementArgs(pstmt, u.getFirstName(), u.getLastName(),
+                u.getUserName(), u.getUserPassword(), u.isLoggedIn());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return (qResult>0);
+        return (qResult > 0);
     }
 
 
@@ -169,36 +169,36 @@ public class UserService implements UserDao {
      * @param u The user object with new values in the fields
      * @return True if the update was successful, false otherwise
      * @throws SQLException returns the vendor specific error code for a wrong sql query
-
      */
     @Override
-    public boolean updateUser(User u) throws SQLException{
+    public boolean updateUser(User u) throws SQLException {
         User user = getUserByUserName(u.getUserName());
         final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
                 "last_name = ?, user_password = ?, logged_in = ? WHERE username = ? ";
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,u.getFirstName(),u.getLastName(),u.getUserPassword(), u.isLoggedIn(),user.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt, u.getFirstName(), u.getLastName(), u.getUserPassword(), u.isLoggedIn(), user.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return qResult>0;
+        return qResult > 0;
     }
 
 
     /**
-     *  Deletes the user details from the database.
-     *  NOTE: For the time being, let the user get deleted from the database, till we decide to add another column
-     *  that will make the user "Inactive"
+     * Deletes the user details from the database.
+     * NOTE: For the time being, let the user get deleted from the database, till we decide to add another column
+     * that will make the user "Inactive"
+     *
      * @param u The user object, that needs to be deleted
      * @return True, if the deletion operation was successful, false otherwise
      */
     @Override
-    public boolean deleteUser(User u) throws SQLException{
+    public boolean deleteUser(User u) throws SQLException {
         final String DELETE_USER =
                 "DELETE FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(DELETE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,u.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt, u.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return qResult>0;
+        return qResult > 0;
     }
 }

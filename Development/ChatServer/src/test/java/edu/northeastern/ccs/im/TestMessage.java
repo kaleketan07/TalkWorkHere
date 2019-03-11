@@ -107,31 +107,31 @@ public class TestMessage {
     }
 
     /**
-	 * Test to check if makeMessage creates the correct object
-	 * based on the first parameter passed - Register.
-	 */
-	@Test
-	public void testMakeMessageForRegister() {
-	    Message message = Message.makeMessage(REG, SENDER_NAME, PASS,PASS);
-		assertEquals(SENDER_NAME, message.getName());
-		assertEquals(PASS, message.getTextOrPassword());
-	    assertEquals(PASS, message.getReceiverOrPassword());
-	    assertFalse(message.isLoginMessage());
-	    assertTrue(message.isRegisterMessage());
-	    assertFalse(message.isCreateGroupMessage());
-	 }
-	
-	/**
-     * Test condition in makeMessage for type CreateGroupMessage 
+     * Test to check if makeMessage creates the correct object
+     * based on the first parameter passed - Register.
      */
-	@Test
-	public void testMakeMessageForCreateGroupMessage() {
-		Message message = Message.makeMessage(CRG, SENDER_NAME, GROUP_NAME, "");
-		assertEquals(SENDER_NAME, message.getName());
-		assertEquals(GROUP_NAME, message.getTextOrPassword());
-	    assertFalse(message.isLoginMessage());
-	    assertTrue(message.isCreateGroupMessage());
-	 }
+    @Test
+    public void testMakeMessageForRegister() {
+        Message message = Message.makeMessage(REG, SENDER_NAME, PASS, PASS);
+        assertEquals(SENDER_NAME, message.getName());
+        assertEquals(PASS, message.getTextOrPassword());
+        assertEquals(PASS, message.getReceiverOrPassword());
+        assertFalse(message.isLoginMessage());
+        assertTrue(message.isRegisterMessage());
+        assertFalse(message.isCreateGroupMessage());
+    }
+
+    /**
+     * Test condition in makeMessage for type CreateGroupMessage
+     */
+    @Test
+    public void testMakeMessageForCreateGroupMessage() {
+        Message message = Message.makeMessage(CRG, SENDER_NAME, GROUP_NAME, "");
+        assertEquals(SENDER_NAME, message.getName());
+        assertEquals(GROUP_NAME, message.getTextOrPassword());
+        assertFalse(message.isLoginMessage());
+        assertTrue(message.isCreateGroupMessage());
+    }
 
     /**
      * Test to check if makeMessage returns null when the first parameter
@@ -248,6 +248,20 @@ public class TestMessage {
     }
 
     /**
+     * Test makeMessage with Delete_Group as the handle
+     */
+    @Test
+    public void testMakeMessageDeleteGroupCondition() {
+        Message message = Message.makeMessage(DEG, SENDER_NAME, PASS, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(DEG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+    }
+
+    /**
      * Test toString method to return the expected output when
      * sender is null and text is not null
      */
@@ -261,8 +275,6 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
     }
-    
-    
 
 
     /**
@@ -286,6 +298,7 @@ public class TestMessage {
     private static final String BCT = "BCT";
     private static final String LGN = "LGN";
     private static final String REG = "REG";
+    private static final String DEG = "DEG";
     private static final String CRG = "CRG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";

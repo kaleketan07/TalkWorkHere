@@ -14,144 +14,138 @@ import java.sql.SQLException;
  * @author rahul
  */
 public class User {
-	
-	private String firstName;
-	private String lastName;
-	private String userName;
-	private String userPassword;
-	private boolean loggedIn;
-	private static ConversationalMessageService cms;
-	static {
-		try{
-			cms = ConversationalMessageService.getInstance();
-		}catch (ClassNotFoundException|IOException|SQLException e){
+
+    private String firstName;
+    private String lastName;
+    private String userName;
+    private String userPassword;
+    private boolean loggedIn;
+    private static ConversationalMessageService cms;
+
+    static {
+        try {
+            cms = ConversationalMessageService.getInstance();
+        } catch (ClassNotFoundException | IOException | SQLException e) {
             ChatLogger.error("Conversational Message Service failed to initialize.");
-		}
-	}
-	private ClientRunnable clientRunnable;
+        }
+    }
 
-	/**
-	 * 
-	 * @param firstName to have the first name of the user
-	 * @param lastName to have the last name of the user
-	 * @param userName to have the user name of the user
-	 * @param userPassword to have the user password name of the user
-	 * @param loggedInStatus to set the loggedIn status of the user
-	 */
-	public User(String firstName, String lastName, String userName, String userPassword, boolean loggedInStatus) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.userName = userName;
-		this.userPassword = userPassword;
-		this.loggedIn = loggedInStatus;
-		this.clientRunnable = null;
-	}
+    private ClientRunnable clientRunnable;
 
-	/**
-	 * 
-	 * @return firstName of the user
-	 */
-	public String getFirstName() {
-		return firstName;
-	}
+    /**
+     * @param firstName      to have the first name of the user
+     * @param lastName       to have the last name of the user
+     * @param userName       to have the user name of the user
+     * @param userPassword   to have the user password name of the user
+     * @param loggedInStatus to set the loggedIn status of the user
+     */
+    public User(String firstName, String lastName, String userName, String userPassword, boolean loggedInStatus) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+        this.userPassword = userPassword;
+        this.loggedIn = loggedInStatus;
+        this.clientRunnable = null;
+    }
 
-	/**
-	 * 
-	 * @param firstName value to set the firstName
-	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    /**
+     * @return firstName of the user
+     */
+    public String getFirstName() {
+        return firstName;
+    }
 
-	/**
-	 * 
-	 * @return lastName of the user
-	 */
-	public String getLastName() {
-		return lastName;
-	}
+    /**
+     * @param firstName value to set the firstName
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	/**
-	 * 
-	 * @param lastName value to set the firstName
-	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    /**
+     * @return lastName of the user
+     */
+    public String getLastName() {
+        return lastName;
+    }
 
-	/**
-	 * 
-	 * @return userName of the user
-	 */
-	public String getUserName() {
-		return userName;
-	}
+    /**
+     * @param lastName value to set the firstName
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	/**
-	 * 
-	 * @param userName value to set the userName
-	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    /**
+     * @return userName of the user
+     */
+    public String getUserName() {
+        return userName;
+    }
 
-	/**
-	 * 
-	 * @return the userPassword of the user
-	 */
-	public String getUserPassword() {
-		return userPassword;
-	}
-	
-	/**
-	 * 
-	 * @param userPassword value to set the userPassword
-	 */
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
-	}
+    /**
+     * @param userName value to set the userName
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	/**
-	 * set the loggedIn flag to the given parameter value
-	 * @param status - the true or false status of the user's loggedIn attribute
-	 */
-	public void setLoggedIn(boolean status) {
-		loggedIn = status;
-	}
+    /**
+     * @return the userPassword of the user
+     */
+    public String getUserPassword() {
+        return userPassword;
+    }
 
-	/**
-	 * @return the loggedIn status of the user
-	 */
-	public boolean isLoggedIn() {
-		return loggedIn;
-	}
+    /**
+     * @param userPassword value to set the userPassword
+     */
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
 
-	/**
-	 * Overrides the toString method for the User object.
-	 *
-	 * @return - string representation of username, firstName and lastName.
-	 *
-	 */
-	public String toString(){
-		return getUserName()+" : "+getFirstName()+" "+getLastName();
-	}
+    /**
+     * set the loggedIn flag to the given parameter value
+     *
+     * @param status - the true or false status of the user's loggedIn attribute
+     */
+    public void setLoggedIn(boolean status) {
+        loggedIn = status;
+    }
 
-	/**
-	 * Send the received message to the user who is supposed to receive it. This method will
-	 * first check if the user is online by checking if there is a ClientRunnable present for
-	 * this instance and then enqueue the message if present accordingly.
-	 * @param msg The message to be sent to this user
-	 */
-	public void userSendMessage(Message msg) throws SQLException{
-		String src = msg.getName();
-		String msgText = msg.getTextOrPassword();
-		boolean flag = false;
-		clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
-		if(clientRunnable != null){
-			flag = true;
-			clientRunnable.enqueueMessage(msg);
-		}
-		cms.insertConversationalMessage(src,this.getUserName(),msgText,flag);
-	}
+    /**
+     * @return the loggedIn status of the user
+     */
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    /**
+     * Overrides the toString method for the User object.
+     *
+     * @return - string representation of username, firstName and lastName.
+     */
+    public String toString() {
+        return getUserName() + " : " + getFirstName() + " " + getLastName();
+    }
+
+    /**
+     * Send the received message to the user who is supposed to receive it. This method will
+     * first check if the user is online by checking if there is a ClientRunnable present for
+     * this instance and then enqueue the message if present accordingly.
+     *
+     * @param msg The message to be sent to this user
+     */
+    public void userSendMessage(Message msg) throws SQLException {
+        String src = msg.getName();
+        String msgText = msg.getTextOrPassword();
+        boolean flag = false;
+        clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
+        if (clientRunnable != null) {
+            flag = true;
+            clientRunnable.enqueueMessage(msg);
+        }
+        cms.insertConversationalMessage(src, this.getUserName(), msgText, flag);
+    }
 }
 

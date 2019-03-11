@@ -3,6 +3,7 @@ package edu.northeastern.ccs.im.services;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +27,10 @@ import edu.northeastern.ccs.im.models.ConversationalMessage;
 
 
 public class TestConversationalMessageService {
-	
-	private ConversationalMessageService cs;
-	
-	/**
+
+    private ConversationalMessageService cs;
+
+    /**
      * The Mocked db connection.
      */
     @Mock
@@ -77,134 +79,134 @@ public class TestConversationalMessageService {
         when(mockedRS.getString("msg_text")).thenReturn("AB");
         when(mockedRS.getString("msg_uniquekey")).thenReturn("ABCBCD2018:05:05");
         when(mockedRS.getTimestamp("msg_timestamp")).thenReturn(Timestamp.valueOf(LocalDateTime.now()));
-        when(mockedRS.next()).thenReturn(true,false);
+        when(mockedRS.next()).thenReturn(true, false);
         Field rs = ConversationalMessageService.class.getDeclaredField("result");
         rs.setAccessible(true);
-        rs.set(cs,mockedRS);
+        rs.set(cs, mockedRS);
         Field ps = ConversationalMessageService.class.getDeclaredField("pstmt");
         ps.setAccessible(true);
-        ps.set(cs,mockedPreparedStatement);
+        ps.set(cs, mockedPreparedStatement);
         Field db = ConversationalMessageService.class.getDeclaredField("conn");
         db.setAccessible(true);
-        db.set(cs,mockedDBConnection);
+        db.set(cs, mockedDBConnection);
         Field ut = ConversationalMessageService.class.getDeclaredField("utils");
         ut.setAccessible(true);
-        ut.set(cs,mockedDBUtils);
+        ut.set(cs, mockedDBUtils);
     }
 
     /**
      * Tear down. Set all mocks to null
      */
     @AfterEach
-    public void tearDown(){
+    public void tearDown() {
         mockedDBConnection = null;
         mockedDBUtils = null;
         mockedPreparedStatement = null;
         mockedRS = null;
     }
-    
+
     /**
      * Test for inserConversationalMessage using src_name, dest_name, msg_text
-     * 
-     * @throws SQLException 	the sql exception
+     *
+     * @throws SQLException the sql exception
      */
     @Test
     public void testInsertConversationalMessage() throws SQLException {
-    	String ret = cs.insertConversationalMessage("ABC", "BCD", "hello", false);
-    	assertTrue(ret.contains("ABCBCD"));    	
+        String ret = cs.insertConversationalMessage("ABC", "BCD", "hello", false);
+        assertTrue(ret.contains("ABCBCD"));
     }
-     
+
     /**
      * Test getMessagebyDestination() by retrieving the uniqueKey of the message
-     * 
-     * @throws SQLException		the sql exception
+     *
+     * @throws SQLException the sql exception
      */
     @Test
     public void testGetMessagebyDestination() throws SQLException {
-    	List<ConversationalMessage> ret = cs.getMessagebyDestination("ABC");
-    	Optional<ConversationalMessage> firstMsg = ret.stream().findFirst();
-    	String msguniqueKey = firstMsg.toString();
-    	assertTrue(msguniqueKey.contains("ABCBCD2018:05:05"));	
-     }
-     
+        List<ConversationalMessage> ret = cs.getMessagebyDestination("ABC");
+        Optional<ConversationalMessage> firstMsg = ret.stream().findFirst();
+        String msguniqueKey = firstMsg.toString();
+        assertTrue(msguniqueKey.contains("ABCBCD2018:05:05"));
+    }
+
     /**
      * Test getMessagebySource() by retrieving the uniqueKey of the message
-     * 
-     * @throws SQLException		the sql exception
+     *
+     * @throws SQLException the sql exception
      */
     @Test
     public void testGetMessagebySource() throws SQLException {
-    	List<ConversationalMessage> ret = cs.getMessagebySource("ABC");
-    	Optional<ConversationalMessage> firstMsg = ret.stream().findFirst();
-    	String msguniqueKey = firstMsg.toString();
-    	assertTrue(msguniqueKey.contains("ABCBCD2018:05:05"));	
-     }
-    
+        List<ConversationalMessage> ret = cs.getMessagebySource("ABC");
+        Optional<ConversationalMessage> firstMsg = ret.stream().findFirst();
+        String msguniqueKey = firstMsg.toString();
+        assertTrue(msguniqueKey.contains("ABCBCD2018:05:05"));
+    }
+
     /**
      * Test getMessagebySourceAndDestination() by retrieving the uniqueKey of the message
-     * 
-     * @throws SQLException		the sql exception
+     *
+     * @throws SQLException the sql exception
      */
     @Test
     public void testGetMessagebySourceAndDestination() throws SQLException {
-    	List<ConversationalMessage> ret = cs.getMessagebySourceAndDestination("ABC" , "BCD" );
-    	Optional<ConversationalMessage> firstMsg = ret.stream().findFirst();
-    	String msguniqueKey = firstMsg.toString();
-    	assertTrue(msguniqueKey.contains("ABCBCD2018:05:05"));	
-     }
-    
+        List<ConversationalMessage> ret = cs.getMessagebySourceAndDestination("ABC", "BCD");
+        Optional<ConversationalMessage> firstMsg = ret.stream().findFirst();
+        String msguniqueKey = firstMsg.toString();
+        assertTrue(msguniqueKey.contains("ABCBCD2018:05:05"));
+    }
+
     /**
      * Test updateMessageDeleteFlag() by deleting a message
-     * 
-     * @throws SQLException		the sql exception
+     *
+     * @throws SQLException the sql exception
      */
     @Test
     public void testUpdateMessageDeleteFlag() throws SQLException {
-    	assertTrue(cs.deleteMessage("ABCBCD2018:05:05"));	
-     }
-    
+        assertTrue(cs.deleteMessage("ABCBCD2018:05:05"));
+    }
+
     /**
      * Test getMessagebyDestination when SQLException is thrown.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testMessagebyDestination() throws SQLException{
-    	doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
-        Assertions.assertThrows(SQLException.class, ()->cs.getMessagebyDestination("BCD"));
+    public void testMessagebyDestination() throws SQLException {
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        Assertions.assertThrows(SQLException.class, () -> cs.getMessagebyDestination("BCD"));
     }
-    
+
     /**
      * Test getMessagebySource when SQLException is thrown.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testMessagebySource() throws SQLException{
-    	doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
-        Assertions.assertThrows(SQLException.class, ()->cs.getMessagebySource("ABC"));
+    public void testMessagebySource() throws SQLException {
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        Assertions.assertThrows(SQLException.class, () -> cs.getMessagebySource("ABC"));
     }
-    
+
     /**
      * Test getMessagebySourceandDestination when SQLException is thrown.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testMessagebySourceandDestination() throws SQLException{
-    	doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
-        Assertions.assertThrows(SQLException.class, ()->cs.getMessagebySourceAndDestination("ABC","BCD"));
+    public void testMessagebySourceandDestination() throws SQLException {
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        Assertions.assertThrows(SQLException.class, () -> cs.getMessagebySourceAndDestination("ABC", "BCD"));
     }
-    
+
     /**
      * Test deleteMessage when SQLException is thrown.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testDeleteMessage() throws SQLException{
-    	doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
-        Assertions.assertThrows(SQLException.class, ()->cs.deleteMessage("ABCBCD2018:05:05"));
+    public void testDeleteMessage() throws SQLException {
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
+        Assertions.assertThrows(SQLException.class, () -> cs.deleteMessage("ABCBCD2018:05:05"));
     }
 
 }

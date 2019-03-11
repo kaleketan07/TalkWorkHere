@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.doNothing;
 
 /**
  * The type Test db utils.
+ *
  * @author Kunal
  */
 public class TestDBUtils {
@@ -29,7 +31,7 @@ public class TestDBUtils {
      * Initiate Mock
      */
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -37,7 +39,7 @@ public class TestDBUtils {
      * Tear down.
      */
     @AfterEach
-    public void tearDown(){
+    public void tearDown() {
         mockedPreparedStatement = null;
     }
 
@@ -49,9 +51,9 @@ public class TestDBUtils {
     @Test
     public void testSetPreparedStatementArgs() throws SQLException {
         DBUtils db = new DBUtils();
-        doNothing().when(mockedPreparedStatement).setInt(1,1);
-        doNothing().when(mockedPreparedStatement).setString(2,"AB");
-        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement,1,"AB");
+        doNothing().when(mockedPreparedStatement).setInt(1, 1);
+        doNothing().when(mockedPreparedStatement).setString(2, "AB");
+        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement, 1, "AB");
         Assertions.assertNotNull(ps);
     }
 
@@ -64,12 +66,12 @@ public class TestDBUtils {
     @Test
     public void testSetPreparedStatementArgsConditions() throws SQLException {
         DBUtils db = new DBUtils();
-        doNothing().when(mockedPreparedStatement).setString(1,"XV");
-        doNothing().when(mockedPreparedStatement).setDouble(2,45.56);
-        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement,"XV",45.56);
+        doNothing().when(mockedPreparedStatement).setString(1, "XV");
+        doNothing().when(mockedPreparedStatement).setDouble(2, 45.56);
+        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement, "XV", 45.56);
         Assertions.assertNotNull(ps);
     }
-    
+
     /**
      * Test set prepared statement args to cover conditions for condition coverage
      * with settimeStamp.
@@ -79,9 +81,9 @@ public class TestDBUtils {
     @Test
     public void testSetPreparedStatementArgsConditionswithTimeStamp() throws SQLException {
         DBUtils db = new DBUtils();
-        doNothing().when(mockedPreparedStatement).setTimestamp(1,Timestamp.valueOf("1966-08-30 08:08:08"));
-        doNothing().when(mockedPreparedStatement).setDouble(2,45.56);
-        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement,Timestamp.valueOf("1966-08-30 08:08:08"),45.56);
+        doNothing().when(mockedPreparedStatement).setTimestamp(1, Timestamp.valueOf("1966-08-30 08:08:08"));
+        doNothing().when(mockedPreparedStatement).setDouble(2, 45.56);
+        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement, Timestamp.valueOf("1966-08-30 08:08:08"), 45.56);
         Assertions.assertNotNull(ps);
     }
 

@@ -55,7 +55,7 @@ public class Message {
         // Save the text of the message.
         msgTextOrPassword = text;
     }
-    
+
     /**
      * Create a new message that contains actual IM text. The type of distribution
      * is defined by the handle and we must also set the name of the message sender,
@@ -75,7 +75,7 @@ public class Message {
         // Save the receiver or password
         msgReceiverOrPassword = receiverorPassword;
     }
-    
+
     /**
      * Create a new message that contains a command sent the server that requires a
      * single argument. This message contains the given handle and the single
@@ -125,9 +125,9 @@ public class Message {
      * Given a handle, name and textOrPassword, return the appropriate message instance or an
      * instance from a subclass of message.
      *
-     * @param handle  Handle of the message to be generated.
-     * @param srcName Name of the originator of the message (may be null)
-     * @param textOrPassword    Text sent in this message (may be null)
+     * @param handle         Handle of the message to be generated.
+     * @param srcName        Name of the originator of the message (may be null)
+     * @param textOrPassword Text sent in this message (may be null)
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword.
      */
@@ -142,9 +142,9 @@ public class Message {
         } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
             result = makeLoginMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
-                result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);    
+            result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
-            result = makeDeleteGroupMessage(srcName, textOrPassword);    
+            result = makeDeleteGroupMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
         	result = makeCreateGroupMessage(srcName, textOrPassword);  
         } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
@@ -166,39 +166,41 @@ public class Message {
 
     /**
      * This method creates a login message based on the given name and password
-     * @param myName - username of the user requesting a login
+     *
+     * @param myName   - username of the user requesting a login
      * @param password - password of the user used to validate the login
      * @return a Message object of type login
      */
     public static Message makeLoginMessage(String myName, String password) {
         return new Message(MessageType.LOGIN, myName, password);
     }
-    
+
     /**
-     * 
      * This method creates a register message based on the given name and password
-     * @param myName - username of the user requesting a register
+     *
+     * @param myName   - username of the user requesting a register
      * @param password - password of the user requesting a register
      * @return a Message object of type register
      */
     public static Message makeRegisterMessage(String myName, String password, String confirmPassword) {
         return new Message(MessageType.REGISTER, myName, password, confirmPassword);
     }
+
     /**
-     * 
      * This method creates a delete group message based on the given group_name and moderator
-     * @param userName - username of the user(moderator) requesting a register
+     *
+     * @param userName  - username of the user(moderator) requesting a register
      * @param groupName - groupName of the group to be deleted
      * @return a Message object of type delete_group
      */
     public static Message makeDeleteGroupMessage(String userName, String groupName) {
         return new Message(MessageType.DELETE_GROUP, userName, groupName);
     }
-    
+
     /**
      * This method creates a message to be sent for creating a group.
      *
-     * @param myName the name of the sender
+     * @param myName    the name of the sender
      * @param groupName the desired group name for the new group
      * @return the Message object of type Create Group
      */
@@ -235,7 +237,7 @@ public class Message {
     public String getTextOrPassword() {
         return msgTextOrPassword;
     }
-    
+
     /**
      * Return the text of this message.
      *
@@ -244,7 +246,7 @@ public class Message {
     public String getReceiverOrPassword() {
         return msgReceiverOrPassword;
     }
-    
+
     /**
      * Determine if this message is broadcasting text to everyone.
      *
@@ -265,30 +267,41 @@ public class Message {
 
     /**
      * This method verifies if the current message has the handle LGN (is a login message)
+     *
      * @return true or false based on the comparison result
      */
-    public boolean isLoginMessage() { return (msgType == MessageType.LOGIN);}
+    public boolean isLoginMessage() {
+        return (msgType == MessageType.LOGIN);
+    }
 
     /**
      * This method verifies if the current message has the handle REG (is a register message)
+     *
      * @return true or false based on the comparison result
      */
-    public boolean isRegisterMessage() { return (msgType == MessageType.REGISTER);}
-    
+    public boolean isRegisterMessage() {
+        return (msgType == MessageType.REGISTER);
+    }
+
     /**
      * This method verifies if the current message has the handle DEG (is a delete_group message)
+     *
      * @return true or false based on the comparison result
      */
-    public boolean isDeleteGroupMessage() { return (msgType == MessageType.DELETE_GROUP);}
+    public boolean isDeleteGroupMessage() {
+        return (msgType == MessageType.DELETE_GROUP);
+    }
 
-    
+
     /**
      * This method verifies if the current message has the handle CRG (is a create group message)
      *
      * @return true or false based on the comparison result
      */
-    public boolean isCreateGroupMessage() { return (msgType == MessageType.CREATE_GROUP);}
-    
+    public boolean isCreateGroupMessage() {
+        return (msgType == MessageType.CREATE_GROUP);
+    }
+
     /**
      * This method verifies if the current message has the handle ADG (is a add user to group message)
      *

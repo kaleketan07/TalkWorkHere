@@ -418,8 +418,7 @@ public class TestClientRunnable {
         Field groupService = ClientRunnable.class.getDeclaredField("groupService");
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
-        User u = Mockito.mock(User.class);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         messageList.clear();
         messageList.add(DELETE_GROUP);
@@ -485,9 +484,8 @@ public class TestClientRunnable {
         Field groupService = ClientRunnable.class.getDeclaredField("groupService");
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
-        User u = Mockito.mock(User.class);
         Group g = Mockito.mock(Group.class);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
         Mockito.when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         messageList.clear();
@@ -521,9 +519,8 @@ public class TestClientRunnable {
         Field groupService = ClientRunnable.class.getDeclaredField("groupService");
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
-        User u = Mockito.mock(User.class);
         Group g = Mockito.mock(Group.class);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
         Mockito.when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         messageList.clear();

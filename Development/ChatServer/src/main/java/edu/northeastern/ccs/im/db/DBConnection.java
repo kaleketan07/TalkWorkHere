@@ -33,7 +33,7 @@ public class DBConnection {
      *
      * @throws SQLException - when an error occurs while closing the connection
      */
-    public void close() throws  SQLException{
+    public void close() throws SQLException {
         connection.close();
     }
 

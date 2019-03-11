@@ -406,10 +406,7 @@ public class ClientRunnable implements Runnable {
     	User currentUser = userService.getUserByUserName(msg.getName());
     	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
     	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
-    	if (currentUser == null) {
-    		ChatLogger.error("Please register first");
-    	}
-    	else if (currentGroup == null) {
+    	if (currentGroup == null) {
     		ChatLogger.error("The group you are trying to add to does not exist!");
     	}
     	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {

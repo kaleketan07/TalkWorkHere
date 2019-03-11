@@ -298,14 +298,21 @@ public class ClientRunnable implements Runnable {
         if (messageIter.hasNext()) {
             // Get the next message
             Message msg = messageIter.next();
-            // If the message is a broadcast message, send it out
-            if (msg.terminate()) {
-                // Stop sending the poor client message.
-                terminate = true;
-                // Reply with a quit message.
-                enqueueMessage(Message.makeQuitMessage(name));
-            } else {
-                processMessage(msg);
+            User user = userService.getUserByUserName(msg.getName());
+            // If the user does not exist, then maybe they are trying to register
+            if (user == null && !(msg.isRegisterMessage() || msg.isLoginMessage()))
+                ChatLogger.error("User does not exist");
+            else {
+                if (msg.terminate()) {
+                    // Stop sending the poor client message.
+                    terminate = true;
+                    // Reply with a quit message.
+                    enqueueMessage(Message.makeQuitMessage(name));
+                } else if (msg.isLoginMessage() || msg.isRegisterMessage() || ( user!=null && user.isLoggedIn())) {
+                    processMessage(msg);
+                } else {
+                    ChatLogger.error("User not logged in.");
+                }
             }
         }
     }
@@ -362,10 +369,6 @@ public class ClientRunnable implements Runnable {
         if (existingGroup != null) {
             ChatLogger.error("Groupname already exists! Please use a different group name.");
         } else {
-            User currentUser = userService.getUserByUserName(msg.getName());
-            if (currentUser == null) {
-                ChatLogger.error("Please log in to the system first!");
-            }
             groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
         }
     }
@@ -380,12 +383,8 @@ public class ClientRunnable implements Runnable {
         // Delete the group after getting the valid moderator name and valid group name
         User currentUser = userService.getUserByUserName(msg.getName());
         Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
-        //if user does not exist
-        if (currentUser == null) {
-            ChatLogger.error("Username does not exist.");
-        }
         // if group does not exist
-        else if (currentGroup == null) {
+        if (currentGroup == null) {
             ChatLogger.error("Group does not exist.");
         } else {
             // if the user is in fact the moderator of the group only then delete the group
@@ -510,16 +509,12 @@ public class ClientRunnable implements Runnable {
 
         // logout user if already logged in
         User currentUser = userService.getUserByUserName(this.getName());
-        if (currentUser == null) {
-            ChatLogger.error("Incorrect username or password.");
-        } else {
-            userClients.remove(this.getName());
-            if (currentUser.isLoggedIn()) {
-                currentUser.setLoggedIn(false);
-                boolean updated = userService.updateUser(currentUser);
-                if (!updated) {
-                    ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
-                }
+        userClients.remove(this.getName());
+        if (currentUser.isLoggedIn()) {
+            currentUser.setLoggedIn(false);
+            boolean updated = userService.updateUser(currentUser);
+            if (!updated) {
+                ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
             }
         }
         // Remove the client from our client listing.

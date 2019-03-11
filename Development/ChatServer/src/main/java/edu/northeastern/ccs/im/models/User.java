@@ -136,7 +136,7 @@ public class User {
      *
      * @param msg The message to be sent to this user
      */
-    public void userSendMessage(Message msg) throws SQLException, IOException, ClassNotFoundException {
+    public void userSendMessage(Message msg) throws SQLException {
         String src = msg.getName();
         String msgText = msg.getTextOrPassword();
         boolean flag = false;

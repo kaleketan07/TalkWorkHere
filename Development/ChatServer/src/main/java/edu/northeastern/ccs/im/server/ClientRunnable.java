@@ -298,13 +298,20 @@ public class ClientRunnable implements Runnable {
             // Get the next message
             Message msg = messageIter.next();
             // If the message is a broadcast message, send it out
-            if (msg.terminate()) {
-                // Stop sending the poor client message.
-                terminate = true;
-                // Reply with a quit message.
-                enqueueMessage(Message.makeQuitMessage(name));
-            } else {
-                processMessage(msg);
+            User user = userService.getUserByUserName(msg.getName());
+            if (user == null && !(msg.isRegisterMessage() || msg.isLoginMessage()))
+                ChatLogger.error("User does not exist");
+            else {
+                if (msg.terminate()) {
+                    // Stop sending the poor client message.
+                    terminate = true;
+                    // Reply with a quit message.
+                    enqueueMessage(Message.makeQuitMessage(name));
+                } else if (msg.isLoginMessage() || msg.isRegisterMessage() || ( user!=null && user.isLoggedIn())) {
+                    processMessage(msg);
+                } else {
+                    ChatLogger.error("User not logged in.");
+                }
             }
         }
     }

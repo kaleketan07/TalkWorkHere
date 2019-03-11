@@ -142,7 +142,7 @@ public class User {
 	 * this instance and then enqueue the message if present accordingly.
 	 * @param msg The message to be sent to this user
 	 */
-	public void userSendMessage(Message msg) throws SQLException, IOException,ClassNotFoundException {
+	public void userSendMessage(Message msg) throws SQLException{
 		String src = msg.getName();
 		String msgText = msg.getTextOrPassword();
 		boolean flag = false;

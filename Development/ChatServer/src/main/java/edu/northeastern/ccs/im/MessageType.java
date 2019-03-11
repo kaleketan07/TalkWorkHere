@@ -20,21 +20,21 @@ public enum MessageType {
      */
     BROADCAST("BCT"),
     /**
-     * Message whose contents are to login a given user 
+     * Message whose contents are to login a given user
      */
     LOGIN("LGN"),
-	/**
-     * Message whose contents are to register a given user 
+    /**
+     * Message whose contents are to register a given user
      */
     REGISTER("REG"),
-	  /**
-    * Message whose contents are to delete a given group 
-    */
+    /**
+     * Message whose contents are to delete a given group
+     */
     DELETE_GROUP("DEG"),
     /**
-    * Message whose contents are to create a group with the passed parameters 
-    */
-	  CREATE_GROUP("CRG");
+     * Message whose contents are to create a group with the passed parameters
+     */
+    CREATE_GROUP("CRG");
     /**
      * Store the short name of this message type.
      */

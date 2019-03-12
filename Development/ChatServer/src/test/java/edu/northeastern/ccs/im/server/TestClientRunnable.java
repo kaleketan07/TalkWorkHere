@@ -342,6 +342,65 @@ public class TestClientRunnable {
         Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Private_User message in waitList and Message sent successfully
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        Message mockedMessage = Mockito.mock(Message.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        User u = new User(SENDER_NAME, null, SENDER_NAME,null, true);
+        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,mockedUser);
+        
+        messageList.clear();
+        messageList.add(PRIVATE_MESSAGE);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Private_User message in waitList and Message not sent 
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithPrivateWithInvalidDestAddress() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        User u = new User(SENDER_NAME, null, SENDER_NAME,null, true);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,null);        
+        messageList.clear();
+        messageList.add(PRIVATE_MESSAGE);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
 
     /**
      * Test handleIncomingMessage() empty message Iterator form network connection
@@ -530,7 +589,7 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-
+ 
 
     /**
      * Test handleIncomingMessage() empty message Iterator form network connection
@@ -560,6 +619,7 @@ public class TestClientRunnable {
         clientRunnableObject.run();
     }
 
+    
     /**
      * Testing checkForIntialization() Method using with Empty
      * message Iterator from network connection
@@ -1147,6 +1207,7 @@ public class TestClientRunnable {
     private static final Message REGISTER2 = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, "");
     private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
+    private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(TestClientRunnable.SENDER_NAME, "hello", "rb");
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final int USER_ID = 120000;

@@ -149,7 +149,9 @@ public class Message {
             result = makeCreateGroupMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
             result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
-        }
+        } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
+            result = makeGetGroupMessage(srcName, textOrPassword);
+        }	
         return result;
     }
 
@@ -219,6 +221,16 @@ public class Message {
         return new Message(MessageType.CREATE_GROUP, myName, groupName);
     }
 
+    /**
+     * This method creates a get group message based on the given group name
+     *
+     * @param srcName   - srcName of the user asking for group details
+     * @param groupName - groupName is the name of the group whose details are needed
+     * @return a Message object of type login
+     */
+    public static Message makeGetGroupMessage(String srcName, String groupName) {
+        return new Message(MessageType.GET_GROUP, srcName, groupName);
+    }
     /**
      * Return the name of the sender of this message.
      *
@@ -308,6 +320,15 @@ public class Message {
      */
     public boolean isPrivateUserMessage() {
         return (msgType == MessageType.MESSAGE_USER);
+    }
+
+    /**
+     * This method verifies if the current message has the handle GTG (is a GET_GROUP message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isGetGroupMessage() {
+        return (msgType == MessageType.GET_GROUP);
     }
 
     /**

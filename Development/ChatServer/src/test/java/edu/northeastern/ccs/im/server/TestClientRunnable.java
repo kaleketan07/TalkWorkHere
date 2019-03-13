@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import edu.northeastern.ccs.im.Message;
-import edu.northeastern.ccs.im.MessageType;
 import edu.northeastern.ccs.im.NetworkConnection;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -1035,7 +1034,6 @@ public class TestClientRunnable {
         Group temp = new Group();
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
-        User tempUser2 = new User("", "", "Bob", "pass", true);
         Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
@@ -1335,7 +1333,6 @@ public class TestClientRunnable {
 
     //Private fields to be used in tests
     private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);
-    private static final Message LOGIN2 = Message.makeLoginMessage("", TestClientRunnable.PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, TestClientRunnable.PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, "");
     private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);

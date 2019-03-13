@@ -44,10 +44,15 @@ public enum MessageType {
      */
     MESSAGE_USER("MSU"),
     /**
-	    * Message whose contents are to add a user to a group with the passed parameters 
-	    */ 
-	  ADD_USER_GROUP("AUG");
-    /**
+    * Message whose contents are to add a user to a group with the passed parameters 
+    */ 
+    ADD_USER_GROUP("AUG"),
+	/**
+    * Message whose contents are to delete a user profile
+    */ 
+    DELETE_USER("DLU");
+	    
+	/**
      * Store the short name of this message type.
      */
     private String abbreviation;

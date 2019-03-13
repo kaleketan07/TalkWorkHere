@@ -38,7 +38,7 @@ public enum MessageType {
     /**
 	    * Message whose contents are to add a user to a group with the passed parameters 
 	    */ 
-	  ADD_USER_GROUP("AUG");
+	  ADD_USER_GROUP("AUG"),
 	  /**
      * Message whose contents are to send a message from one user to another
      */

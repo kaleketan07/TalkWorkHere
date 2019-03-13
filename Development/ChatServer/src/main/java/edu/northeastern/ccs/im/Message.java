@@ -149,6 +149,8 @@ public class Message {
         	result = makeCreateGroupMessage(srcName, textOrPassword);  
         } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
         	result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
+            result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return result;
     }
@@ -186,6 +188,17 @@ public class Message {
         return new Message(MessageType.REGISTER, myName, password, confirmPassword);
     }
 
+    /**
+     * This message creates a Private User message type of a message
+     * 
+     * @param srcName   the username of the sender of the message
+     * @param text		the text the sender wants to send
+     * @param destName	the username of the receiver of the message
+     * @return
+     */
+    public static Message makePrivateUserMessage(String srcName, String text, String destName) {
+        return new Message(MessageType.MESSAGE_USER, srcName, text, destName);
+    }
     /**
      * This method creates a delete group message based on the given group_name and moderator
      *
@@ -307,8 +320,19 @@ public class Message {
      *
      * @return true or false based on the comparison result
      */
-    public boolean isAddUserToGroupMessage() {return (msgType == MessageType.ADD_USER_GROUP);}
+    public boolean isAddUserToGroupMessage() {
+      return (msgType == MessageType.ADD_USER_GROUP);
+    }
     
+    /**
+     * This method verifies if the current message has the handle MSU (is a Message_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isPrivateUserMessage() {
+        return (msgType == MessageType.MESSAGE_USER);
+    }
+
     /**
      * Determine if this message is a message signing off from the IM server.
      *

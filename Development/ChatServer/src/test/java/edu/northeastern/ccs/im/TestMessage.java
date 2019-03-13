@@ -119,6 +119,20 @@ public class TestMessage {
         assertFalse(message.isLoginMessage());
         assertTrue(message.isRegisterMessage());
         assertFalse(message.isCreateGroupMessage());
+        assertFalse(message.isPrivateUserMessage());
+    }
+    
+    /**
+     * Test to check if makeMessage creates the correct object
+     * based on the first parameter passed - Message_User Message.
+     */
+    @Test
+    public void testMakeMessageForPrivateUserMessage() {
+        Message message = Message.makeMessage(MSU, SENDER_NAME, PASS, PASS);
+        assertEquals(SENDER_NAME, message.getName());
+        assertEquals(PASS, message.getTextOrPassword());
+        assertEquals(PASS, message.getReceiverOrPassword());
+        assertTrue(message.isPrivateUserMessage());
     }
 
     /**
@@ -300,6 +314,7 @@ public class TestMessage {
     private static final String REG = "REG";
     private static final String DEG = "DEG";
     private static final String CRG = "CRG";
+    private static final String MSU = "MSU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

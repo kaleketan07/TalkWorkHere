@@ -335,6 +335,22 @@ public class ClientRunnable implements Runnable {
             }
         }
     }
+    
+    /**
+     * Handles private message
+     * 
+     * @param msg the incoming message_user type of message
+     * @throws SQLException thrown by the database queries and calls
+     */
+    private void handlePrivateMessage(Message msg) throws SQLException {
+    	 User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
+    	 if (destUser == null) {
+    		 ChatLogger.error("Destination username does not exist.");
+    	 }
+    	 else {
+    		 destUser.userSendMessage(msg);
+    	 }
+    }
 
     /**
      * Handles the login message
@@ -441,6 +457,8 @@ public class ClientRunnable implements Runnable {
             handleDeleteGroupMessage(msg);
         } else if(msg.isAddUserToGroupMessage()) {
         	handleAddUserToGroupMessage(msg);
+        } else if (msg.isPrivateUserMessage()) {
+        	handlePrivateMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

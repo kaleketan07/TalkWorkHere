@@ -153,7 +153,9 @@ public class Message {
             result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
             result = makeGetGroupMessage(srcName, textOrPassword);
-        }	
+        } else if(handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0){
+            result = makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
+        }
         return result;
     }
 
@@ -245,6 +247,19 @@ public class Message {
     public static Message makeGetGroupMessage(String srcName, String groupName) {
         return new Message(MessageType.GET_GROUP, srcName, groupName);
     }
+    /**
+     * The method creates a message that handles the user's request for updating
+     * his profile details
+     *
+     * @param uname         the username of the user
+     * @param firstName     the first name of the user
+     * @param lastName      the last name of the user
+     * @return the message
+     */
+    public static Message makeUserProfileUpdateMessage(String uname, String firstName, String lastName ){
+        return new Message(MessageType.UPDATE_PROFILE_USER, uname, firstName, lastName);
+    }
+
     /**
      * Return the name of the sender of this message.
      *
@@ -345,6 +360,10 @@ public class Message {
         return (msgType == MessageType.MESSAGE_USER);
     }
 
+    public boolean isUserProfileUpdateMessage(){
+        return (msgType == MessageType.UPDATE_PROFILE_USER);
+    }
+
     /**
      * This method verifies if the current message has the handle GTG (is a GET_GROUP message)
      *
@@ -362,6 +381,7 @@ public class Message {
     public boolean terminate() {
         return (msgType == MessageType.QUIT);
     }
+
 
     /**
      * Representation of this message as a String. This begins with the message

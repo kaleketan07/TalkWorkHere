@@ -43,10 +43,17 @@ public enum MessageType {
      * Message whose contents are to send a message from one user to another
      */
     MESSAGE_USER("MSU"),
+
     /**
-	    * Message whose contents are to add a user to a group with the passed parameters 
-	    */ 
-	  ADD_USER_GROUP("AUG");
+     * Message whose contents are to add a user to a group with the passed parameters
+     */
+    ADD_USER_GROUP("AUG"),
+
+    /**
+     * Message whose contents are to update a user's profile
+     */
+    UPDATE_PROFILE_USER("UPU");
+
     /**
      * Store the short name of this message type.
      */

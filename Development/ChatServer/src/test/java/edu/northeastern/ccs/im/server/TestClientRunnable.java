@@ -15,6 +15,7 @@ import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.GroupService;
 import edu.northeastern.ccs.im.services.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -1245,6 +1246,7 @@ public class TestClientRunnable {
         Mockito.when(mockMsg.isLoginMessage()).thenReturn(true,false);
         Mockito.when(mockMsg.isRegisterMessage()).thenReturn(false);
         Mockito.when(mockMsg.isAddUserToGroupMessage()).thenReturn(false);
+        Mockito.when(mockMsg.isUserProfileUpdateMessage()).thenReturn(false);
         Mockito.when(mockMsg.getName()).thenReturn(SENDER_NAME);
         ml.add(mockMsg);
         ml.add(mockMsg);
@@ -1458,6 +1460,64 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+
+    /**
+     * Test handle user profile update message when there is a successful update.
+     *
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testHandleUserProfileUpdateMessage() throws NoSuchFieldException,IllegalAccessException,SQLException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        messageList.add(USER_PROFILE_UPDATE);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"Alex","Predna")).thenReturn(true);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        Assertions.assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle user profile update message for false.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testHandleUserProfileUpdateMessageForFalse() throws
+            SQLException,IllegalAccessException,NoSuchFieldException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        messageList.add(USER_PROFILE_UPDATE);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"Alex","Predna")).thenReturn(false);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        Assertions.assertTrue(clientRunnableObject.isInitialized());
+    }
+
     //Private fields to be used in tests
     private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, TestClientRunnable.PASS);
@@ -1466,6 +1526,7 @@ public class TestClientRunnable {
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(TestClientRunnable.SENDER_NAME, "hello", "rb");
     private static final Message GET_GROUP = Message.makeGetGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
+    private static final Message USER_PROFILE_UPDATE = Message.makeUserProfileUpdateMessage(TestClientRunnable.SENDER_NAME,"Alex","Predna");
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

@@ -211,28 +211,25 @@ public class GroupService implements GroupDao {
     }
 
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#isModerator(java.lang.String, java.lang.String)
-     */
-    @Override
-    public boolean isModerator(String groupName, String userName) throws SQLException {
-        final String GET_MODERATOR_NAME = "SELECT moderator_name from prattle.groups where group_name = ?";
-        pstmt = conn.getPreparedStatement(GET_MODERATOR_NAME);
-        pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
-        String modName;
-        try {
-            result = pstmt.executeQuery();
-            if (!result.first()) {
-                throw new SQLException();
-            }
-            result.first();
-            modName = result.getString(MODERATOR_NAME);
-        } catch (Exception e) {
-            throw new SQLException();
+	/* (non-Javadoc)
+	 * @see edu.northeastern.ccs.im.services.GroupDao#isModerator(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isModerator(String groupName, String userName) throws SQLException {
+		final String GET_MODERATOR_NAME = "SELECT moderator_name from prattle.groups where group_name = ?";
+		pstmt = conn.getPreparedStatement(GET_MODERATOR_NAME);
+		pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
+		String modName;
+    	result = pstmt.executeQuery();
+        if(!result.first()){
+            return false;
         }
-        pstmt.close();
-        return userName.equals(modName);
-    }
+        result.first();
+        modName = result.getString(MODERATOR_NAME);
+        pstmt.close(); 
+		return userName.equals(modName);
+	}
+
 
 
     /* (non-Javadoc)

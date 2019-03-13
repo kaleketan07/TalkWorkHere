@@ -332,7 +332,12 @@ public class ClientRunnable implements Runnable {
             // since the user was not found, a new user with this name may be created
             if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+                ChatLogger.error("User" + msg.getName() +"registed");
             }
+            else {
+            	ChatLogger.error("Password and confirm password do not match.");
+            }
+            
         }
     }
     

@@ -297,14 +297,14 @@ public class TestGroupService {
     }
 
     /**
-     * Test is moderator check exception.
+     * Test is moderator for false.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testIsModeratorCheckException() throws SQLException {
+    public void testIsModeratorForFalse() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
-        Assertions.assertThrows(SQLException.class, () -> testGS.isModerator("ABC", "Alice"));
+        Assertions.assertFalse(testGS.isModerator("ABC","Alice"));
     }
 
     /**

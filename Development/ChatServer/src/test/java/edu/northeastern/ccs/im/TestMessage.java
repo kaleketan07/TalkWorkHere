@@ -275,8 +275,23 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isDeleteGroupMessage());
+        assertFalse(message.isDeleteUserMessage());
     }
     
+    /**
+     * Test makeMessage with Delete_User as the handle
+     */
+    @Test
+    public void testMakeMessageDeleteUserCondition() {
+        Message message = Message.makeMessage(DLU, SENDER_NAME, PASS, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(DLU);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeleteUserMessage());
+    }
     /**
      * Test makeMessage with Get_Group as the handle
      */
@@ -334,6 +349,7 @@ public class TestMessage {
     private static final String CRG = "CRG";
     private static final String MSU = "MSU";
     private static final String GTG = "GTG";
+    private static final String DLU = "DLU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

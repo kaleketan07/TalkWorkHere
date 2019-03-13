@@ -332,7 +332,12 @@ public class ClientRunnable implements Runnable {
             // since the user was not found, a new user with this name may be created
             if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+                ChatLogger.error("User" + msg.getName() +"registed");
             }
+            else {
+            	ChatLogger.error("Password and confirm password do not match.");
+            }
+            
         }
     }
     
@@ -429,6 +434,24 @@ public class ClientRunnable implements Runnable {
             }
         }
     }
+    
+    /**
+     * Handles the handleDeleteUserMessage
+     *
+     * @param msg - the incoming delete user message
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void handleDeleteUserMessage(Message msg) throws SQLException {
+        // Delete the user after getting the user
+    	User currentUser = userService.getUserByUserName(msg.getName());
+    	boolean result = userService.deleteUser(currentUser);
+    	if (!result) {
+    		ChatLogger.error("User could not deteled");
+    	}
+    	else {
+    		this.terminate = true;
+    	}
+    }
 
     /**
      * Handle add user to group message.
@@ -479,6 +502,8 @@ public class ClientRunnable implements Runnable {
         	handlePrivateMessage(msg);
         } else if (msg.isGetGroupMessage()) {
         	handleGetGroupMessage(msg);
+        } else if (msg.isDeleteUserMessage()) {
+        	handleDeleteUserMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

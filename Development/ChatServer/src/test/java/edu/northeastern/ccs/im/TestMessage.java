@@ -133,6 +133,7 @@ public class TestMessage {
         assertEquals(PASS, message.getTextOrPassword());
         assertEquals(PASS, message.getReceiverOrPassword());
         assertTrue(message.isPrivateUserMessage());
+        assertFalse(message.isGetGroupMessage());
     }
 
     /**
@@ -273,6 +274,23 @@ public class TestMessage {
         strBuild.append(toStringHelper(PASS));
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeleteGroupMessage());
+    }
+    
+    /**
+     * Test makeMessage with Get_Group as the handle
+     */
+    @Test
+    public void testMakeMessageGetGroupCondition() {
+        Message message = Message.makeMessage(GTG, SENDER_NAME, GROUP_NAME,PASS );
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(GTG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(GROUP_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isGetGroupMessage());
+        assertFalse(message.isDeleteGroupMessage());
     }
 
     /**
@@ -315,6 +333,7 @@ public class TestMessage {
     private static final String DEG = "DEG";
     private static final String CRG = "CRG";
     private static final String MSU = "MSU";
+    private static final String GTG = "GTG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

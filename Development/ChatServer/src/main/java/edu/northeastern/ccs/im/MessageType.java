@@ -32,18 +32,21 @@ public enum MessageType {
      */
     DELETE_GROUP("DEG"),
     /**
-    * Message whose contents are to create a group with the passed parameters 
-    */
-	  CREATE_GROUP("CRG"),
+     * Message whose contents are to create a group with the passed parameters
+     */
+    CREATE_GROUP("CRG"),
+    /**
+     * Message whose content is a groupname of the group of which details are needed
+     */
+	GET_GROUP("GTG"),
+    /**
+     * Message whose contents are to send a message from one user to another
+     */
+    MESSAGE_USER("MSU"),
     /**
 	    * Message whose contents are to add a user to a group with the passed parameters 
 	    */ 
-	  ADD_USER_GROUP("AUG"),
-	  /**
-     * Message whose contents are to send a message from one user to another
-     */
-    MESSAGE_USER("MSU");
-
+	  ADD_USER_GROUP("AUG");
     /**
      * Store the short name of this message type.
      */

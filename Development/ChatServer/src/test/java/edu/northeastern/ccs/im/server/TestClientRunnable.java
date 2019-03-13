@@ -557,6 +557,73 @@ public class TestClientRunnable {
 
     /**
      * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Get_Group Message as the message type
+     * With Valid Group
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithGetGroupMessageWithValidGroup() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        GroupService mockedGroupService = Mockito.mock(GroupService.class);
+        Field groupService = ClientRunnable.class.getDeclaredField("groupService");
+        groupService.setAccessible(true);
+        groupService.set(clientRunnableObject, mockedGroupService);
+        Group g = Mockito.mock(Group.class);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
+        messageList.clear();
+        messageList.add(GET_GROUP);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Get_Group Message as the message type
+     * With Invalid Group
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithGetGroupMessageWithInvalidGroup() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        GroupService mockedGroupService = Mockito.mock(GroupService.class);
+        Field groupService = ClientRunnable.class.getDeclaredField("groupService");
+        groupService.setAccessible(true);
+        groupService.set(clientRunnableObject, mockedGroupService);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
+        messageList.clear();
+        messageList.add(GET_GROUP);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
      * which also tests the handleOutgoingMessage() with Delete_Group Message as the message type
      * where user is not the moderator of the group
      */
@@ -1398,6 +1465,7 @@ public class TestClientRunnable {
     private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(TestClientRunnable.SENDER_NAME, "hello", "rb");
+    private static final Message GET_GROUP = Message.makeGetGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

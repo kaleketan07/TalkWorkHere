@@ -329,6 +329,27 @@ public class TestGroupService {
     }
 
     /**
+     * Test add user to group with existing user.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testRemoveUserFromGroupWithExistingUser() throws SQLException {
+    	Assertions.assertTrue(testGS.removeUserFromGroup("ABC", "AB"));
+    }
+    
+    /**
+     * Test add user to group with existing user.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testRemoveUserFromGroupWithNonUser() throws SQLException {
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+    	Assertions.assertFalse(testGS.removeUserFromGroup("ABC", "AB"));
+    }
+    
+    /**
      * Test add user to group with non existing user.
      *
      * @throws SQLException the SQL exception

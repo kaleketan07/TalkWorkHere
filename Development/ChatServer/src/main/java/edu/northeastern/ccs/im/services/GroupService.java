@@ -247,7 +247,24 @@ public class GroupService implements GroupDao {
         pstmt.close();
         return (qResult > 0);
     }
-
+    
+    /* (non-Javadoc)
+     * @see edu.northeastern.ccs.im.services.GroupDao#addUserToGroup(java.lang.String, java.lang.String)
+     */
+    /**
+     * @param hostGroupName
+     * @param guestUserName
+     * @return
+     * @throws SQLException
+     */
+    public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+    	final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_deleted = 1 WHERE host_group_name = ? and guest_user_name = ?";
+    	pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
+        pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
+        int qResult = pstmt.executeUpdate();
+        pstmt.close();
+        return (qResult > 0);
+    }
 
     /**
      * Gets the flat list of groups present in this group.

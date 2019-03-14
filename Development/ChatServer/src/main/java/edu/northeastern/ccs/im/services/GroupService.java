@@ -132,10 +132,8 @@ public class GroupService implements GroupDao {
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_USERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<User> users = new HashSet<>();
-
         result = pstmt.executeQuery();
         while (result.next()) {
-//            result.first();
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             String uName = result.getString(USER_NAME);
@@ -143,10 +141,7 @@ public class GroupService implements GroupDao {
             User user = new User(fName, lName, uName, "", stat);    // do we need a constructor without password here?
             users.add(user);
         }
-
-
         pstmt.close();
-
         return users;
     }
 
@@ -159,19 +154,12 @@ public class GroupService implements GroupDao {
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_GROUPS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<String> groups = new HashSet<>();
-        try {
-            result = pstmt.executeQuery();
-            while (result.next()) {
-                result.first();
-                String gName = result.getString(GROUP_NAME);
-                groups.add(gName);
-            }
-
-        } catch (Exception e) {
-            throw new SQLException();
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String gName = result.getString(GROUP_NAME);
+            groups.add(gName);
         }
         pstmt.close();
-
         return groups;
     }
 

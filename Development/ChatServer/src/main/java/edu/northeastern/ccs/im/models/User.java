@@ -144,9 +144,7 @@ public class User {
         if (clientRunnable != null) {
             flag = true;
             if(clientRunnable.isInitialized())
-            {
-            clientRunnable.enqueueMessage(msg);
-            }
+                clientRunnable.enqueueMessage(msg);
 
         }
         cms.insertConversationalMessage(src, this.getUserName(), msgText, flag);

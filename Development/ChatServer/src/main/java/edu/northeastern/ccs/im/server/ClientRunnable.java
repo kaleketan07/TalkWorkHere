@@ -132,6 +132,7 @@ public class ClientRunnable implements Runnable {
         // create user Service instance
         try {
             userService = UserService.getInstance();
+            groupService = GroupService.getGroupServiceInstance();
         } catch (ClassNotFoundException | SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e.getMessage());
         }
@@ -390,7 +391,7 @@ public class ClientRunnable implements Runnable {
         if (existingGroup != null) {
             ChatLogger.error("Groupname already exists! Please use a different group name.");
         } else {
-            groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
+            groupService.createGroup(msg.getTextOrPassword(), msg.getName());
         }
     }
     
@@ -555,6 +556,7 @@ public class ClientRunnable implements Runnable {
             // queue.
             do {
                 Message msg = waitingList.remove();
+                System.out.println("test");
                 boolean sentGood = sendMessage(msg);
                 keepAlive |= sentGood;
                 // Update the time until we terminate the client for inactivity.

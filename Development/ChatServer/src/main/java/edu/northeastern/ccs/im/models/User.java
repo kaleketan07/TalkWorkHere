@@ -143,7 +143,11 @@ public class User {
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
         if (clientRunnable != null) {
             flag = true;
+            if(clientRunnable.isInitialized())
+            {
             clientRunnable.enqueueMessage(msg);
+            }
+
         }
         cms.insertConversationalMessage(src, this.getUserName(), msgText, flag);
     }

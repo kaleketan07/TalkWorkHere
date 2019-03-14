@@ -214,7 +214,7 @@ public class UserService implements UserDao {
     @Override
     public boolean deleteUser(User u) throws SQLException {
         final String DELETE_USER =
-                "DELETE FROM user_profile WHERE username = ?";
+                "UPDATE user_profile SET user_deleted = 1 WHERE username = ?";
         pstmt = conn.getPreparedStatement(DELETE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, u.getUserName());
         int qResult = pstmt.executeUpdate();

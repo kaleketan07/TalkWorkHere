@@ -67,6 +67,7 @@ stage('Master Branch Tasks') {
  agent any
  steps {
    echo "Building ChatServer"
+   sh 'mvn -f Development/ChatServer/pom.xml install:install-file'
    sh 'mvn -f Development/ChatServer/pom.xml package -Dmaven.test.skip=true'          
 
    script {

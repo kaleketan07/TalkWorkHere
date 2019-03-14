@@ -478,6 +478,21 @@ public class ClientRunnable implements Runnable {
     }
     
     /**
+     * Handle the update message sent by the user. This just updates the first name and
+     * last name for the time being.
+     *
+     * @param msg The incoming user profile update message (for firstName and lastName only)
+     * @throws SQLException thrown by wrong database queries
+     */
+    private void handleUserProfileUpdateMessage(Message msg) throws SQLException{
+        if (userService.updateUserAttributes(msg.getName(), msg.getTextOrPassword(), msg.getReceiverOrPassword()))
+            ChatLogger.info("User's first name and last name updated successfully");
+        else
+            ChatLogger.error("Failed updating database");
+    }
+
+
+    /**
      * This method handles different types of messages and delegates works to its respective methods
      *
      * @param msg - The incoming message
@@ -502,6 +517,8 @@ public class ClientRunnable implements Runnable {
         	handlePrivateMessage(msg);
         } else if (msg.isGetGroupMessage()) {
         	handleGetGroupMessage(msg);
+        } else if (msg.isUserProfileUpdateMessage()){
+            handleUserProfileUpdateMessage(msg);
         } else if (msg.isDeleteUserMessage()) {
         	handleDeleteUserMessage(msg);
         } else {

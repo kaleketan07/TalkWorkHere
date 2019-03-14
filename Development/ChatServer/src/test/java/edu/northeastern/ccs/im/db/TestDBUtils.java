@@ -87,4 +87,13 @@ public class TestDBUtils {
         Assertions.assertNotNull(ps);
     }
 
+    @Test
+    public void testSetPreparedStatementArgsForNulls() throws SQLException {
+        DBUtils db = new DBUtils();
+        doNothing().when(mockedPreparedStatement).setString(1, null);
+        doNothing().when(mockedPreparedStatement).setString(2, null);
+        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement, null, null);
+        Assertions.assertNotNull(ps);
+    }
+
 }

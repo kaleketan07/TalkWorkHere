@@ -244,22 +244,58 @@ public class TestUserService {
         Assertions.assertThrows(SQLException.class, () -> us.getUserByUserNameAndPassword("AB", "QWERTY"));
     }
 
+    /**
+     * Test delete user for false.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testDeleteUserForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.deleteUser(testUser));
     }
 
+    /**
+     * Test update user false.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testUpdateUserFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.updateUser(testUser));
     }
 
+    /**
+     * Test create user false.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testCreateUserFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.createUser(testUser));
+    }
+
+    /**
+     * Test update user attributes for true.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributesForTrue() throws SQLException {
+        Assertions.assertTrue(us.updateUserAttributes("ABC","BCD","DEF"));
+    }
+
+    /**
+     * Test update user attributes for false.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributesForFalse() throws SQLException {
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.updateUserAttributes("ABC","BCD","DEF"));
     }
 
 }

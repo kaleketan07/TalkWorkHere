@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -309,6 +310,38 @@ public class TestMessage {
     }
 
     /**
+     * Test make message for user profile update message.
+     */
+    @Test
+    public void testMakeMessageForUserProfileUpdateMessage(){
+        Message message = Message.makeMessage(UPU, SENDER_NAME,"Alex","Predna");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("Alex", message.getTextOrPassword());
+        Assertions.assertEquals("Predna", message.getReceiverOrPassword());
+        Assertions.assertTrue(message.isUserProfileUpdateMessage());
+    }
+
+    /**
+     * Test make user profile update message.
+     */
+    @Test
+    public void testMakeUserProfileUpdateMessage(){
+        Message message = Message.makeUserProfileUpdateMessage(SENDER_NAME,"Alex","Predna");
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Assertions.assertEquals("Alex",message.getTextOrPassword());
+        Assertions.assertEquals("Predna",message.getReceiverOrPassword());
+    }
+
+    /**
+     * Test is user profile update message for false.
+     */
+    @Test
+    public void testIsUserProfileUpdateMessageForFalse(){
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isUserProfileUpdateMessage());
+    }
+
+    /**
      * Test toString method to return the expected output when
      * sender is null and text is not null
      */
@@ -349,6 +382,7 @@ public class TestMessage {
     private static final String CRG = "CRG";
     private static final String MSU = "MSU";
     private static final String GTG = "GTG";
+    private static final String UPU = "UPU";
     private static final String DLU = "DLU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";

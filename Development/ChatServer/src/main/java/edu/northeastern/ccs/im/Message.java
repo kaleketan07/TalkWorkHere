@@ -63,7 +63,8 @@ public class Message {
      *
      * @param handle  Handle for the type of message being created.
      * @param srcName Name of the individual sending this message
-     * @param text    Text of the instant message
+     * @param textorpassword the text or the password to be sent
+     * @param receiverorPassword    receiver or password
      */
     private Message(MessageType handle, String srcName, String textorpassword, String receiverorPassword) {
         msgType = handle;
@@ -155,7 +156,9 @@ public class Message {
             result = makeGetGroupMessage(srcName, textOrPassword);
         } else if(handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0){
             result = makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
-        }
+        } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
+            result = makeDeleteUserMessage(srcName);
+        }	
         return result;
     }
 
@@ -203,6 +206,17 @@ public class Message {
     public static Message makePrivateUserMessage(String srcName, String text, String destName) {
         return new Message(MessageType.MESSAGE_USER, srcName, text, destName);
     }
+    
+    /**
+     * This message creates a Delete User message type of a message
+     * 
+     * @param srcName   the username of the sender whoes profile needs to be deleted
+     * @return Message of type DeleteUser Message
+     */
+    public static Message makeDeleteUserMessage(String srcName) {
+        return new Message(MessageType.DELETE_USER, srcName);
+    }
+    
     /**
      * This method creates a delete group message based on the given group_name and moderator
      *
@@ -331,8 +345,16 @@ public class Message {
     public boolean isDeleteGroupMessage() {
         return (msgType == MessageType.DELETE_GROUP);
     }
-
-
+    
+    /**
+     * This method verifies if the current message has the handle DLU (is a Delete_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isDeleteUserMessage() {
+        return (msgType == MessageType.DELETE_USER);
+    }
+    
     /**
      * This method verifies if the current message has the handle CRG (is a create group message)
      *
@@ -360,6 +382,11 @@ public class Message {
         return (msgType == MessageType.MESSAGE_USER);
     }
 
+    /**
+     * This method verifies if the current message has the handle MSU (is a Message_User message)
+     *
+     * @return the boolean
+     */
     public boolean isUserProfileUpdateMessage(){
         return (msgType == MessageType.UPDATE_PROFILE_USER);
     }

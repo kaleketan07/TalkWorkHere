@@ -31,6 +31,8 @@ public class DBUtils {
                 stmt.setTimestamp(i++, (Timestamp) arg);
             else if (arg instanceof Boolean)
                 stmt.setBoolean(i++, (boolean) arg);
+            else if( arg == null)
+                stmt.setObject(i++,null);
         }
         return stmt;
     }

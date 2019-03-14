@@ -52,9 +52,14 @@ public enum MessageType {
     /**
      * Message whose contents are to update a user's profile
      */
-    UPDATE_PROFILE_USER("UPU");
+    UPDATE_PROFILE_USER("UPU"),
 
-    /**
+	/**
+    * Message whose contents are to delete a user profile
+    */ 
+    DELETE_USER("DLU");
+	    
+	/**
      * Store the short name of this message type.
      */
     private String abbreviation;

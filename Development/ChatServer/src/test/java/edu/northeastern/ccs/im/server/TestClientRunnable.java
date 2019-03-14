@@ -686,7 +686,65 @@ public class TestClientRunnable {
         Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
+    
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Delete User Message with valid user
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithDeleteUserMessage() throws SQLException, NoSuchFieldException, IllegalAccessException {
 
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Mockito.when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(true);
+        messageList.clear();
+        messageList.add(DELETE_USER);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with Delete User Message with invalid user
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithDeleteUserMessageInvalid() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Mockito.when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(false);
+        messageList.clear();
+        messageList.add(DELETE_USER);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
     
     /**
      * Testing checkForIntialization() Method using with Empty
@@ -764,8 +822,7 @@ public class TestClientRunnable {
      * @throws NoSuchFieldException      the no such field exception to be used while using java Reflection
      */
     @Test
-    public void testTimerIsBehind() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
-
+    public void testTimerIsBehind() throws IllegalAccessException,SQLException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
         Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
         retrieveItems.setAccessible(true);
         Message.class.getDeclaredMethods();
@@ -786,10 +843,15 @@ public class TestClientRunnable {
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
                 ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        UserService us = Mockito.mock(UserService.class);
+        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
         clientRunnableObject.setFuture(future);
         clientRunnableObject.run();
-        assertEquals(clientRunnableObject.isInitialized(), false);
-
+        assertFalse(clientRunnableObject.isInitialized());
     }
 
 
@@ -1525,6 +1587,7 @@ public class TestClientRunnable {
     private static final Message BROADCAST = Message.makeBroadcastMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.MESSAGE_TEXT);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(TestClientRunnable.SENDER_NAME, "hello", "rb");
+    private static final Message DELETE_USER = Message.makeDeleteUserMessage(TestClientRunnable.SENDER_NAME);
     private static final Message GET_GROUP = Message.makeGetGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
     private static final Message USER_PROFILE_UPDATE = Message.makeUserProfileUpdateMessage(TestClientRunnable.SENDER_NAME,"Alex","Predna");
     private static final String DUMMY_GROUP_NAME = "dummy";

@@ -46,7 +46,6 @@ public class GroupService implements GroupDao {
 
     }
 
-
     /**
      * Gets the singleton group service instance.
      *
@@ -73,7 +72,6 @@ public class GroupService implements GroupDao {
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         result = pstmt.executeQuery();
         if (result.first()) {
-            result.first();
             String gName = result.getString(GROUP_NAME);
             String modName = result.getString(MODERATOR_NAME);
             g.setGroupName(gName);
@@ -173,11 +171,7 @@ public class GroupService implements GroupDao {
         Set<Group> groups = new HashSet<>();
         try {
             result = pstmt.executeQuery();
-            if (!result.first()) {
-                throw new SQLException();
-            }
             while (result.next()) {
-                result.first();
                 String gName = result.getString(GROUP_NAME);
                 groups.add(getGroup(gName));
             }
@@ -204,7 +198,6 @@ public class GroupService implements GroupDao {
         if(!result.first()){
             return false;
         }
-        result.first();
         modName = result.getString(MODERATOR_NAME);
         pstmt.close(); 
 		return userName.equals(modName);

@@ -87,6 +87,12 @@ public class TestDBUtils {
         Assertions.assertNotNull(ps);
     }
 
+    /**
+     * Test set prepared statement args to cover conditions for condition coverage
+     * with setObject.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testSetPreparedStatementArgsForNulls() throws SQLException {
         DBUtils db = new DBUtils();
@@ -96,4 +102,18 @@ public class TestDBUtils {
         Assertions.assertNotNull(ps);
     }
 
+    /**
+     * Test set prepared statement args to cover conditions for condition coverage
+     * with setBoolean.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSetPreparedStatementArgsForBoolean() throws SQLException {
+        DBUtils db = new DBUtils();
+        doNothing().when(mockedPreparedStatement).setBoolean(1, false);
+        doNothing().when(mockedPreparedStatement).setBoolean(2, true);
+        PreparedStatement ps = db.setPreparedStatementArgs(mockedPreparedStatement, false, true);
+        Assertions.assertNotNull(ps);
+    }
 }

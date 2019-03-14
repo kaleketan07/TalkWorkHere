@@ -234,17 +234,6 @@ public class TestUserService {
     }
 
     /**
-     * Test get user by username and password when user not present.
-     *
-     * @throws SQLException the sql exception
-     */
-    @Test
-    public void testGetUserByUsernameAndPasswordUserNotPresent() throws SQLException {
-        when(mockedRS.first()).thenReturn(false);
-        Assertions.assertThrows(SQLException.class, () -> us.getUserByUserNameAndPassword("AB", "QWERTY"));
-    }
-
-    /**
      * Test delete user for false.
      *
      * @throws SQLException the sql exception

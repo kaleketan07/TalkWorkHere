@@ -556,7 +556,6 @@ public class ClientRunnable implements Runnable {
             // queue.
             do {
                 Message msg = waitingList.remove();
-                System.out.println("test");
                 boolean sentGood = sendMessage(msg);
                 keepAlive |= sentGood;
                 // Update the time until we terminate the client for inactivity.

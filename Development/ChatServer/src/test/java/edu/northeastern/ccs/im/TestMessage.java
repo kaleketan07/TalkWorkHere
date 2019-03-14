@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -119,6 +120,21 @@ public class TestMessage {
         assertFalse(message.isLoginMessage());
         assertTrue(message.isRegisterMessage());
         assertFalse(message.isCreateGroupMessage());
+        assertFalse(message.isPrivateUserMessage());
+    }
+    
+    /**
+     * Test to check if makeMessage creates the correct object
+     * based on the first parameter passed - Message_User Message.
+     */
+    @Test
+    public void testMakeMessageForPrivateUserMessage() {
+        Message message = Message.makeMessage(MSU, SENDER_NAME, PASS, PASS);
+        assertEquals(SENDER_NAME, message.getName());
+        assertEquals(PASS, message.getTextOrPassword());
+        assertEquals(PASS, message.getReceiverOrPassword());
+        assertTrue(message.isPrivateUserMessage());
+        assertFalse(message.isGetGroupMessage());
     }
 
     /**
@@ -259,6 +275,70 @@ public class TestMessage {
         strBuild.append(toStringHelper(PASS));
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeleteGroupMessage());
+        assertFalse(message.isDeleteUserMessage());
+    }
+    
+    /**
+     * Test makeMessage with Delete_User as the handle
+     */
+    @Test
+    public void testMakeMessageDeleteUserCondition() {
+        Message message = Message.makeMessage(DLU, SENDER_NAME, PASS, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(DLU);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeleteUserMessage());
+    }
+    /**
+     * Test makeMessage with Get_Group as the handle
+     */
+    @Test
+    public void testMakeMessageGetGroupCondition() {
+        Message message = Message.makeMessage(GTG, SENDER_NAME, GROUP_NAME,PASS );
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(GTG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(GROUP_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isGetGroupMessage());
+        assertFalse(message.isDeleteGroupMessage());
+    }
+
+    /**
+     * Test make message for user profile update message.
+     */
+    @Test
+    public void testMakeMessageForUserProfileUpdateMessage(){
+        Message message = Message.makeMessage(UPU, SENDER_NAME,"Alex","Predna");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("Alex", message.getTextOrPassword());
+        Assertions.assertEquals("Predna", message.getReceiverOrPassword());
+        Assertions.assertTrue(message.isUserProfileUpdateMessage());
+    }
+
+    /**
+     * Test make user profile update message.
+     */
+    @Test
+    public void testMakeUserProfileUpdateMessage(){
+        Message message = Message.makeUserProfileUpdateMessage(SENDER_NAME,"Alex","Predna");
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Assertions.assertEquals("Alex",message.getTextOrPassword());
+        Assertions.assertEquals("Predna",message.getReceiverOrPassword());
+    }
+
+    /**
+     * Test is user profile update message for false.
+     */
+    @Test
+    public void testIsUserProfileUpdateMessageForFalse(){
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isUserProfileUpdateMessage());
     }
 
     /**
@@ -300,6 +380,10 @@ public class TestMessage {
     private static final String REG = "REG";
     private static final String DEG = "DEG";
     private static final String CRG = "CRG";
+    private static final String MSU = "MSU";
+    private static final String GTG = "GTG";
+    private static final String UPU = "UPU";
+    private static final String DLU = "DLU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

@@ -63,7 +63,8 @@ public class Message {
      *
      * @param handle  Handle for the type of message being created.
      * @param srcName Name of the individual sending this message
-     * @param text    Text of the instant message
+     * @param textorpassword the text or the password to be sent
+     * @param receiverorPassword    receiver or password
      */
     private Message(MessageType handle, String srcName, String textorpassword, String receiverorPassword) {
         msgType = handle;
@@ -146,8 +147,18 @@ public class Message {
         } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
             result = makeDeleteGroupMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
-            result = makeCreateGroupMessage(srcName, textOrPassword);
-        }
+        	result = makeCreateGroupMessage(srcName, textOrPassword);  
+        } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
+        	result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
+            result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
+            result = makeGetGroupMessage(srcName, textOrPassword);
+        } else if(handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0){
+            result = makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
+        } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
+            result = makeDeleteUserMessage(srcName);
+        }	
         return result;
     }
 
@@ -185,6 +196,28 @@ public class Message {
     }
 
     /**
+     * This message creates a Private User message type of a message
+     * 
+     * @param srcName   the username of the sender of the message
+     * @param text		the text the sender wants to send
+     * @param destName	the username of the receiver of the message
+     * @return
+     */
+    public static Message makePrivateUserMessage(String srcName, String text, String destName) {
+        return new Message(MessageType.MESSAGE_USER, srcName, text, destName);
+    }
+    
+    /**
+     * This message creates a Delete User message type of a message
+     * 
+     * @param srcName   the username of the sender whoes profile needs to be deleted
+     * @return Message of type DeleteUser Message
+     */
+    public static Message makeDeleteUserMessage(String srcName) {
+        return new Message(MessageType.DELETE_USER, srcName);
+    }
+    
+    /**
      * This method creates a delete group message based on the given group_name and moderator
      *
      * @param userName  - username of the user(moderator) requesting a register
@@ -204,6 +237,41 @@ public class Message {
      */
     public static Message makeCreateGroupMessage(String myName, String groupName) {
         return new Message(MessageType.CREATE_GROUP, myName, groupName);
+    }
+    
+    
+    /**
+     * This method creates a message to add a user to group.
+     *
+     * @param myName the name of the sender
+     * @param userName the user name that is to be added in the group
+     * @param groupName the group name in which the user will be added
+     * @return the message object with handle Add user to group
+     */
+    public static Message makeAddUserToGroupMessage(String myName, String userName, String groupName) {
+    	return new Message(MessageType.ADD_USER_GROUP, myName, userName, groupName);
+    }
+    /**
+     * This method creates a get group message based on the given group name
+     *
+     * @param srcName   - srcName of the user asking for group details
+     * @param groupName - groupName is the name of the group whose details are needed
+     * @return a Message object of type login
+     */
+    public static Message makeGetGroupMessage(String srcName, String groupName) {
+        return new Message(MessageType.GET_GROUP, srcName, groupName);
+    }
+    /**
+     * The method creates a message that handles the user's request for updating
+     * his profile details
+     *
+     * @param uname         the username of the user
+     * @param firstName     the first name of the user
+     * @param lastName      the last name of the user
+     * @return the message
+     */
+    public static Message makeUserProfileUpdateMessage(String uname, String firstName, String lastName ){
+        return new Message(MessageType.UPDATE_PROFILE_USER, uname, firstName, lastName);
     }
 
     /**
@@ -277,8 +345,16 @@ public class Message {
     public boolean isDeleteGroupMessage() {
         return (msgType == MessageType.DELETE_GROUP);
     }
-
-
+    
+    /**
+     * This method verifies if the current message has the handle DLU (is a Delete_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isDeleteUserMessage() {
+        return (msgType == MessageType.DELETE_USER);
+    }
+    
     /**
      * This method verifies if the current message has the handle CRG (is a create group message)
      *
@@ -289,6 +365,42 @@ public class Message {
     }
 
     /**
+     * This method verifies if the current message has the handle ADG (is a add user to group message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isAddUserToGroupMessage() {
+      return (msgType == MessageType.ADD_USER_GROUP);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle MSU (is a Message_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isPrivateUserMessage() {
+        return (msgType == MessageType.MESSAGE_USER);
+    }
+
+    /**
+     * This method verifies if the current message has the handle MSU (is a Message_User message)
+     *
+     * @return the boolean
+     */
+    public boolean isUserProfileUpdateMessage(){
+        return (msgType == MessageType.UPDATE_PROFILE_USER);
+    }
+
+    /**
+     * This method verifies if the current message has the handle GTG (is a GET_GROUP message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isGetGroupMessage() {
+        return (msgType == MessageType.GET_GROUP);
+    }
+
+    /**
      * Determine if this message is a message signing off from the IM server.
      *
      * @return True if the message is sent when signing off; false otherwise
@@ -296,6 +408,7 @@ public class Message {
     public boolean terminate() {
         return (msgType == MessageType.QUIT);
     }
+
 
     /**
      * Representation of this message as a String. This begins with the message

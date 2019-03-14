@@ -34,8 +34,32 @@ public enum MessageType {
     /**
      * Message whose contents are to create a group with the passed parameters
      */
-    CREATE_GROUP("CRG");
+    CREATE_GROUP("CRG"),
     /**
+     * Message whose content is a groupname of the group of which details are needed
+     */
+	GET_GROUP("GTG"),
+    /**
+     * Message whose contents are to send a message from one user to another
+     */
+    MESSAGE_USER("MSU"),
+
+    /**
+     * Message whose contents are to add a user to a group with the passed parameters
+     */
+    ADD_USER_GROUP("AUG"),
+
+    /**
+     * Message whose contents are to update a user's profile
+     */
+    UPDATE_PROFILE_USER("UPU"),
+
+	/**
+    * Message whose contents are to delete a user profile
+    */ 
+    DELETE_USER("DLU");
+	    
+	/**
      * Store the short name of this message type.
      */
     private String abbreviation;

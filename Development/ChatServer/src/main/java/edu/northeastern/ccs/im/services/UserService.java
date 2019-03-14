@@ -165,6 +165,7 @@ public class UserService implements UserDao {
      * The function overwrites all other overwrite-able fields of the user.
      * The SQLException is thrown when a request is made to update the username and that username
      * is not found in the database OR when the new username matches another username in the database.
+     * NOTE : We might not need this yet, will delete if this turns out to be useless in the further sprints
      *
      * @param u The user object with new values in the fields
      * @return True if the update was successful, false otherwise
@@ -176,10 +177,29 @@ public class UserService implements UserDao {
         final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
                 "last_name = ?, user_password = ?, logged_in = ? WHERE username = ? ";
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt, u.getFirstName(), u.getLastName(), u.getUserPassword(), u.isLoggedIn(), user.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt, u.getFirstName(), u.getLastName(), u.getUserPassword(),
+                u.isLoggedIn(), user.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return qResult > 0;
+    }
+
+    /**
+     * This method will only update the user's first name and last name (for this sprint).
+     *
+     * @param uname         the username
+     * @param firstName     the first name of the user
+     * @param lastName      the last name of the user
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
+    public boolean updateUserAttributes(String uname, String firstName, String lastName) throws SQLException{
+        final String UPDATE_USER = "UPDATE user_profile SET first_name = ? , last_name = ? WHERE username = ?";
+        pstmt = conn.getPreparedStatement(UPDATE_USER);
+        pstmt = utils.setPreparedStatementArgs(pstmt,firstName,lastName,uname);
+        int qResult = pstmt.executeUpdate();
+        pstmt.close();
+        return qResult>0;
     }
 
 

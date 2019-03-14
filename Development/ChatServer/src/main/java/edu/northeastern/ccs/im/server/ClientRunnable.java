@@ -298,14 +298,21 @@ public class ClientRunnable implements Runnable {
         if (messageIter.hasNext()) {
             // Get the next message
             Message msg = messageIter.next();
-            // If the message is a broadcast message, send it out
-            if (msg.terminate()) {
-                // Stop sending the poor client message.
-                terminate = true;
-                // Reply with a quit message.
-                enqueueMessage(Message.makeQuitMessage(name));
-            } else {
-                processMessage(msg);
+            User user = userService.getUserByUserName(msg.getName());
+            // If the user does not exist, then maybe they are trying to register
+            if (user == null && !(msg.isRegisterMessage() || msg.isLoginMessage()))
+                ChatLogger.error("User does not exist");
+            else {
+                if (msg.terminate()) {
+                    // Stop sending the poor client message.
+                    terminate = true;
+                    // Reply with a quit message.
+                    enqueueMessage(Message.makeQuitMessage(name));
+                } else if (msg.isLoginMessage() || msg.isRegisterMessage() || ( user!=null && user.isLoggedIn())) {
+                    processMessage(msg);
+                } else {
+                    ChatLogger.error("User not logged in.");
+                }
             }
         }
     }
@@ -325,8 +332,29 @@ public class ClientRunnable implements Runnable {
             // since the user was not found, a new user with this name may be created
             if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+                ChatLogger.error("User" + msg.getName() +"registed");
             }
+            else {
+            	ChatLogger.error("Password and confirm password do not match.");
+            }
+            
         }
+    }
+    
+    /**
+     * Handles private message
+     * 
+     * @param msg the incoming message_user type of message
+     * @throws SQLException thrown by the database queries and calls
+     */
+    private void handlePrivateMessage(Message msg) throws SQLException {
+    	 User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
+    	 if (destUser == null) {
+    		 ChatLogger.error("Destination username does not exist.");
+    	 }
+    	 else {
+    		 destUser.userSendMessage(msg);
+    	 }
     }
 
     /**
@@ -353,7 +381,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the createGroupMessage
      *
-     * @param msg - the incoming login message
+     * @param msg - the incoming createGroupMessage
      * @throws SQLException - thrown by the database queries and calls
      */
     private void handleCreateGroupMessage(Message msg) throws SQLException {
@@ -362,11 +390,25 @@ public class ClientRunnable implements Runnable {
         if (existingGroup != null) {
             ChatLogger.error("Groupname already exists! Please use a different group name.");
         } else {
-            User currentUser = userService.getUserByUserName(msg.getName());
-            if (currentUser == null) {
-                ChatLogger.error("Please log in to the system first!");
-            }
             groupService.createGroup(msg.getReceiverOrPassword(), msg.getName());
+        }
+    }
+    
+    /**
+     * Handles the GetGroupMessage
+     *
+     * @param msg - the incoming getGroup message
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void handleGetGroupMessage(Message msg) throws SQLException {
+        // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+        Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
+        if (existingGroup == null) {
+            ChatLogger.error("Groupname does not exist. So no details can be provided");
+        } else {
+        	//Not sure if this code will work so have commented just see if next statement is valid or no
+        	//this.enqueue(msg);  HERE we might have to create a public makeGeneraMsg/MakePrattlemsg in Message class
+        	ChatLogger.error("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
         }
     }
 
@@ -380,12 +422,8 @@ public class ClientRunnable implements Runnable {
         // Delete the group after getting the valid moderator name and valid group name
         User currentUser = userService.getUserByUserName(msg.getName());
         Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
-        //if user does not exist
-        if (currentUser == null) {
-            ChatLogger.error("Username does not exist.");
-        }
         // if group does not exist
-        else if (currentGroup == null) {
+        if (currentGroup == null) {
             ChatLogger.error("Group does not exist.");
         } else {
             // if the user is in fact the moderator of the group only then delete the group
@@ -396,6 +434,63 @@ public class ClientRunnable implements Runnable {
             }
         }
     }
+    
+    /**
+     * Handles the handleDeleteUserMessage
+     *
+     * @param msg - the incoming delete user message
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void handleDeleteUserMessage(Message msg) throws SQLException {
+        // Delete the user after getting the user
+    	User currentUser = userService.getUserByUserName(msg.getName());
+    	boolean result = userService.deleteUser(currentUser);
+    	if (!result) {
+    		ChatLogger.error("User could not deteled");
+    	}
+    	else {
+    		this.terminate = true;
+    	}
+    }
+
+    /**
+     * Handle add user to group message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleAddUserToGroupMessage(Message msg) throws SQLException {
+    	User currentUser = userService.getUserByUserName(msg.getName());
+    	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+    	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
+    	if (currentGroup == null) {
+    		ChatLogger.error("The group you are trying to add to does not exist!");
+    	}
+    	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
+    		ChatLogger.error("You do not have the permissions to perform this operation");
+    	} 
+    	else if (guestUser == null) {
+    		ChatLogger.error("The user you are trying to add does not exist");
+    	}
+    	else {
+    		groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName());
+    	}
+    }
+    
+    /**
+     * Handle the update message sent by the user. This just updates the first name and
+     * last name for the time being.
+     *
+     * @param msg The incoming user profile update message (for firstName and lastName only)
+     * @throws SQLException thrown by wrong database queries
+     */
+    private void handleUserProfileUpdateMessage(Message msg) throws SQLException{
+        if (userService.updateUserAttributes(msg.getName(), msg.getTextOrPassword(), msg.getReceiverOrPassword()))
+            ChatLogger.info("User's first name and last name updated successfully");
+        else
+            ChatLogger.error("Failed updating database");
+    }
+
 
     /**
      * This method handles different types of messages and delegates works to its respective methods
@@ -416,6 +511,16 @@ public class ClientRunnable implements Runnable {
             handleCreateGroupMessage(msg);
         } else if (msg.isDeleteGroupMessage()) {
             handleDeleteGroupMessage(msg);
+        } else if(msg.isAddUserToGroupMessage()) {
+        	handleAddUserToGroupMessage(msg);
+        } else if (msg.isPrivateUserMessage()) {
+        	handlePrivateMessage(msg);
+        } else if (msg.isGetGroupMessage()) {
+        	handleGetGroupMessage(msg);
+        } else if (msg.isUserProfileUpdateMessage()){
+            handleUserProfileUpdateMessage(msg);
+        } else if (msg.isDeleteUserMessage()) {
+        	handleDeleteUserMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }
@@ -481,16 +586,12 @@ public class ClientRunnable implements Runnable {
 
         // logout user if already logged in
         User currentUser = userService.getUserByUserName(this.getName());
-        if (currentUser == null) {
-            ChatLogger.error("Incorrect username or password.");
-        } else {
-            userClients.remove(this.getName());
-            if (currentUser.isLoggedIn()) {
-                currentUser.setLoggedIn(false);
-                boolean updated = userService.updateUser(currentUser);
-                if (!updated) {
-                    ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
-                }
+        userClients.remove(this.getName());
+        if (currentUser.isLoggedIn()) {
+            currentUser.setLoggedIn(false);
+            boolean updated = userService.updateUser(currentUser);
+            if (!updated) {
+                ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
             }
         }
         // Remove the client from our client listing.

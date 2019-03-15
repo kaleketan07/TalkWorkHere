@@ -358,6 +358,12 @@ public class TestMessage {
         Assertions.assertFalse(message.isUserProfileUpdateMessage());
     }
 
+    @Test
+    public void testMakeMessageAddUserGroupMessageCondition() {
+        Message message = Message.makeMessage(AUG, SENDER_NAME, GROUP_NAME, ANOTHER_USER);
+        Assertions.assertTrue(message.isAddUserToGroupMessage());
+    }
+
     /**
      * Test toString method to return the expected output when
      * sender is null and text is not null
@@ -402,9 +408,11 @@ public class TestMessage {
     private static final String UPU = "UPU";
     private static final String DLU = "DLU";
     private static final String RUG = "RUG";
+    private static final String AUG = "AUG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final String PASS = "some_p@$$worD";
     private static final String GROUP_NAME = "group";
+    private static final String ANOTHER_USER = "another-user";
 }

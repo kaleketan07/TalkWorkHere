@@ -287,4 +287,26 @@ public class TestUserService {
         Assertions.assertFalse(us.updateUserAttributes("ABC","BCD","DEF"));
     }
 
+    /**
+     * Test if a null is sent instead of user when no matching result is found
+     * @throws SQLException thrown by downstream SQL calls
+     */
+    @Test
+    public void testNullConditionGetUserByUsernameAndPassword() throws SQLException{
+        when(mockedRS.first()).thenReturn(false);
+        Assertions.assertNull(us.getUserByUserNameAndPassword(USER, PASS));
+    }
+
+    /**
+     * Test if a null is sent instead of user when no matching result is found
+     * @throws SQLException thrown by downstream SQL calls
+     */
+    @Test
+    public void testNullConditionGetUserByUsername() throws SQLException{
+        when(mockedRS.first()).thenReturn(false);
+        Assertions.assertNull(us.getUserByUserName(USER));
+    }
+
+    private static final String USER = "user";
+    private static final String PASS = "pass";
 }

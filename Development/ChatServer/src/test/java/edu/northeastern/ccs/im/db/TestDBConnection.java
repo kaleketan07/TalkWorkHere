@@ -1,6 +1,6 @@
 package edu.northeastern.ccs.im.db;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
+import java.sql.SQLNonTransientConnectionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,7 +38,7 @@ public class TestDBConnection {
         DBConnection dbConn = new DBConnection();
         dbConn.close();
         String sql = "select * from test";
-        Assertions.assertThrows(MySQLNonTransientConnectionException.class, () -> dbConn.getPreparedStatement(sql));
+        Assertions.assertThrows(SQLNonTransientConnectionException.class, () -> dbConn.getPreparedStatement(sql));
     }
 
     /**

@@ -24,7 +24,6 @@ public class DBConnection {
         String driver = properties.getProperty("jdbc.driver");
         String username = properties.getProperty("jdbc.username");
         String password = properties.getProperty("jdbc.password");
-        Class.forName(driver);
         connection = DriverManager.getConnection(url, username, password);
     }
 

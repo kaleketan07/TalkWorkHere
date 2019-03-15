@@ -134,7 +134,7 @@ public class ClientRunnable implements Runnable {
             userService = UserService.getInstance();
             groupService = GroupService.getGroupServiceInstance();
         } catch (ClassNotFoundException | SQLException | IOException e) {
-            ChatLogger.error("Exception occurred : " + e.getMessage());
+            ChatLogger.error("Exception occurred : " + e);
         }
     }
 

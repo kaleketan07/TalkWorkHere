@@ -292,7 +292,24 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isDeleteUserMessage());
+        assertFalse(message.isRemoveUserFromGroupMessage());
     }
+    
+    /**
+     * Test makeMessage with Remove_user as the handle
+     */
+    @Test
+    public void testMakeMessageRemoveUserFromGroupCondition() {
+        Message message = Message.makeMessage(RUG, SENDER_NAME, GROUP_NAME, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(RUG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(GROUP_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isRemoveUserFromGroupMessage());
+    }
+    
     /**
      * Test makeMessage with Get_Group as the handle
      */
@@ -384,6 +401,7 @@ public class TestMessage {
     private static final String GTG = "GTG";
     private static final String UPU = "UPU";
     private static final String DLU = "DLU";
+    private static final String RUG = "RUG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";

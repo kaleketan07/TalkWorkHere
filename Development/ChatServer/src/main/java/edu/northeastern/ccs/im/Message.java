@@ -158,7 +158,9 @@ public class Message {
             result = makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
             result = makeDeleteUserMessage(srcName);
-        }	
+        } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
+            result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        }		
         return result;
     }
 
@@ -251,6 +253,20 @@ public class Message {
     public static Message makeAddUserToGroupMessage(String myName, String userName, String groupName) {
     	return new Message(MessageType.ADD_USER_GROUP, myName, userName, groupName);
     }
+    
+    /**
+     * This method creates a message to remove a user from group.
+     *
+     * @param myName the name of the sender
+     * @param userName the user name that is to be removed from the group
+     * @param groupName the group name in which the user will be removed form
+     * @return the message object with handle delete user from group
+     */
+    public static Message makeRemoveUserFromGroupMessage(String myName, String userName, String groupName) {
+    	return new Message(MessageType.REMOVE_USER_GROUP, myName, userName, groupName);
+    }
+
+    
     /**
      * This method creates a get group message based on the given group name
      *
@@ -371,6 +387,15 @@ public class Message {
      */
     public boolean isAddUserToGroupMessage() {
       return (msgType == MessageType.ADD_USER_GROUP);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle ADG (is a add user to group message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isRemoveUserFromGroupMessage() {
+      return (msgType == MessageType.REMOVE_USER_GROUP);
     }
     
     /**

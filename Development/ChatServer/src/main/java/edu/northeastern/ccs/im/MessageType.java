@@ -57,8 +57,13 @@ public enum MessageType {
 	/**
     * Message whose contents are to delete a user profile
     */ 
-    DELETE_USER("DLU");
-	    
+    DELETE_USER("DLU"),
+	/**
+    * Message whose contents are to delete a user profile from a group
+    */ 
+    REMOVE_USER_GROUP("RUG");    
+		  
+	
 	/**
      * Store the short name of this message type.
      */

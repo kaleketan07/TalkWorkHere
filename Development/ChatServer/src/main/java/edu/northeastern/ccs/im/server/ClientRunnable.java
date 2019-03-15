@@ -473,7 +473,47 @@ public class ClientRunnable implements Runnable {
     		ChatLogger.error("The user you are trying to add does not exist");
     	}
     	else {
-    		groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName());
+    		if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
+    		{
+    			ChatLogger.error("User was added successfully");
+    		}
+    		else 
+    		{
+    			ChatLogger.error("user was not added as the user was already there");	
+    		}
+    		
+    	}
+    }    
+    
+    /**
+     * Handle remove user from group message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleRemoveUserFromGroupMessage(Message msg) throws SQLException {
+    	User currentUser = userService.getUserByUserName(msg.getName());
+    	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+    	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
+    	if (currentGroup == null) {
+    		ChatLogger.error("The group you are trying to add to does not exist!");
+    	}
+    	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
+    		ChatLogger.error("You do not have the permissions to perform this operation");
+    	} 
+    	else if (guestUser == null) {
+    		ChatLogger.error("The user you are trying to add does not exist");
+    	}
+    	else {
+    		if(groupService.removeUserFromGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
+    		{
+    			ChatLogger.error("User was removed successfully");
+    		}
+    		else 
+    		{
+    			ChatLogger.error("user was not removed as the user was not in the group");	
+    		}
+    		
     	}
     }
     
@@ -513,6 +553,8 @@ public class ClientRunnable implements Runnable {
             handleDeleteGroupMessage(msg);
         } else if(msg.isAddUserToGroupMessage()) {
         	handleAddUserToGroupMessage(msg);
+        } else if(msg.isRemoveUserFromGroupMessage()) {
+        	handleRemoveUserFromGroupMessage(msg);	
         } else if (msg.isPrivateUserMessage()) {
         	handlePrivateMessage(msg);
         } else if (msg.isGetGroupMessage()) {

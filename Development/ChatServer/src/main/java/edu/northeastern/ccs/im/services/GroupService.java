@@ -112,7 +112,7 @@ public class GroupService implements GroupDao {
     @Override
     public boolean deleteGroup(String groupName) throws SQLException {
         final String DELETE_GROUP =
-                "DELETE FROM prattle.groups WHERE group_name = ?";
+                "UPDATE prattle.groups SET is_deleted = 1 WHERE group_name = ?";
         pstmt = conn.getPreparedStatement(DELETE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         int qResult = pstmt.executeUpdate();

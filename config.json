@@ -4,7 +4,7 @@
    "DNS": "ec2-3-80-147-81.compute-1.amazonaws.com",
     "user":"ec2-user",
     "directory":"/home/ec2-user",
-    "JARNAME": "prattle-0.0.1-SNAPSHOT.jar",
+    "JARNAME": "prattle-0.0.1-SNAPSHOT-jar-with-dependencies.jar",
     "PEM": "EC2-Instance-Key.pem"
  }
 ]

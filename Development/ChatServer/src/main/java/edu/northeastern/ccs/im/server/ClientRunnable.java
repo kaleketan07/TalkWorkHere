@@ -455,37 +455,41 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
+     * Helper for checking the validity of input before calling the handlers
+     * @param currentUser - the current user requesting the service
+     * @param currentGroup - the group from which the user needs to be removed or added to.
+     * @param guestUser - the user to be added or removed.
+     * @return - true or false value based on the required checks passed or failed respectively.
+     */
+    private boolean helperAddRemoveUserToGroupMessage(User currentUser, Group currentGroup, User guestUser) {
+        if (currentGroup == null)
+            ChatLogger.error("The group you are trying to add to does not exist!");
+        else if (!currentGroup.getModeratorName().equals(currentUser.getUserName()))
+            ChatLogger.error("You do not have the permissions to perform this operation");
+        else if (guestUser == null)
+            ChatLogger.error("The user you are trying to add does not exist");
+        else
+            return true;
+        return false;
+    }
+    /**
      * Handle add user to group message.
      *
      * @param msg the msg
      * @throws SQLException the SQL exception
      */
     private void handleAddUserToGroupMessage(Message msg) throws SQLException {
-    	User currentUser = userService.getUserByUserName(msg.getName());
-    	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
-    	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
-    	if (currentGroup == null) {
-    		ChatLogger.error("The group you are trying to add to does not exist!");
-    	}
-    	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
-    		ChatLogger.error("You do not have the permissions to perform this operation");
-    	} 
-    	else if (guestUser == null) {
-    		ChatLogger.error("The user you are trying to add does not exist");
-    	}
-    	else {
-    		if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
-    		{
-    			ChatLogger.error("User was added successfully");
-    		}
-    		else 
-    		{
-    			ChatLogger.error("user was not added as the user was already there");	
-    		}
-    		
-    	}
-    }    
-    
+        User currentUser = userService.getUserByUserName(msg.getName());
+        Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+        User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
+        if(helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
+            if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName()))
+                ChatLogger.error("User was added successfully");
+            else
+                ChatLogger.error("user was not added as the user was already there");
+        }
+    }
+
     /**
      * Handle remove user from group message.
      *
@@ -496,29 +500,15 @@ public class ClientRunnable implements Runnable {
     	User currentUser = userService.getUserByUserName(msg.getName());
     	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
     	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
-    	if (currentGroup == null) {
-    		ChatLogger.error("The group you are trying to add to does not exist!");
-    	}
-    	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
-    		ChatLogger.error("You do not have the permissions to perform this operation");
-    	} 
-    	else if (guestUser == null) {
-    		ChatLogger.error("The user you are trying to add does not exist");
-    	}
-    	else {
+        if(helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
     		if(groupService.removeUserFromGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
-    		{
     			ChatLogger.error("User was removed successfully");
-    		}
-    		else 
-    		{
-    			ChatLogger.error("user was not removed as the user was not in the group");	
-    		}
-    		
+    		else
+    			ChatLogger.error("user was not removed as the user was not in the group");
     	}
     }
     
-    /**
+    /**g
      * Handle the update message sent by the user. This just updates the first name and
      * last name for the time being.
      *
@@ -555,7 +545,7 @@ public class ClientRunnable implements Runnable {
         } else if(msg.isAddUserToGroupMessage()) {
         	handleAddUserToGroupMessage(msg);
         } else if(msg.isRemoveUserFromGroupMessage()) {
-        	handleRemoveUserFromGroupMessage(msg);	
+        	handleRemoveUserFromGroupMessage(msg);
         } else if (msg.isPrivateUserMessage()) {
         	handlePrivateMessage(msg);
         } else if (msg.isGetGroupMessage()) {

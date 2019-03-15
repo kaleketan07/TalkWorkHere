@@ -469,20 +469,19 @@ public class ClientRunnable implements Runnable {
     	}
     	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
     		ChatLogger.error("You do not have the permissions to perform this operation");
-    	} 
+    	}
     	else if (guestUser == null) {
     		ChatLogger.error("The user you are trying to add does not exist");
     	}
     	else {
-    		if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
+    		if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName()))
     		{
     			ChatLogger.error("User was added successfully");
     		}
-    		else 
+    		else
     		{
-    			ChatLogger.error("user was not added as the user was already there");	
+    			ChatLogger.error("user was not added as the user was already there");
     		}
-    		
     	}
     }    
     
@@ -497,13 +496,13 @@ public class ClientRunnable implements Runnable {
     	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
     	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
     	if (currentGroup == null) {
-    		ChatLogger.error("The group you are trying to add to does not exist!");
+    		ChatLogger.error("The group you are trying to remove to does not exist!");
     	}
     	else if (!currentGroup.getModeratorName().equals(currentUser.getUserName())) {
     		ChatLogger.error("You do not have the permissions to perform this operation");
     	} 
     	else if (guestUser == null) {
-    		ChatLogger.error("The user you are trying to add does not exist");
+    		ChatLogger.error("The user you are trying to remove does not exist");
     	}
     	else {
     		if(groupService.removeUserFromGroup(currentGroup.getGroupName(), guestUser.getUserName())) 

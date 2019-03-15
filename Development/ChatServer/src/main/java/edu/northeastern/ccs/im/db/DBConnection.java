@@ -18,7 +18,8 @@ public class DBConnection {
      */
     public DBConnection() throws ClassNotFoundException, SQLException, IOException {
         Properties properties = new Properties();
-        InputStream input = new FileInputStream("src/main/resources/rdsConfig.properties");
+        ClassLoader cl = this.getClass().getClassLoader();
+        InputStream input = cl.getResourceAsStream("rdsConfig.properties");
         properties.load(input);
         String url = properties.getProperty("jdbc.url");
         String driver = properties.getProperty("jdbc.driver");

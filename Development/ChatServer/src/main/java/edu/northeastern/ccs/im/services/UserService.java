@@ -61,18 +61,14 @@ public class UserService implements UserDao {
     public Set<User> getAllUsers() throws SQLException {
         final String GET_ALL_USERS = "SELECT * FROM user_profile";
         pstmt = conn.getPreparedStatement(GET_ALL_USERS);
-        try {
-            result = pstmt.executeQuery();
-            while (result.next()) {
-                String fName = result.getString(FIRST_NAME);
-                String lName = result.getString(LAST_NAME);
-                String uName = result.getString(USER_NAME);
-                String uPwd = result.getString(USER_PSWD);
-                boolean loggedInStatus = result.getBoolean(LOGGED_IN);
-                userSet.add(new User(fName, lName, uName, uPwd, loggedInStatus));
-            }
-        } catch (Exception e) {
-            throw new SQLException(e);
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String fName = result.getString(FIRST_NAME);
+            String lName = result.getString(LAST_NAME);
+            String uName = result.getString(USER_NAME);
+            String uPwd = result.getString(USER_PSWD);
+            boolean loggedInStatus = result.getBoolean(LOGGED_IN);
+            userSet.add(new User(fName, lName, uName, uPwd, loggedInStatus));
         }
         pstmt.close();
         return userSet;
@@ -90,23 +86,17 @@ public class UserService implements UserDao {
      */
     @Override
     public User getUserByUserNameAndPassword(String username, String password) throws SQLException {
-        User user;
+        User user = null;
         final String GET_USER_USERNAME_PSWD =
                 "SELECT * FROM user_profile WHERE username = ? AND user_password = ?";
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
         pstmt = utils.setPreparedStatementArgs(pstmt, username, password);
-        try {
-            result = pstmt.executeQuery();
-            if (!result.first()) {
-                throw new SQLException();
-            }
-            result.first();
+        result = pstmt.executeQuery();
+        if(result.first()) {
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             boolean loggedIn = result.getBoolean(LOGGED_IN);
             user = new User(fName, lName, username, password, loggedIn);
-        } catch (Exception e) {
-            throw new SQLException();
         }
         pstmt.close();
         return user;
@@ -121,7 +111,7 @@ public class UserService implements UserDao {
      */
     @Override
     public User getUserByUserName(String username) throws SQLException {
-        User user;
+        User user = null;
         final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt, username);
@@ -132,8 +122,6 @@ public class UserService implements UserDao {
             String uPwd = result.getString(USER_PSWD);
             boolean loggedIn = result.getBoolean(LOGGED_IN);
             user = new User(fName, lName, username, uPwd, loggedIn);
-        } else {
-            user = null;
         }
         pstmt.close();
         return user;
@@ -214,7 +202,7 @@ public class UserService implements UserDao {
     @Override
     public boolean deleteUser(User u) throws SQLException {
         final String DELETE_USER =
-                "DELETE FROM user_profile WHERE username = ?";
+                "UPDATE user_profile SET user_deleted = 1 WHERE username = ?";
         pstmt = conn.getPreparedStatement(DELETE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, u.getUserName());
         int qResult = pstmt.executeUpdate();

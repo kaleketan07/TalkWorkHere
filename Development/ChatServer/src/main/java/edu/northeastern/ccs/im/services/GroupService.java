@@ -46,7 +46,6 @@ public class GroupService implements GroupDao {
 
     }
 
-
     /**
      * Gets the singleton group service instance.
      *
@@ -68,12 +67,11 @@ public class GroupService implements GroupDao {
     @Override
     public Group getGroup(String groupName) throws SQLException {
         Group g = new Group();
-        final String GET_GROUP = "SELECT * FROM groups WHERE group_name = ?";
+        final String GET_GROUP = "SELECT * FROM prattle.groups WHERE group_name = ?";
         pstmt = conn.getPreparedStatement(GET_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         result = pstmt.executeQuery();
         if (result.first()) {
-            result.first();
             String gName = result.getString(GROUP_NAME);
             String modName = result.getString(MODERATOR_NAME);
             g.setGroupName(gName);
@@ -100,7 +98,7 @@ public class GroupService implements GroupDao {
     @Override
     public boolean createGroup(String groupName, String modName) throws SQLException {
         final String CREATE_GROUP =
-                "INSERT INTO groups (group_name, moderator_name) VALUES (?,?)";
+                "INSERT INTO prattle.groups (group_name, moderator_name) VALUES (?,?)";
         pstmt = conn.getPreparedStatement(CREATE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName, modName);
         int qResult = pstmt.executeUpdate();
@@ -114,7 +112,7 @@ public class GroupService implements GroupDao {
     @Override
     public boolean deleteGroup(String groupName) throws SQLException {
         final String DELETE_GROUP =
-                "DELETE FROM groups WHERE group_name = ?";
+                "DELETE FROM prattle.groups WHERE group_name = ?";
         pstmt = conn.getPreparedStatement(DELETE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         int qResult = pstmt.executeUpdate();
@@ -128,30 +126,20 @@ public class GroupService implements GroupDao {
     @Override
     public Set<User> getMemberUsers(String groupName) throws SQLException {
 
-        final String FETCH_MEMBER_USERS = "WITH cte AS (SELECT * FROM prattle.groups JOIN prattle.membership_users ON prattle.groups.group_name = prattle.membership_users.host_group_name WHERE prattle.groups.group_name = ?) SELECT user_id, username, first_name, last_name FROM cte JOIN prattle.user_profile ON cte.guest_user_name = prattle.user_profile.username;";
+        final String FETCH_MEMBER_USERS = "WITH cte AS (SELECT * FROM prattle.groups JOIN prattle.membership_users ON prattle.groups.group_name = prattle.membership_users.host_group_name WHERE prattle.groups.group_name = ?) SELECT user_id, username, first_name, last_name, logged_in FROM cte JOIN prattle.user_profile ON cte.guest_user_name = prattle.user_profile.username;";
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_USERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<User> users = new HashSet<>();
-        try {
-            result = pstmt.executeQuery();
-            if (!result.first()) {
-                throw new SQLException();
-            }
-            while (result.next()) {
-                result.first();
-                String fName = result.getString(FIRST_NAME);
-                String lName = result.getString(LAST_NAME);
-                String uName = result.getString(USER_NAME);
-                boolean stat = result.getBoolean(LOGGED_IN);
-                User user = new User(fName, lName, uName, "", stat);    // do we need a constructor without password here?
-                users.add(user);
-            }
-
-        } catch (Exception e) {
-            throw new SQLException();
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String fName = result.getString(FIRST_NAME);
+            String lName = result.getString(LAST_NAME);
+            String uName = result.getString(USER_NAME);
+            boolean stat = result.getBoolean(LOGGED_IN);
+            User user = new User(fName, lName, uName, "", stat);    // do we need a constructor without password here?
+            users.add(user);
         }
         pstmt.close();
-
         return users;
     }
 
@@ -164,22 +152,12 @@ public class GroupService implements GroupDao {
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_GROUPS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<String> groups = new HashSet<>();
-        try {
-            result = pstmt.executeQuery();
-            if (!result.first()) {
-                throw new SQLException();
-            }
-            while (result.next()) {
-                result.first();
-                String gName = result.getString(GROUP_NAME);
-                groups.add(gName);
-            }
-
-        } catch (Exception e) {
-            throw new SQLException();
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String gName = result.getString(GROUP_NAME);
+            groups.add(gName);
         }
         pstmt.close();
-
         return groups;
     }
 
@@ -188,16 +166,12 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Set<Group> getAllGroups() throws SQLException {
-        final String GET_ALL_GROUP_NAMES = "SELECT group_name from groups";
+        final String GET_ALL_GROUP_NAMES = "SELECT group_name from prattle.groups";
         pstmt = conn.getPreparedStatement(GET_ALL_GROUP_NAMES);
         Set<Group> groups = new HashSet<>();
         try {
             result = pstmt.executeQuery();
-            if (!result.first()) {
-                throw new SQLException();
-            }
             while (result.next()) {
-                result.first();
                 String gName = result.getString(GROUP_NAME);
                 groups.add(getGroup(gName));
             }
@@ -224,7 +198,6 @@ public class GroupService implements GroupDao {
         if(!result.first()){
             return false;
         }
-        result.first();
         modName = result.getString(MODERATOR_NAME);
         pstmt.close(); 
 		return userName.equals(modName);

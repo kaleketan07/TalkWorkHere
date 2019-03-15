@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The type Test group has the tests for the Group class
@@ -62,6 +64,16 @@ public class TestGroup {
         Assertions.assertEquals(TEST_MODERATOR_NAME, testGroup.getModeratorName());
     }
 
+    /**
+     * Test get member users.
+     */
+    @Test
+    public void testGetMemberUsers() {
+        Group testGroup = new Group();
+        Set<User> testUsers = new HashSet<>();
+        testGroup.setMemberUsers(testUsers);
+        Assertions.assertEquals(testUsers, testGroup.getMemberUsers());
+    }
 
     private final String TEST_GROUP_NAME = "Group201";
     private final String TEST_MODERATOR_NAME = "Alice";

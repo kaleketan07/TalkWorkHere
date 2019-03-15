@@ -202,7 +202,7 @@ public class TestGroupService {
      */
     @Test
     public void testGetMemberGroupsCheckException() throws SQLException {
-        when(mockedRS.first()).thenReturn(false);
+        doThrow(SQLException.class).when(mockedRS).next();
         Assertions.assertThrows(SQLException.class, () -> testGS.getMemberGroups("ABC"));
     }
 
@@ -236,7 +236,7 @@ public class TestGroupService {
      */
     @Test
     public void testGetAllGroupsCheckException() throws SQLException {
-        when(mockedRS.first()).thenReturn(false);
+        doThrow(SQLException.class).when(mockedRS).next();
         Assertions.assertThrows(SQLException.class, () -> testGS.getAllGroups());
     }
 
@@ -271,7 +271,7 @@ public class TestGroupService {
      */
     @Test
     public void testGetMembersUsersCheckException() throws SQLException {
-        when(mockedRS.first()).thenReturn(false);
+        doThrow(SQLException.class).when(mockedRS).next();
         Assertions.assertThrows(SQLException.class, () -> testGS.getMemberUsers("ABC"));
     }
 

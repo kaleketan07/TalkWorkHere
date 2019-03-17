@@ -61,8 +61,11 @@ public enum MessageType {
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 
-    REMOVE_USER_GROUP("RUG");    
-		  
+    REMOVE_USER_GROUP("RUG"),  
+	/**
+	 * Handle To send prattle messages to the client 
+	 */
+	PRATTLE_MESSAGE("PRM");
 	
 	/**
      * Store the short name of this message type.

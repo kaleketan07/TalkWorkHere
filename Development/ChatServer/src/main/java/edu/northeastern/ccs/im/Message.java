@@ -160,10 +160,20 @@ public class Message {
             result = makeDeleteUserMessage(srcName);
         } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
             result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        }		
+        }  			
         return result;
     }
-
+    
+    /**
+     * Creates a new message which updates the client with the responses from the prattle 
+     * server(error/success information)
+     * @param responseMessage text of the response message
+     * @return a message with Prattle_Message Handle
+     */
+    public static Message makePrattleMessage(String responseMessage) {
+    	return new Message(MessageType.PRATTLE_MESSAGE, "Prattle", responseMessage);
+    }
+    
     /**
      * Create a new message for the early stages when the user logs in without all
      * the special stuff.

@@ -1005,7 +1005,6 @@ public class TestClientRunnable {
         assertNotEquals(clientRunnableObject.getUserId(), -1);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
         ClientRunnable senderClient = ClientRunnable.getClientByUsername(SENDER_NAME);
-//        assertEquals(SENDER_NAME, senderClient.getName());
     }
 
     /**

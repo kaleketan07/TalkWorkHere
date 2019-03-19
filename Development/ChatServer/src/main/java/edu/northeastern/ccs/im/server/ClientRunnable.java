@@ -86,8 +86,11 @@ public class ClientRunnable implements Runnable {
      * Stores the groupService instance to be used across multiple conditions.
      */
     private GroupService groupService;
-
-
+    /**
+     * Error message to be sent
+     */
+    private Message responseMessage;
+    
     /**
      * This static data structure stores the client runnable instances
      * associated with their usernames for easy lookup during messaging.
@@ -170,6 +173,13 @@ public class ClientRunnable implements Runnable {
         return (msg.getName() != null) && (msg.getName().compareToIgnoreCase(getName()) == 0);
     }
 
+    /**
+     * Sending response message from prattle to client  
+     */
+    public void enqueuePrattleResponseMessage(String responseMessage) {
+    	this.enqueueMessage(Message.makePrattleMessage(responseMessage));
+    }
+    
     /**
      * Immediately send this message to the client. This returns if we were
      * successful or not in our attempt to send the message.
@@ -264,7 +274,7 @@ public class ClientRunnable implements Runnable {
      *
      * @see java.lang.Thread#run()
      */
-    public void run() {
+    public void run() {  
         try {
             // The client must be initialized before we can do anything else
             if (!initialized) {
@@ -328,15 +338,15 @@ public class ClientRunnable implements Runnable {
         // Register the user after checking whether the user already exists or no
         User currentUser = userService.getUserByUserName(msg.getName());
         if (currentUser != null) {
-            ChatLogger.error("Username already exists.");
+        	this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
             // since the user was not found, a new user with this name may be created
             if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                ChatLogger.error("User" + msg.getName() +"registed");
+                this.enqueuePrattleResponseMessage("User" + msg.getName() +"registed");
             }
             else {
-            	ChatLogger.error("Password and confirm password do not match.");
+            	this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
             }
             
         }
@@ -351,7 +361,7 @@ public class ClientRunnable implements Runnable {
     private void handlePrivateMessage(Message msg) throws SQLException {
     	 User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
     	 if (destUser == null) {
-    		 ChatLogger.error("Destination username does not exist.");
+    		 this.enqueuePrattleResponseMessage("Destination username does not exist.");
     	 }
     	 else {
     		 destUser.userSendMessage(msg);
@@ -368,13 +378,13 @@ public class ClientRunnable implements Runnable {
         // Login the user after checking in the user with this username-password combo exists
         User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
         if (currentUser == null) {
-            ChatLogger.error("Incorrect username or password.");
+        	this.enqueuePrattleResponseMessage("Incorrect username and password");
         } else {
             // since the user was found, set the loggedIn attribute to true in the database
             currentUser.setLoggedIn(true);
             boolean updated = userService.updateUser(currentUser);
             if (!updated) {
-                ChatLogger.error("The profile details for " + currentUser.getUserName() + " was not updated.");
+            	this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
             }
         }
     }
@@ -389,7 +399,7 @@ public class ClientRunnable implements Runnable {
         // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup != null) {
-            ChatLogger.error("Groupname already exists! Please use a different group name.");
+        	this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
         } else {
             groupService.createGroup(msg.getTextOrPassword(), msg.getName());
         }
@@ -405,11 +415,9 @@ public class ClientRunnable implements Runnable {
         // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup == null) {
-            ChatLogger.error("Groupname does not exist. So no details can be provided");
+        	this.enqueuePrattleResponseMessage("Groupname does not exist. So no details can be provided");
         } else {
-        	//Not sure if this code will work so have commented just see if next statement is valid or no
-        	//this.enqueue(msg);  HERE we might have to create a public makeGeneraMsg/MakePrattlemsg in Message class
-        	ChatLogger.error("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
+        	this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
         }
     }
 
@@ -425,13 +433,13 @@ public class ClientRunnable implements Runnable {
         Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
         // if group does not exist
         if (currentGroup == null) {
-            ChatLogger.error("Group does not exist.");
+        	this.enqueuePrattleResponseMessage("Group does not exist.");
         } else {
             // if the user is in fact the moderator of the group only then delete the group
             if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
                 groupService.deleteGroup(currentGroup.getGroupName());
             } else {
-                ChatLogger.error("CurrentUser is not the moderator of the group.");
+            	this.enqueuePrattleResponseMessage("CurrentUser is not the moderator of the group.");
             }
         }
     }
@@ -447,7 +455,7 @@ public class ClientRunnable implements Runnable {
     	User currentUser = userService.getUserByUserName(msg.getName());
     	boolean result = userService.deleteUser(currentUser);
     	if (!result) {
-    		ChatLogger.error("User could not deteled");
+    		this.enqueuePrattleResponseMessage("User could not deteled");
     	}
     	else {
     		this.terminate = true;
@@ -463,11 +471,11 @@ public class ClientRunnable implements Runnable {
      */
     private boolean helperAddRemoveUserToGroupMessage(User currentUser, Group currentGroup, User guestUser) {
         if (currentGroup == null)
-            ChatLogger.error("The group you are trying to add to does not exist!");
+        	this.enqueuePrattleResponseMessage("The group you are trying to add to does not exist!");
         else if (!currentGroup.getModeratorName().equals(currentUser.getUserName()))
-            ChatLogger.error("You do not have the permissions to perform this operation");
+        	this.enqueuePrattleResponseMessage("You do not have the permissions to perform this operation");
         else if (guestUser == null)
-            ChatLogger.error("The user you are trying to add does not exist");
+        	this.enqueuePrattleResponseMessage("The user you are trying to add does not exist");
         else
             return true;
         return false;
@@ -479,17 +487,21 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the SQL exception
      */
     private void handleAddUserToGroupMessage(Message msg) throws SQLException {
-        User currentUser = userService.getUserByUserName(msg.getName());
+    	
+    	User currentUser = userService.getUserByUserName(msg.getName());
         Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
         User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
         if(helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
-            if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName()))
-                ChatLogger.error("User was added successfully");
-            else
-                ChatLogger.error("user was not added as the user was already there");
+            if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName())) {
+            	this.enqueuePrattleResponseMessage("User was added successfully");
+            }
+            else {  
+                this.enqueuePrattleResponseMessage("User was not added as the user was already there");
+            }
         }
     }
 
+    
     /**
      * Handle remove user from group message.
      *
@@ -502,9 +514,9 @@ public class ClientRunnable implements Runnable {
     	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
         if(helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
     		if(groupService.removeUserFromGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
-    			ChatLogger.error("User was removed successfully");
+    			this.enqueuePrattleResponseMessage("User was removed successfully");
     		else
-    			ChatLogger.error("user was not removed as the user was not in the group");
+    			this.enqueuePrattleResponseMessage("user was not removed as the user was not in the group");
     	}
     }
     
@@ -517,9 +529,9 @@ public class ClientRunnable implements Runnable {
      */
     private void handleUserProfileUpdateMessage(Message msg) throws SQLException{
         if (userService.updateUserAttributes(msg.getName(), msg.getTextOrPassword(), msg.getReceiverOrPassword()))
-            ChatLogger.info("User's first name and last name updated successfully");
+        	this.enqueuePrattleResponseMessage("User's first name and last name updated successfully");
         else
-            ChatLogger.error("Failed updating database");
+        	this.enqueuePrattleResponseMessage("Failed updating database");
     }
 
 

@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im.services;
 
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.models.User;
@@ -173,18 +174,36 @@ public class UserService implements UserDao {
     }
 
     /**
-     * This method will only update the user's first name and last name (for this sprint).
+     * This method updates the user's profile attributes, assuming that the user has sent correct attribute name
+     * This will check if the attributeName is "user_searchable" and will prepare a different statement
+     * for such attribute. The assumption here is that the value corresponding to this attribute is either 1/True or
+     * 0/False.
+     * Other attributes assume Strings are passed.
      *
-     * @param uname         the username
-     * @param firstName     the first name of the user
-     * @param lastName      the last name of the user
+     * @param uname             the username
+     * @param attributeName     the attribute to be updated
+     * @param attributeValue    the value of the attribute that is to be set
      * @return the boolean
      * @throws SQLException the sql exception
      */
-    public boolean updateUserAttributes(String uname, String firstName, String lastName) throws SQLException{
-        final String UPDATE_USER = "UPDATE user_profile SET first_name = ? , last_name = ? WHERE username = ?";
+    public boolean updateUserAttributes(String uname, String attributeName, String attributeValue ) throws SQLException{
+        final String UPDATE_USER = "UPDATE user_profile SET " + attributeName + "  = ? WHERE username = ?";
+        String trueOrFalse;
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,firstName,lastName,uname);
+        if(attributeName.compareTo("user_searchable") == 0){
+            if(attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")){
+                trueOrFalse = "0";
+                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,uname);
+            }
+            else if(attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")){
+                trueOrFalse = "1";
+                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,uname);
+            }
+            else
+                ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
+        }else{
+            pstmt = utils.setPreparedStatementArgs(pstmt,attributeValue,uname);
+        }
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return qResult>0;

@@ -520,18 +520,45 @@ public class ClientRunnable implements Runnable {
     	}
     }
     
-    /**g
-     * Handle the update message sent by the user. This just updates the first name and
-     * last name for the time being.
+    /**
+     * Handle the update message sent by the user. Check which number value was sent,
+     * 1 is first name, 2 is second name, 3 is password, 4 is searchability and call updateUserAttributes accordingly
      *
      * @param msg The incoming user profile update message (for firstName and lastName only)
      * @throws SQLException thrown by wrong database queries
      */
-    private void handleUserProfileUpdateMessage(Message msg) throws SQLException{
-        if (userService.updateUserAttributes(msg.getName(), msg.getTextOrPassword(), msg.getReceiverOrPassword()))
-        	this.enqueuePrattleResponseMessage("User's first name and last name updated successfully");
+    private void handleUserProfileUpdateMessage(Message msg){
+        try{
+            String mappedAttributeName = helperUserProfileUpdateMessage(msg.getTextOrPassword());
+            if(userService.updateUserAttributes(msg.getName(), mappedAttributeName, msg.getReceiverOrPassword()))
+                this.enqueuePrattleResponseMessage("Updated the value: " + mappedAttributeName + " successfully.");
+            else
+                this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
+        }catch (SQLException e){
+            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages: \n" +
+                    " UPU;[AttributeNumber];Value \n Where AttributeNumber is \n 1 - First Name" +
+                    "\n 2 - Last Name \n 3 - Password \n 4 - User Searchable (1/0 True/False)");
+        }
+    }
+
+    /**
+     * Helper function to help map the attribute name to the number value sent by the user
+     * @param attributeNumber The number of the attribute to be mapped
+     * @return the mapped attribute name to be updated
+     */
+    private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException{
+        String mappedAttribute = null;
+        if(attributeNumber.compareTo("1") == 0)
+            mappedAttribute = "first_name";
+        else if(attributeNumber.compareTo("2") == 0)
+            mappedAttribute = "last_name";
+        else if(attributeNumber.compareTo("3") == 0)
+            mappedAttribute = "user_password";
+        else if(attributeNumber.compareTo("4") == 0)
+            mappedAttribute = "user_searchable";
         else
-        	this.enqueuePrattleResponseMessage("Failed updating database");
+            throw new SQLException("Number not in bounds");
+        return mappedAttribute;
     }
 
 

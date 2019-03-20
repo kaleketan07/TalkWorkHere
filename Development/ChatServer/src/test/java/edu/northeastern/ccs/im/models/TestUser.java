@@ -136,6 +136,24 @@ public class TestUser {
                 "Hello, Alice", true);
     }
 
+    /**
+     * Test setter and getter for searchable attribute when true.
+     */
+    @Test
+    public void testSetterAndGetterForSearchableAttributeWhenTrue(){
+        ALICE.setSearchable(true);
+        assertTrue(ALICE.isSearchable());
+    }
+
+    /**
+     * Test setter and getter for searchable attribute when false.
+     */
+    @Test
+    public void testSetterAndGetterForSearchableAttributeWhenFalse(){
+        ALICE.setSearchable(false);
+        assertFalse(ALICE.isSearchable());
+    }
+
     private static final User TOM = new User("Tom", "Harris", "tomharris", "123", false);
     private static final User ALICE = new User("Alice", "Bob", "alicebob", "password", false);
     private static final String RUBY = "RUBY";

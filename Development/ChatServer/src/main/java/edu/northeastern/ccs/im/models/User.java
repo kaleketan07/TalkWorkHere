@@ -21,6 +21,7 @@ public class User {
     private String userPassword;
     private boolean loggedIn;
     private static ConversationalMessageService cms;
+    private boolean searchable;
 
     static {
         try {
@@ -46,6 +47,7 @@ public class User {
         this.userPassword = userPassword;
         this.loggedIn = loggedInStatus;
         this.clientRunnable = null;
+        this.searchable = true;
     }
 
     /**
@@ -114,10 +116,26 @@ public class User {
     }
 
     /**
+     * Set the searchable flag of the user according to their preference
+     *
+     * @param searchableStatus - true or false status of the user's searchable preference
+     */
+    public void setSearchable(boolean searchableStatus){
+        searchable = searchableStatus;
+    }
+
+    /**
      * @return the loggedIn status of the user
      */
     public boolean isLoggedIn() {
         return loggedIn;
+    }
+
+    /**
+     * @return the searchable status of the user
+     */
+    public boolean isSearchable(){
+        return searchable;
     }
 
     /**

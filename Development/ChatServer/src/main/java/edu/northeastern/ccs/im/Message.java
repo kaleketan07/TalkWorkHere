@@ -291,13 +291,13 @@ public class Message {
      * The method creates a message that handles the user's request for updating
      * his profile details
      *
-     * @param uname         the username of the user
-     * @param firstName     the first name of the user
-     * @param lastName      the last name of the user
+     * @param uname             the username of the user
+     * @param attributeName     the attribute name (user profile attribute to be updated)
+     * @param attributeValue    the value of the attribute to be set
      * @return the message
      */
-    public static Message makeUserProfileUpdateMessage(String uname, String firstName, String lastName ){
-        return new Message(MessageType.UPDATE_PROFILE_USER, uname, firstName, lastName);
+    public static Message makeUserProfileUpdateMessage(String uname, String attributeName, String attributeValue ){
+        return new Message(MessageType.UPDATE_PROFILE_USER, uname, attributeName, attributeValue);
     }
 
     /**

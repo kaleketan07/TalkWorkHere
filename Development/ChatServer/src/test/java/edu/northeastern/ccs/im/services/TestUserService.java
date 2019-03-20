@@ -273,7 +273,7 @@ public class TestUserService {
      */
     @Test
     public void testUpdateUserAttributesForTrue() throws SQLException {
-        Assertions.assertTrue(us.updateUserAttributes("ABC","BCD","DEF"));
+        Assertions.assertTrue(us.updateUserAttributes("ABC","first_name","XYZ"));
     }
 
     /**
@@ -284,7 +284,7 @@ public class TestUserService {
     @Test
     public void testUpdateUserAttributesForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.updateUserAttributes("ABC","BCD","DEF"));
+        Assertions.assertFalse(us.updateUserAttributes("ABC","last_name","DEF"));
     }
 
     /**
@@ -305,6 +305,98 @@ public class TestUserService {
     public void testNullConditionGetUserByUsername() throws SQLException{
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertNull(us.getUserByUserName(USER));
+    }
+
+    /**
+     * Test update user attribute when the given attribute is not searchable attribute
+     * when database operations go as expected.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenNotSearchableForTrue() throws SQLException{
+        Assertions.assertTrue(us.updateUserAttributes("ABC","first_name","NewABC"));
+    }
+
+    /**
+     * Test update user attribute when the given attribute is not searchable attribute
+     * when database operations go as expected but there no user to be found of that username
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenNotSearchableForFalse() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.updateUserAttributes("ABC","first_name","NewABC"));
+    }
+
+    /**
+     * Test update user attribute when database operations throw an exception
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenException() throws SQLException{
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
+        Assertions.assertThrows(SQLException.class,() -> us.updateUserAttributes("ABC","first_name","NewABC"));
+    }
+
+    /**
+     * Test update user attribute when the given attribute is the searchable attribute and
+     * when database operations go as expected and input is "1"
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenSearchableIsTrueForOne() throws SQLException{
+        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","1"));
+    }
+
+    /**
+     * Test update user attribute when the given attribute is the searchable attribute and
+     * when database operations go as expected and input is "True"
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenSearchableIsTrueForTrueValue() throws SQLException{
+        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","True"));
+    }
+
+
+    /**
+     * Test update user attribute when the given attribute is the searchable attribute and
+     * when database operations go as expected and input is "False"
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenSearchableIsTrueForFalseValue() throws SQLException{
+        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","False"));
+    }
+
+    /**
+     * Test update user attribute when the given attribute is the searchable attribute and
+     * when database operations go as expected and input is "0"
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenSearchableIsTrueFor0Value() throws SQLException{
+        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","0"));
+    }
+
+    /**
+     * Test update user attribute when the given attribute is the searchable attribute but the value passed is
+     * not boolean
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateUserAttributeWhenSearchableButInvalidParameterPassed() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.updateUserAttributes("ABC","user_searchable",
+                "SomethingElse"));
     }
 
     private static final String USER = "user";

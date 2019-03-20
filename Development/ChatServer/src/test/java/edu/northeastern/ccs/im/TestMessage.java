@@ -349,7 +349,7 @@ public class TestMessage {
    
     
    /**
-    * Test addUniqueKey with PrivateReply as the handle
+    * Test addUniqueKey with DeleteUser as the handle
     */
    @Test
    public void testAddUniqueKeyWithInvalidHandle() {

@@ -147,15 +147,6 @@ public class TestUserService {
         Assertions.assertTrue(us.deleteUser(testUser));
     }
 
-    /**
-     * Test update user.
-     *
-     * @throws SQLException the sql exception
-     */
-    @Test
-    public void testUpdateUser() throws SQLException {
-        Assertions.assertTrue(us.updateUser(testUser));
-    }
 
     /**
      * Test the getAllUsers() method of UserService class
@@ -211,16 +202,6 @@ public class TestUserService {
         Assertions.assertThrows(SQLException.class, () -> us.createUser(testUser));
     }
 
-    /**
-     * Test update user exception.
-     *
-     * @throws SQLException the sql exception
-     */
-    @Test
-    public void testUpdateUserException() throws SQLException {
-        doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
-        Assertions.assertThrows(SQLException.class, () -> us.updateUser(testUser));
-    }
 
     /**
      * Test delete user exception.
@@ -244,16 +225,6 @@ public class TestUserService {
         Assertions.assertFalse(us.deleteUser(testUser));
     }
 
-    /**
-     * Test update user false.
-     *
-     * @throws SQLException the sql exception
-     */
-    @Test
-    public void testUpdateUserFalse() throws SQLException {
-        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.updateUser(testUser));
-    }
 
     /**
      * Test create user false.

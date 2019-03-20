@@ -322,7 +322,7 @@ public class TestClientRunnable {
         userService.set(clientRunnableObject, mockedUserService);
         User u = Mockito.mock(User.class);
         Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
-        Mockito.when(mockedUserService.updateUser(u)).thenReturn(true);
+        Mockito.when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(true);
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
@@ -712,7 +712,7 @@ public class TestClientRunnable {
         userService.set(clientRunnableObject, mockedUserService);
         User u = Mockito.mock(User.class);
         Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
-        Mockito.when(mockedUserService.updateUser(u)).thenReturn(false);
+        Mockito.when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(false);
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
@@ -1709,7 +1709,7 @@ public class TestClientRunnable {
         f.set(clientRunnableObject, mockedService);
         User loggedInUser = new User(null, null, SENDER_NAME, null, true);
         Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
-        Mockito.when(mockedService.updateUser(Mockito.any())).thenReturn(true);
+        Mockito.when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1741,7 +1741,7 @@ public class TestClientRunnable {
         f.set(clientRunnableObject, mockedService);
         User loggedInUser = new User(null, null, SENDER_NAME, null, true);
         Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
-        Mockito.when(mockedService.updateUser(Mockito.any())).thenReturn(false);
+        Mockito.when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(false);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());

@@ -147,32 +147,6 @@ public class UserService implements UserDao {
         return (qResult > 0);
     }
 
-
-    /**
-     * This function takes in a user object whose fields have new values, but the username
-     * and the user_id should match of a previous old user. If it does not, it throws a SQLException
-     * The function overwrites all other overwrite-able fields of the user.
-     * The SQLException is thrown when a request is made to update the username and that username
-     * is not found in the database OR when the new username matches another username in the database.
-     * NOTE : We might not need this yet, will delete if this turns out to be useless in the further sprints
-     *
-     * @param u The user object with new values in the fields
-     * @return True if the update was successful, false otherwise
-     * @throws SQLException returns the vendor specific error code for a wrong sql query
-     */
-    @Override
-    public boolean updateUser(User u) throws SQLException {
-        User user = getUserByUserName(u.getUserName());
-        final String UPDATE_USER = "UPDATE user_profile SET first_name = ?," +
-                "last_name = ?, user_password = ?, logged_in = ? WHERE username = ? ";
-        pstmt = conn.getPreparedStatement(UPDATE_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt, u.getFirstName(), u.getLastName(), u.getUserPassword(),
-                u.isLoggedIn(), user.getUserName());
-        int qResult = pstmt.executeUpdate();
-        pstmt.close();
-        return qResult > 0;
-    }
-
     /**
      * This method updates the user's profile attributes, assuming that the user has sent correct attribute name
      * This will check if the attributeName is "user_searchable" and will prepare a different statement
@@ -186,6 +160,7 @@ public class UserService implements UserDao {
      * @return the boolean
      * @throws SQLException the sql exception
      */
+    @Override
     public boolean updateUserAttributes(String uname, String attributeName, String attributeValue ) throws SQLException{
         final String UPDATE_USER = "UPDATE user_profile SET " + attributeName + "  = ? WHERE username = ?";
         String trueOrFalse;

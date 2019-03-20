@@ -381,8 +381,7 @@ public class ClientRunnable implements Runnable {
         	this.enqueuePrattleResponseMessage("Incorrect username and password");
         } else {
             // since the user was found, set the loggedIn attribute to true in the database
-            currentUser.setLoggedIn(true);
-            boolean updated = userService.updateUser(currentUser);
+            boolean updated = userService.updateUserAttributes(currentUser.getUserName(),"logged_in","1");
             if (!updated) {
             	this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
             }
@@ -660,8 +659,7 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserName(this.getName());
         userClients.remove(this.getName());
         if (currentUser.isLoggedIn()) {
-            currentUser.setLoggedIn(false);
-            boolean updated = userService.updateUser(currentUser);
+            boolean updated = userService.updateUserAttributes(currentUser.getUserName(),"logged_in","0");
             if (!updated) {
                 ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
             }

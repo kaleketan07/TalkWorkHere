@@ -12,8 +12,10 @@ import java.util.concurrent.ScheduledFuture;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+import edu.northeastern.ccs.im.models.ConversationalMessage;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.ConversationalMessageService;
 import edu.northeastern.ccs.im.services.GroupService;
 import edu.northeastern.ccs.im.services.UserService;
 
@@ -86,10 +88,17 @@ public class ClientRunnable implements Runnable {
      * Stores the groupService instance to be used across multiple conditions.
      */
     private GroupService groupService;
+
     /**
      * Error message to be sent
      */
     private Message responseMessage;
+
+
+    /**
+     * Store instance of ConversationalMessage to be used to retrive messages 
+     */
+    private ConversationalMessageService conversationalMessagesService;
     
     /**
      * This static data structure stores the client runnable instances
@@ -136,6 +145,7 @@ public class ClientRunnable implements Runnable {
         try {
             userService = UserService.getInstance();
             groupService = GroupService.getGroupServiceInstance();
+            conversationalMessagesService = ConversationalMessageService.getInstance();
         } catch (ClassNotFoundException | SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
         }
@@ -480,6 +490,32 @@ public class ClientRunnable implements Runnable {
             return true;
         return false;
     }
+    
+    
+    /**
+     * Handle PrivateReplyMessage to group message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handlePrivateReplyMessage(Message msg) throws SQLException {
+        String destName = conversationalMessagesService.getSender(msg.getReceiverOrPassword());
+    	if (destName != null)
+        {
+    		User destUser = userService.getUserByUserName(destName);
+            if (destUser == null) 
+            {
+       		 ChatLogger.error("msg_UniqueKey provided is wrong");
+       	 	}
+       	 	else {
+       	 		destUser.userSendMessage(msg);
+       	 	}
+        }
+    	else
+    		this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
+    				+ " Please try again with the right msg_uniqueKey");
+    }
+
     /**
      * Handle add user to group message.
      *
@@ -520,7 +556,7 @@ public class ClientRunnable implements Runnable {
     	}
     }
     
-    /**g
+    /**
      * Handle the update message sent by the user. This just updates the first name and
      * last name for the time being.
      *
@@ -566,6 +602,8 @@ public class ClientRunnable implements Runnable {
             handleUserProfileUpdateMessage(msg);
         } else if (msg.isDeleteUserMessage()) {
         	handleDeleteUserMessage(msg);
+        } else if (msg.isPrivateReplyMessage()) {
+        	handlePrivateReplyMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.ConversationalMessageService;
 import edu.northeastern.ccs.im.services.GroupService;
 import edu.northeastern.ccs.im.services.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -378,6 +379,116 @@ public class TestClientRunnable {
         
         messageList.clear();
         messageList.add(PRIVATE_MESSAGE);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithValidDestAddress() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        Message mockedMessage = Mockito.mock(Message.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,mockedUser);
+        Mockito.when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(PRIVATE_REPLY);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithInvalidDestAddress() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        Message mockedMessage = Mockito.mock(Message.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
+        Mockito.when(mockedcms.getSender(Mockito.anyString())).thenReturn(null);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(PRIVATE_REPLY);
+        messageIter = messageList.iterator();
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator form network connection
+     * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithInvalidDestAddress2() throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        Message mockedMessage = Mockito.mock(Message.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,null);
+        Mockito.when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(PRIVATE_REPLY);
         messageIter = messageList.iterator();
         Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
@@ -1992,6 +2103,7 @@ public class TestClientRunnable {
     private static final Message DELETE_USER = Message.makeDeleteUserMessage(TestClientRunnable.SENDER_NAME);
     private static final Message GET_GROUP = Message.makeGetGroupMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.GROUP_NAME);
     private static final Message USER_PROFILE_UPDATE = Message.makeUserProfileUpdateMessage(TestClientRunnable.SENDER_NAME,"Alex","Predna");
+    private static final Message PRIVATE_REPLY = Message.makePrivateReplyMessage(TestClientRunnable.SENDER_NAME,"Alex","MESSAGEKEY");    
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

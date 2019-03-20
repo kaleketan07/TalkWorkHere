@@ -53,11 +53,17 @@ public enum MessageType {
      * Message whose contents are to update a user's profile
      */
     UPDATE_PROFILE_USER("UPU"),
-
+    
+    /**
+     * Message to privately reply to a group Message
+     */
+    PRIVATE_REPLY_MESSAGE("PRE"),
+    
 	/**
     * Message whose contents are to delete a user profile
     */ 
     DELETE_USER("DLU"),
+    
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 

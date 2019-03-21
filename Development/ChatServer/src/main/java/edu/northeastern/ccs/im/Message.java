@@ -1,5 +1,8 @@
 package edu.northeastern.ccs.im;
 
+import java.util.Set;
+
+import edu.northeastern.ccs.im.models.User;
 /**
  * Each instance of this class represents a single transmission by our IM
  * clients.
@@ -37,6 +40,11 @@ public class Message {
      * The third argument used in the message.
      */
     private String msgReceiverOrPassword;
+    
+    /**
+     * The recipients of this message.
+     */
+    private Set<User> messageRecipients = null;
 
     /**
      * Create a new message that contains actual IM text. The type of distribution
@@ -90,6 +98,27 @@ public class Message {
         this(handle, srcName, null);
     }
 
+    
+    /**
+     * Checks if this message has already been sent to the user.
+     *
+     * @param u the user object to be checked for being a recipient
+     * @return true, if the user is already in the recipients else returns false
+     */
+    public boolean messageAlreadySent(User u) {
+    	return messageRecipients.contains(u);
+    }
+    
+    /**
+     * Adds the user to recipients.
+     *
+     * @param u the user object
+     * @return true, if the user is added to the messageRecipients successfully else returns false 
+     */
+    public boolean addUserToRecipients(User u) {
+    	return messageRecipients.add(u);
+    }
+    
     /**
      * Create a new message to continue the logout process.
      *

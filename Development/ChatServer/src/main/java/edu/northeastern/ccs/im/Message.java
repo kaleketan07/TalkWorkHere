@@ -198,6 +198,12 @@ public class Message {
             result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.MESSAGE_GROUP.toString()) == 0) {
         	result = makeGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
+            result = makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
+            result = makeFollowUserMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
+            result = makeUnfollowUserMessage(srcName, textOrPassword);
         }
         return result;
     }
@@ -349,6 +355,41 @@ public class Message {
     public static Message makePrivateReplyMessage(String srcName, String text, String msgUniqueKey) {
         return new Message(MessageType.PRIVATE_REPLY_MESSAGE, srcName , text, msgUniqueKey);
     }
+
+    /**
+     * Make update group message message.
+     *
+     * @param userName          the username of the sender of the update message
+     * @param groupName         the group name whose settings needs to be updated
+     * @param attributeKeyValue the attribute key and it's value separated by ':'
+     * @return the message object of type UPDATE_GROUP
+     */
+    public static Message makeUpdateGroupMessage(String userName, String groupName, String attributeKeyValue){
+        return new Message(MessageType.UPDATE_GROUP, userName, groupName, attributeKeyValue);
+    }
+
+    
+    /**
+     * This method creates a follow user message
+     *
+     * @param follower - String of the follower user name
+     * @param followee - string of the followee user name
+     * @return a Message object of type Follow_User
+     */
+    public static Message makeFollowUserMessage(String follower, String followee) {
+        return new Message(MessageType.FOLLOW_USER, follower, followee);
+    }
+    
+    /**
+     * This method creates a unfollow user message
+     *
+     * @param follower - String of the follower user name
+     * @param followee - string of the followee user name
+     * @return a Message object of type Unfollow_User
+     */
+    public static Message makeUnfollowUserMessage(String follower, String followee) {
+        return new Message(MessageType.UNFOLLOW_USER, follower, followee);
+    }
     
     /**
      * Add's the UniqueKey details to the existing message
@@ -493,6 +534,24 @@ public class Message {
     }
     
     /**
+     * This method verifies if the current message has the handle FWU (is a Follow_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isFollowUserMessage() {
+        return (msgType == MessageType.FOLLOW_USER);
+    }
+
+    /**
+     * This method verifies if the current message has the handle UFU (is a Unfollow_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isUnfollowUserMessage() {
+        return (msgType == MessageType.UNFOLLOW_USER);
+    }
+    
+    /**
      * This method verifies if the current message has the handle PRE (is a PRIVATE_REPLY_MESSAGE)
      *
      * @return true or false based on the comparison result
@@ -527,6 +586,13 @@ public class Message {
         return (msgType == MessageType.MESSAGE_GROUP);
     }
     
+    /**
+     * Verify if the message is a update group message.
+     *
+     * @return true if the message is a update_group message, false otherwise
+     */
+    public boolean isUpdateGroupMessage(){ return (msgType == MessageType.UPDATE_GROUP);}
+
     /**
      * Determine if this message is a message signing off from the IM server.
      *

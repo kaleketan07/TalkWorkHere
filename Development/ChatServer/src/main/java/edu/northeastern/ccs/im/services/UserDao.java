@@ -29,4 +29,22 @@ public interface UserDao {
 
     // delete a User from database
     boolean deleteUser(User u) throws SQLException;
+
+    /**
+     * add a entry for a user following other user
+     * @param followee user who is the followee
+     * @param follower user who is the follower
+     * @return true if the relation was inserted successfully
+     * @throws SQLException  the sql exception
+     */
+	boolean followUser(User followee, User follower) throws SQLException;
+	
+	/**
+     * delete a entry for a user following other user
+     * @param followee user who is the followee
+     * @param follower user who is the follower
+     * @return true if the relation was deleted successfully
+     * @throws SQLException  the sql exception
+     */
+	boolean unfollowUser(User followee, User follower) throws SQLException;
 }

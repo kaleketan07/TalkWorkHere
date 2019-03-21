@@ -2,10 +2,7 @@ package edu.northeastern.ccs.im.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
 
@@ -88,12 +85,6 @@ public class ClientRunnable implements Runnable {
      * Stores the groupService instance to be used across multiple conditions.
      */
     private GroupService groupService;
-
-    /**
-     * Error message to be sent
-     */
-    private Message responseMessage;
-
 
     /**
      * Store instance of ConversationalMessage to be used to retrive messages 
@@ -561,7 +552,7 @@ public class ClientRunnable implements Runnable {
      * Handle the update message sent by the user. This just updates the first name and
      * last name for the time being.
      *
-     * @param msg The incoming user profile update message (for firstName and lastName only)
+     * @param msg The incoming user profile update message
      * @throws SQLException thrown by wrong database queries
      */
     private void handleUserProfileUpdateMessage(Message msg){
@@ -576,9 +567,44 @@ public class ClientRunnable implements Runnable {
                     "using HELP UPU");
         }
     }
+    
+    /**
+     * Handle a user following other user of the other user exists in the database
+     *
+     * @param msg The incoming follow user message
+     * @throws SQLException thrown by wrong database queries
+     */
+    private void handleFollowUserMessage(Message msg) throws SQLException{
+       User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
+       User followerUser = userService.getUserByUserName(msg.getName());
+       
+       if (followeeUser == null) {
+    	   this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
+    	   return;
+       }
+       userService.followUser(followeeUser, followerUser);
+    }
+    
+    /**
+     * Handle a user unfollowing other user if the other user exists in the database
+     *
+     * @param msg The incoming follow user message
+     * @throws SQLException thrown by wrong database queries
+     */
+    private void handleUnfollowUserMessage(Message msg) throws SQLException{
+       User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
+       User followerUser = userService.getUserByUserName(msg.getName());
+       
+       if (followeeUser == null) {
+    	   this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
+    	   return;
+       }
+       userService.unfollowUser(followeeUser, followerUser);
+    }
 
     /**
-     * Helper function to help map the attribute name to the number value sent by the user
+     * Helper function to help map the attribute name 
+     * to the number value sent by the user
      * @param attributeNumber The number of the attribute to be mapped
      * @return the mapped attribute name to be updated
      */
@@ -596,6 +622,7 @@ public class ClientRunnable implements Runnable {
             throw new SQLException("Number not in bounds");
         return mappedAttribute;
     }
+
 
     
     /**
@@ -615,6 +642,54 @@ public class ClientRunnable implements Runnable {
     		this.enqueuePrattleResponseMessage("message sent successfully");
     		currGroup.groupSendMessage(msg);
     	}
+    }
+
+    /**
+     * Handle the update group message method
+     *
+     * @param msg the message sent by the client
+     * @throws SQLException
+     */
+    private void handleUpdateGroupMessage(Message msg){
+        try {
+            User user = userService.getUserByUserName(msg.getName());
+            Group group = groupService.getGroup(msg.getTextOrPassword());
+            if (group == null) {
+                this.enqueuePrattleResponseMessage("This group does not exist yet.");
+            } else if (groupService.isModerator(msg.getTextOrPassword(), user.getUserName())) {
+                //User is allowed to make changes to this group
+                //Split the string into key and value pair
+                String[] keyValuePair = msg.getReceiverOrPassword().split(":");
+                String attributeName = getGroupAttributeName(keyValuePair[0]);
+                if(groupService.updateGroupSettings(msg.getTextOrPassword(),attributeName,keyValuePair[1]))
+                    this.enqueuePrattleResponseMessage("Group setting updated successfully");
+                else
+                    this.enqueuePrattleResponseMessage("Failed updating the group setting.");
+            } else {
+                this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
+            }
+        }catch(Exception e){
+            this.enqueuePrattleResponseMessage("Something went wrong with the update. Please refer to the correct " +
+                    "group update syntax using HELP UPG");
+        }
+    }
+
+    /**
+     * This method is used for mapping the group setting number sent in the update group message
+     * to the group setting name that is present in the database. This is a separate function since
+     * more group settings may get added later on.
+     *
+     * @param attributeNumber the number of the attribute
+     * @return a String which is the name of the attribute as defined in the database
+     * @throws SQLException the SQL exception.
+     */
+    private String getGroupAttributeName(String attributeNumber) throws SQLException{
+        String attributeName;
+        if(attributeNumber.compareTo("1") == 0)
+            attributeName = "is_searchable";
+        else
+            throw new SQLException("Group setting number out of bounds");
+        return attributeName;
     }
 
     /**
@@ -652,6 +727,12 @@ public class ClientRunnable implements Runnable {
         	handlePrivateReplyMessage(msg);
         } else if (msg.isGroupMessage()){
         	handleGroupMessage(msg);
+        } else if (msg.isUpdateGroupMessage()) {
+            handleUpdateGroupMessage(msg);
+        } else if (msg.isFollowUserMessage()) {
+        	handleFollowUserMessage(msg);
+        } else if (msg.isUnfollowUserMessage()) {
+        	handleUnfollowUserMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

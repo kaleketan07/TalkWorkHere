@@ -68,14 +68,28 @@ public enum MessageType {
     * Message whose contents are to delete a user profile from a group
     */ 
     REMOVE_USER_GROUP("RUG"),  
+    /**
+     * Message whose contents are to follow a user
+     */
+    FOLLOW_USER("FWU"),
+    /**
+     * Message whose contents are to unfollow a user
+     */
+    UNFOLLOW_USER("UFU"),
 	/**
 	 * Handle To send prattle messages to the client 
 	 */
 	PRATTLE_MESSAGE("PRM"),
+
 	/**
 	 * Handle To send prattle messages to the client 
 	 */
-	MESSAGE_GROUP("MSG");
+	MESSAGE_GROUP("MSG"),
+
+    /**
+     * Handle to Update group settings.
+     */
+    UPDATE_GROUP("UPG");
 	
 	/**
      * Store the short name of this message type.

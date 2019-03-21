@@ -69,9 +69,13 @@ public enum MessageType {
     */ 
     REMOVE_USER_GROUP("RUG"),  
     /**
-     * Message whose contents ara to follow a user
+     * Message whose contents are to follow a user
      */
     FOLLOW_USER("FWU"),
+    /**
+     * Message whose contents are to unfollow a user
+     */
+    UNFOLLOW_USER("UFU"),
 	/**
 	 * Handle To send prattle messages to the client 
 	 */

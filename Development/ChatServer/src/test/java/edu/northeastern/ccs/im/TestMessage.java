@@ -250,6 +250,7 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
         assertFalse(message.isFollowUserMessage());
+        assertFalse(message.isUnfollowUserMessage());
     }
     
     /**
@@ -265,6 +266,21 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isFollowUserMessage());
+    }
+    
+    /**
+     * Test for message Follow_User
+     */
+    @Test
+    public void testUnfollowUserMessage() {
+        Message message = Message.makeMessage(UFU, SENDER_NAME, SENDER_NAME, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(UFU);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isUnfollowUserMessage());
     }
     
     /**
@@ -575,6 +591,7 @@ public class TestMessage {
     private static final String PRE = "PRE";
     private static final String PRM = "PRM";
     private static final String FWU = "FWU";
+    private static final String UFU = "UFU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

@@ -1889,6 +1889,33 @@ public class TestClientRunnable {
        clientRunnableObject.run();
    }
    
+   /**
+    * Verify unfollow user is handled properly for valid followee
+    */
+   @Test
+   public void testUserUnfollowMessageValid() throws NoSuchFieldException, IllegalAccessException, SQLException {
+
+	   List<Message> messageList = new ArrayList<>();
+       messageList.add(BROADCAST);
+       Iterator<Message> messageIter = messageList.iterator();
+       NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       clientRunnableObject.run();
+       UserService mockedUserService = Mockito.mock(UserService.class);
+       Field userService = ClientRunnable.class.getDeclaredField("userService");
+       userService.setAccessible(true);
+       userService.set(clientRunnableObject, mockedUserService);
+       USER_LOGGED_ON.setLoggedIn(true);
+       Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON,USER_LOGGED_ON);
+       messageList.clear();
+       messageList.add(UNFOLLOW_USER_MESSAGE);
+       messageIter = messageList.iterator();
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       clientRunnableObject.run();
+   }
    
    /**
     * Verify follow user is handled properly for invalid followee 
@@ -1913,6 +1940,34 @@ public class TestClientRunnable {
        Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON,null);
        messageList.clear();
        messageList.add(FOLLOW_USER_MESSAGE);
+       messageIter = messageList.iterator();
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       clientRunnableObject.run();
+   }
+   
+   /**
+    * Verify unfollow user is handled properly for invalid followee 
+    **/
+   @Test
+   public void testUserUnfollowMessageInvalid() throws NoSuchFieldException, IllegalAccessException, SQLException {
+
+	   List<Message> messageList = new ArrayList<>();
+       messageList.add(BROADCAST);
+       Iterator<Message> messageIter = messageList.iterator();
+       NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       clientRunnableObject.run();
+       UserService mockedUserService = Mockito.mock(UserService.class);
+       Field userService = ClientRunnable.class.getDeclaredField("userService");
+       userService.setAccessible(true);
+       userService.set(clientRunnableObject, mockedUserService);
+       USER_LOGGED_ON.setLoggedIn(true);
+       Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON,null);
+       messageList.clear();
+       messageList.add(UNFOLLOW_USER_MESSAGE);
        messageIter = messageList.iterator();
        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
        clientRunnableObject.run();
@@ -2572,6 +2627,7 @@ public class TestClientRunnable {
     private static final Message USER_PROFILE_UPDATE = Message.makeUserProfileUpdateMessage(TestClientRunnable.SENDER_NAME,"Alex","Predna");
     private static final Message PRIVATE_REPLY = Message.makePrivateReplyMessage(TestClientRunnable.SENDER_NAME,"Alex","MESSAGEKEY");    
     private static final Message FOLLOW_USER_MESSAGE = Message.makeFollowUserMessage(TestClientRunnable.SENDER_NAME,"Alex");  
+    private static final Message UNFOLLOW_USER_MESSAGE = Message.makeUnfollowUserMessage(TestClientRunnable.SENDER_NAME,"Alex");  
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

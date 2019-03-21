@@ -200,6 +200,8 @@ public class Message {
             result = makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
             result = makeFollowUserMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
+            result = makeUnfollowUserMessage(srcName, textOrPassword);
         }
         return result;
     }
@@ -377,6 +379,17 @@ public class Message {
     }
     
     /**
+     * This method creates a unfollow user message
+     *
+     * @param follower - String of the follower user name
+     * @param followee - string of the followee user name
+     * @return a Message object of type Unfollow_User
+     */
+    public static Message makeUnfollowUserMessage(String follower, String followee) {
+        return new Message(MessageType.UNFOLLOW_USER, follower, followee);
+    }
+    
+    /**
      * Add's the UniqueKey details to the existing message
      * @param msg   The message to be sent
      * @param text 	The text to be replaced in msg object
@@ -513,6 +526,15 @@ public class Message {
      */
     public boolean isFollowUserMessage() {
         return (msgType == MessageType.FOLLOW_USER);
+    }
+
+    /**
+     * This method verifies if the current message has the handle UFU (is a Unfollow_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isUnfollowUserMessage() {
+        return (msgType == MessageType.UNFOLLOW_USER);
     }
     
     /**

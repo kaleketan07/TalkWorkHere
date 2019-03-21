@@ -138,7 +138,7 @@ public class TestUserService {
     }
     
     /**
-     * Test create user.
+     * Test follow user.
      *
      * @throws SQLException the sql exception
      */
@@ -213,7 +213,7 @@ public class TestUserService {
     }
     
     /**
-     * Test create user exception.
+     * Test follow user exception.
      *
      * @throws SQLException the sql exception
      */

@@ -196,6 +196,8 @@ public class Message {
             result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword); 			
         } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
             result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
+            result = makeFollowUserMessage(srcName, textOrPassword);
         }
         return result;
     }
@@ -349,6 +351,17 @@ public class Message {
     }
     
     /**
+     * This method creates a follow user message
+     *
+     * @param follower - String of the follower user name
+     * @param followee - string of the followee user name
+     * @return a Message object of type Follow_User
+     */
+    public static Message makeFollowUserMessage(String follower, String followee) {
+        return new Message(MessageType.FOLLOW_USER, follower, followee);
+    }
+    
+    /**
      * Add's the UniqueKey details to the existing message
      * @param msg   The message to be sent
      * @param text 	The text to be replaced in msg object
@@ -476,6 +489,15 @@ public class Message {
      */
     public boolean isPrivateUserMessage() {
         return (msgType == MessageType.MESSAGE_USER);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle FWU (is a Follow_User message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isFollowUserMessage() {
+        return (msgType == MessageType.FOLLOW_USER);
     }
     
     /**

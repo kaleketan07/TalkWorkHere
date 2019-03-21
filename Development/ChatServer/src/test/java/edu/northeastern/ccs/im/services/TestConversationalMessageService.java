@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im.services;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -105,6 +106,30 @@ public class TestConversationalMessageService {
         mockedRS = null;
     }
 
+    /**
+     * Test getSender() method 
+     * @throws SQLException 
+     */
+    @Test
+    public void testGetSender() throws SQLException {
+    	String ret = cs.getSender("ABC");
+        assertTrue(ret.equals("ABC"));
+    }
+    
+
+    /**
+     * Test getSender() method  with invalid user
+     * @throws SQLException 
+     */
+    @Test
+    public void testGetSenderInvalid() throws SQLException {
+    	when(mockedRS.first()).thenReturn(false);
+        String ret = cs.getSender("ABC");
+    	assertNull(ret);
+    }
+    
+    
+    
     /**
      * Test for inserConversationalMessage using src_name, dest_name, msg_text
      *

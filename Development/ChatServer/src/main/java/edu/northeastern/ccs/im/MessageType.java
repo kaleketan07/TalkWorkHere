@@ -81,6 +81,11 @@ public enum MessageType {
 	 */
 	PRATTLE_MESSAGE("PRM"),
 
+	/**
+	 * Handle To send prattle messages to the client 
+	 */
+	MESSAGE_GROUP("MSG"),
+
     /**
      * Handle to Update group settings.
      */

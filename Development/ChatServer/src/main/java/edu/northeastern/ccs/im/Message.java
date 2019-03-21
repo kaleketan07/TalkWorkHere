@@ -1,5 +1,9 @@
 package edu.northeastern.ccs.im;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import edu.northeastern.ccs.im.models.User;
 /**
  * Each instance of this class represents a single transmission by our IM
  * clients.
@@ -37,6 +41,11 @@ public class Message {
      * The third argument used in the message.
      */
     private String msgReceiverOrPassword;
+    
+    /**
+     * The recipients of this message.
+     */
+    private Set<User> messageRecipients;
 
     /**
      * Create a new message that contains actual IM text. The type of distribution
@@ -54,6 +63,8 @@ public class Message {
         msgSender = srcName;
         // Save the text of the message.
         msgTextOrPassword = text;
+        // initialize an empty set of recipients
+        messageRecipients = new HashSet<>();
     }
 
     /**
@@ -75,6 +86,8 @@ public class Message {
         msgTextOrPassword = textorpassword;
         // Save the receiver or password
         msgReceiverOrPassword = receiverorPassword;
+        // initialize an empty set of recipients
+        messageRecipients = new HashSet<>();
     }
 
     /**
@@ -90,6 +103,27 @@ public class Message {
         this(handle, srcName, null);
     }
 
+    
+    /**
+     * Checks if this message has already been sent to the user.
+     *
+     * @param u the user object to be checked for being a recipient
+     * @return true, if the user is already in the recipients else returns false
+     */
+    public boolean messageAlreadySent(User u) {
+    	return messageRecipients.contains(u);
+    }
+    
+    /**
+     * Adds the user to recipients.
+     *
+     * @param u the user object
+     * @return true, if the user is added to the messageRecipients successfully else returns false 
+     */
+    public boolean addUserToRecipients(User u) {
+    	return messageRecipients.add(u);
+    }
+    
     /**
      * Create a new message to continue the logout process.
      *
@@ -159,11 +193,23 @@ public class Message {
         } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
             result = makeDeleteUserMessage(srcName);
         } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
-            result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        }		
+            result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword); 			
+        } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
+            result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
+        }
         return result;
     }
-
+    
+    /**
+     * Creates a new message which updates the client with the responses from the prattle 
+     * server(error/success information)
+     * @param responseMessage text of the response message
+     * @return a message with Prattle_Message Handle
+     */
+    public static Message makePrattleMessage(String responseMessage) {
+    	return new Message(MessageType.PRATTLE_MESSAGE, "Prattle", responseMessage);
+    }
+    
     /**
      * Create a new message for the early stages when the user logs in without all
      * the special stuff.
@@ -277,19 +323,44 @@ public class Message {
     public static Message makeGetGroupMessage(String srcName, String groupName) {
         return new Message(MessageType.GET_GROUP, srcName, groupName);
     }
+    
     /**
      * The method creates a message that handles the user's request for updating
      * his profile details
      *
-     * @param uname         the username of the user
-     * @param firstName     the first name of the user
-     * @param lastName      the last name of the user
+     * @param uname             the username of the user
+     * @param attributeName     the attribute name (user profile attribute to be updated)
+     * @param attributeValue    the value of the attribute to be set
      * @return the message
      */
-    public static Message makeUserProfileUpdateMessage(String uname, String firstName, String lastName ){
-        return new Message(MessageType.UPDATE_PROFILE_USER, uname, firstName, lastName);
+    public static Message makeUserProfileUpdateMessage(String uname, String attributeName, String attributeValue ){
+        return new Message(MessageType.UPDATE_PROFILE_USER, uname, attributeName, attributeValue);
     }
 
+    /**
+     * This method creates a private reply message
+     *
+     * @param msgUniqueKey - msg_uniqueKey to which the the reply is 
+     * @param text - text in the message
+     * @return a Message object of type Private_Reply
+     */
+    public static Message makePrivateReplyMessage(String srcName, String text, String msgUniqueKey) {
+        return new Message(MessageType.PRIVATE_REPLY_MESSAGE, srcName , text, msgUniqueKey);
+    }
+    
+    /**
+     * Add's the UniqueKey details to the existing message
+     * @param msg   The message to be sent
+     * @param text 	The text to be replaced in msg object
+     * @return msg 
+     */
+    public static Message addUniqueKeyToMsg(Message msg , String text) {
+    	if (msg.isPrivateUserMessage() || msg.isPrivateReplyMessage()) {
+    		return new Message(msg.msgType, msg.msgSender , text, msg.msgReceiverOrPassword);
+    	}
+    	return msg;
+    }
+    
     /**
      * Return the name of the sender of this message.
      *
@@ -405,6 +476,15 @@ public class Message {
      */
     public boolean isPrivateUserMessage() {
         return (msgType == MessageType.MESSAGE_USER);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle PRE (is a PRIVATE_REPLY_MESSAGE)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isPrivateReplyMessage() {
+        return (msgType == MessageType.PRIVATE_REPLY_MESSAGE);
     }
 
     /**

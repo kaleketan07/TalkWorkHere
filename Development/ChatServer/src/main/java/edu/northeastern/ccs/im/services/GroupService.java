@@ -231,7 +231,7 @@ public class GroupService implements GroupDao {
      * @throws SQLException
      */
     public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
-    	final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_deleted = 1 WHERE host_group_name = ? and guest_user_name = ?";
+    	final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_removed = 1 WHERE host_group_name = ? and guest_user_name = ?";
     	pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         int qResult = pstmt.executeUpdate();

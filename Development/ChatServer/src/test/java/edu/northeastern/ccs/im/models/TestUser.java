@@ -133,7 +133,25 @@ public class TestUser {
         mapField.set(mockedClientRunnable, userClients);
         ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
-                "Hello, Alice", true);
+                "Hello, Alice", false);
+    }
+
+    /**
+     * Test setter and getter for searchable attribute when true.
+     */
+    @Test
+    public void testSetterAndGetterForSearchableAttributeWhenTrue(){
+        ALICE.setSearchable(true);
+        assertTrue(ALICE.isSearchable());
+    }
+
+    /**
+     * Test setter and getter for searchable attribute when false.
+     */
+    @Test
+    public void testSetterAndGetterForSearchableAttributeWhenFalse(){
+        ALICE.setSearchable(false);
+        assertFalse(ALICE.isSearchable());
     }
 
     private static final User TOM = new User("Tom", "Harris", "tomharris", "123", false);

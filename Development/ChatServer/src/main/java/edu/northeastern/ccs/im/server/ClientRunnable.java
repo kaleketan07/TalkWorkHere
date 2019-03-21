@@ -612,22 +612,21 @@ public class ClientRunnable implements Runnable {
      * @param msg the message sent by the client
      * @throws SQLException
      */
-    private void handleUpdateGroupMessage(Message msg) throws SQLException{
+    private void handleUpdateGroupMessage(Message msg){
         try {
             User user = userService.getUserByUserName(msg.getName());
             Group group = groupService.getGroup(msg.getTextOrPassword());
             if (group == null) {
-                enqueuePrattleResponseMessage("This group does not exist yet.");
+                this.enqueuePrattleResponseMessage("This group does not exist yet.");
             } else if (groupService.isModerator(msg.getTextOrPassword(), user.getUserName())) {
                 //User is allowed to make changes to this group
-                ArrayList<String> keyValue = helperForHandleUpdateGroupMessage(msg.getReceiverOrPassword());
-                Iterator<String> it = keyValue.iterator();
-                while (it.hasNext()) {
-                    if (groupService.updateGroupSettings(msg.getTextOrPassword(), it.next(), it.next()))
-                        enqueuePrattleResponseMessage("Group setting updated successfully");
-                    else
-                        enqueuePrattleResponseMessage("Failed updating the group setting.");
-                }
+                //Split the string into key and value pair
+                String[] keyValuePair = msg.getReceiverOrPassword().split(":");
+                String attributeName = getGroupAttributeName(keyValuePair[0]);
+                if(groupService.updateGroupSettings(msg.getTextOrPassword(),attributeName,keyValuePair[1]))
+                    this.enqueuePrattleResponseMessage("Group setting updated successfully");
+                else
+                    this.enqueuePrattleResponseMessage("Failed updating the group setting.");
             } else {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
@@ -635,32 +634,6 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("Something went wrong with the update. Please refer to the correct " +
                     "group update syntax using HELP UPG");
         }
-    }
-
-    /**
-     * Helper function for handling update group message. This helper will basically return the attribute names
-     * and their values in a list. index and index+1 have the key and values respectively.
-     *
-     * @param attributeKeyValueString the attributes and their values to be updated in the format
-     *                                attributeName:attributeValue
-     * @return the ArrayList with the attribute names and their values.
-     * @throws SQLException the SQL exception
-     */
-
-    private ArrayList<String> helperForHandleUpdateGroupMessage(String attributeKeyValueString) throws SQLException{
-        ArrayList<String> keyValuePair = new ArrayList<>();
-        String[] arrayKeyPair = attributeKeyValueString.split(":");
-        int index=0;
-        for(String s : arrayKeyPair) {
-            if(index % 2 == 0){
-                //Map the attribute number to attribute name
-                String attributeName = getGroupAttributeName(s);
-                keyValuePair.add(attributeName);
-            }
-            else keyValuePair.add(s);
-            index++;
-        }
-        return keyValuePair;
     }
 
     /**

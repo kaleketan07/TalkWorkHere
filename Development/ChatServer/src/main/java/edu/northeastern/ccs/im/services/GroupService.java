@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.models.Group;
@@ -330,8 +331,22 @@ public class GroupService implements GroupDao {
     public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
             throws SQLException{
         final String UPDATE_GROUP = "UPDATE prattle.groups SET " + attributeName + " = ? WHERE group_name = ?";
+        String trueOrFalse;
         pstmt = conn.getPreparedStatement(UPDATE_GROUP);
-        pstmt = utils.setPreparedStatementArgs(pstmt,attributeValue,groupName);
+        if(attributeName.compareTo("is_searchable") == 0){
+            if(attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")){
+                trueOrFalse = "0";
+                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,groupName);
+            }
+            else if(attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")){
+                trueOrFalse = "1";
+                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,groupName);
+            }
+            else
+                ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
+        }else{
+            pstmt = utils.setPreparedStatementArgs(pstmt,attributeValue,groupName);
+        }
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return qResult>0;

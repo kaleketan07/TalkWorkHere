@@ -415,14 +415,74 @@ public class TestGroupService {
     }
 
     /**
-     * Test update group for true.
+     * Test update group for when the group is searchable when attribute value is 1.
      *
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForTrue() throws SQLException{
+    public void testUpdateGroupForSearchableWhenAttributeValueIs1() throws SQLException{
         Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","1"));
     }
+
+
+    /**
+     * Test update group when group is searchable and attribute value if true.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupForTrueWhenAttributeValueIsTrue() throws SQLException{
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","True"));
+    }
+
+    /**
+     * Test update group when group is searchable and attribute value if false.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupForSearchableGroupWhenAttributeValueIsFalse() throws SQLException{
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","False"));
+    }
+
+    /**
+     * Test update group when searchable group and attribute value is 0.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupWhenSearchableGroupAndAttributeValueIs0() throws SQLException{
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","0"));
+    }
+
+    /**
+     * Test update group when searchable group and attribute value is incorrect.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupWhenSearchableGroupAndAttributeValueIsIncorrect() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(testGS.updateGroupSettings("testGroup","is_searchable","Something"));
+    }
+
+    /**
+     * Test update group for a different attribute
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupForADifferentAttribute() throws SQLException{
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","another_attribute","Something"));
+    }
+
+
+
+
+
+
+
+
 
     /**
      * Test update group for false.

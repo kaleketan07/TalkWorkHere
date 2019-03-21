@@ -184,5 +184,22 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
         return msgSrc;
     }
     
+    /**
+     * Insert an entry to the group_messages table.
+     *
+     * @param uniqueGroupKey the unique group key
+     * @param uniqueMessageKey the unique message key
+     * @throws SQLException the SQL exception
+     * @return true, if the message was inserted successfully else return false
+     */
+    public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException {
+    	 final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
+         pstmt = conn.getPreparedStatement(ADD_MAPPING);
+         pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey,uniqueMessageKey);
+         int res = pstmt.executeUpdate();
+         pstmt.close();
+         return (res > 0);
+    }	
+    
     
 }

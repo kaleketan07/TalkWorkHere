@@ -53,5 +53,15 @@ public interface ConversationalMessageDAO {
     boolean deleteMessage(String msgUniqueKey) throws SQLException;
 
     
+    /**
+     * Insert an entry to the group_messages table.
+     *
+     * @param uniqueGroupKey the unique group key
+     * @param uniqueMessageKey the unique message key
+     * @throws SQLException the SQL exception
+     * @return true if the message was inserted successfully else return false
+     */
+    boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException;
+    
     
 }

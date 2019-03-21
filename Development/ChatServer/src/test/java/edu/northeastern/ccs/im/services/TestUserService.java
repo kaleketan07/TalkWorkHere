@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import static org.mockito.Mockito.*;
 
@@ -433,6 +434,28 @@ public class TestUserService {
                 "SomethingElse"));
     }
 
+    /**
+     * Test search user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSearchUser() throws SQLException{
+        HashMap<String,String> testSet = new HashMap<>();
+        testSet.put("AB","ABC BCD");
+        Assertions.assertEquals(testSet.size(),us.searchUser("AB").size());
+    }
+
+    /**
+     * Test search user for exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSearchUserForException() throws SQLException{
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        Assertions.assertThrows(SQLException.class,()->us.searchUser("AB"));
+    }
     private static final String USER = "user";
     private static final String PASS = "pass";
 }

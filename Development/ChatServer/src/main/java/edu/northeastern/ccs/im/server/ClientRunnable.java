@@ -692,6 +692,52 @@ public class ClientRunnable implements Runnable {
         return attributeName;
     }
 
+
+    /**
+     * Handles the search message type when encountered. Will call search method for users or groups
+     * depending on the parameter passed by the user.
+     *
+     * @param msg The message sent by the user
+     */
+    private void handleSearchMessage(Message msg){
+        if(msg.getTextOrPassword().equalsIgnoreCase("User"))
+            handleUserSearchMessage(msg.getReceiverOrPassword());
+        else
+            this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check the syntax" +
+                    " for SRH using HELP SRH.");
+    }
+
+
+    /**
+     * This method is used to handle the search functionality for when users are to be searched.
+     * This method will enqueue all the usernames and the respective full names to the client.
+     *
+     * @param searchString The string that is used for the regex to retrieve all similar users
+     */
+    private void handleUserSearchMessage(String searchString){
+        HashMap<String,String> resultantSet;
+        try {
+            StringBuilder workString = new StringBuilder();
+            resultantSet = userService.searchUser(searchString);
+            if(resultantSet.isEmpty()){
+                this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
+                return;
+            }
+            workString.append("The users with their usernames and full names: \n");
+            for(Map.Entry<String,String> pair : resultantSet.entrySet()){
+                workString.append(pair.getKey());
+                workString.append(" ");
+                workString.append(pair.getValue());
+                workString.append("\n");
+            }
+            String answerString = workString.toString();
+            this.enqueuePrattleResponseMessage(answerString);
+        }catch(Exception e){
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP SRH.");
+        }
+    }
+
     /**
      * This method handles different types of messages and delegates works to its respective methods
      *
@@ -733,6 +779,8 @@ public class ClientRunnable implements Runnable {
         	handleFollowUserMessage(msg);
         } else if (msg.isUnfollowUserMessage()) {
         	handleUnfollowUserMessage(msg);
+        } else if (msg.isSearchMessage()) {
+            handleSearchMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

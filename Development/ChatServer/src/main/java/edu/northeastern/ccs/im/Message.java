@@ -181,9 +181,9 @@ public class Message {
         } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
             result = makeDeleteGroupMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
-        	result = makeCreateGroupMessage(srcName, textOrPassword);  
+        	  result = makeCreateGroupMessage(srcName, textOrPassword);  
         } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
-        	result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        	  result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
             result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {

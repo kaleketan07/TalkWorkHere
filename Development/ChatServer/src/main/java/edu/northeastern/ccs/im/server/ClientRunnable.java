@@ -2,6 +2,7 @@ package edu.northeastern.ccs.im.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -640,7 +641,11 @@ public class ClientRunnable implements Runnable {
     		this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() +" to send a message on it");
     	} else {
     		this.enqueuePrattleResponseMessage("message sent successfully");
-    		currGroup.groupSendMessage(msg);
+    		// generate the group key to mark all individual messages sent as a result of this group message
+    		long time = System.currentTimeMillis();
+            Timestamp sqlTimestamp = new Timestamp(time);
+            String uniqueGroupKey = currUser.getUserName() +"::"+ currGroup.getGroupName() +"::"+ sqlTimestamp;
+    		currGroup.groupSendMessage(msg, uniqueGroupKey);
     	}
     }
 

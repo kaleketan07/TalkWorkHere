@@ -93,9 +93,9 @@ public class TestGroup {
         Set<User> users = new HashSet<>(Arrays.asList(CAROL, DAN));
         testGroup.setMemberUsers(users);
         Message msg = Message.makeLoginMessage(TEST_LOGIN, "");
-        Mockito.doNothing().when(DAN).userSendMessage(msg);
-        Mockito.doNothing().when(CAROL).userSendMessage(msg);
-        testGroup.groupSendMessage(msg);
+        Mockito.when(DAN.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
+        Mockito.when(CAROL.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
+        testGroup.groupSendMessage(msg, "");
         
     }
     
@@ -119,10 +119,10 @@ public class TestGroup {
         Set<Group> groups = new HashSet<>(Arrays.asList(testGroup2));
         testGroup.setMemberGroups(groups);
         Message msg = Message.makeLoginMessage(TEST_LOGIN, "");
-        Mockito.doNothing().when(DAN).userSendMessage(msg);
-        Mockito.doNothing().when(CAROL).userSendMessage(msg);
-        Mockito.doNothing().when(GARY).userSendMessage(msg);
-        testGroup.groupSendMessage(msg);
+        Mockito.when(DAN.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
+        Mockito.when(CAROL.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
+        Mockito.when(GARY.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
+        testGroup.groupSendMessage(msg, "");
         
     }
     
@@ -135,4 +135,5 @@ public class TestGroup {
     private final String TEST_GROUP_NAME_1 = "Group202";
     private final String TEST_MODERATOR_NAME = "Alice";
     private final String TEST_LOGIN = "login";
+    private final String DUMMY_MSG_UNIQUE_KEY = "dummy_key";
 }

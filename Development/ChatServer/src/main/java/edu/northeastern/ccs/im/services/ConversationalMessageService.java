@@ -63,7 +63,8 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
      * @param msgSource      Username of the source of the message
      * @param msgDestination Username of the Destination of the message
      * @param msgText        Text in the message
-     * @return String            UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
+     * @param setFlag 		 Marks if this message has been sent to the user or queued
+     * @return String        UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
      * @throws SQLException the sql exception
      */
     public String insertConversationalMessage(String msgSource, String msgDestination, String msgText, boolean setFlag)

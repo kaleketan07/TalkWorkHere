@@ -122,18 +122,19 @@ public class Group implements Member {
      * @param msg the message to be sent
      * @throws SQLException the SQL exception
      */
-    public void groupSendMessage(Message msg) throws SQLException {
+    public void groupSendMessage(Message msg, String uniqueGroupKey) throws SQLException {
     	// send message to member users
     	for (User u : memberUsers) {
     		// a user can also be a part of a group at a higher level in the hierarchy. Do not send the message again
     		if (!msg.messageAlreadySent(u)) {
     			msg.addUserToRecipients(u);
     			u.userSendMessage(msg);
+    			// add the uniqueMsgKey and the UniqueGroupKey to the new table
     		}
     	}
     	// send message to member groups
     	for (Group g: memberGroups) {
-    		g.groupSendMessage(msg);
+    		g.groupSendMessage(msg, uniqueGroupKey);
     	}
     }
 }

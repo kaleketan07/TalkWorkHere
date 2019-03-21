@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
+import com.mysql.cj.xdevapi.Client;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
@@ -34,6 +35,7 @@ import com.mysql.cj.x.protobuf.MysqlxDatatypes.Any;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 /**
  * TestClientRunnable class contains all the unit tests for the java class ClientRunnable
@@ -75,7 +77,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -93,7 +95,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -130,7 +132,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -150,7 +152,7 @@ public class TestClientRunnable {
         messageList.add(login);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -181,7 +183,7 @@ public class TestClientRunnable {
         messageList.add(helloMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -208,7 +210,7 @@ public class TestClientRunnable {
         messageList.add(quitMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -241,7 +243,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -266,12 +268,12 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         messageList.clear();
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
 
     }
@@ -287,8 +289,8 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -298,7 +300,7 @@ public class TestClientRunnable {
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
        
         clientRunnableObject.run();
     }
@@ -314,7 +316,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -322,12 +324,12 @@ public class TestClientRunnable {
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
         User u = Mockito.mock(User.class);
-        Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
-        Mockito.when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(true);
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
+        when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(true);
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
 
@@ -342,8 +344,8 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -351,11 +353,11 @@ public class TestClientRunnable {
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
         User u = new User("rahul", "bhat", null, null, true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u);
         messageList.clear();
         messageList.add(REGISTER);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         
         clientRunnableObject.run();
     }
@@ -371,7 +373,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -383,12 +385,12 @@ public class TestClientRunnable {
         userService.set(clientRunnableObject, mockedUserService);
         User u = new User(SENDER_NAME, null, SENDER_NAME,null, true);
         Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,mockedUser);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,mockedUser);
         
         messageList.clear();
         messageList.add(PRIVATE_MESSAGE);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
     
@@ -403,7 +405,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -418,13 +420,13 @@ public class TestClientRunnable {
         cmService.setAccessible(true);
         cmService.set(clientRunnableObject, mockedcms);
         Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,mockedUser);
-        Mockito.when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,mockedUser);
+        when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
         messageList.clear();
         mockedUser.setLoggedIn(true);
         messageList.add(PRIVATE_REPLY);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
     
@@ -439,7 +441,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -455,14 +457,14 @@ public class TestClientRunnable {
         cmService.set(clientRunnableObject, mockedcms);
         USER_LOGGED_ON.setLoggedIn(true);
         Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
-        Mockito.when(mockedcms.getSender(Mockito.anyString())).thenReturn(null);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
+        when(mockedcms.getSender(Mockito.anyString())).thenReturn(null);
         messageList.clear();
         mockedUser.setLoggedIn(true);
         messageList.add(PRIVATE_REPLY);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
     
@@ -477,7 +479,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -492,13 +494,13 @@ public class TestClientRunnable {
         cmService.setAccessible(true);
         cmService.set(clientRunnableObject, mockedcms);
         Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,null);
-        Mockito.when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,null);
+        when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
         messageList.clear();
         mockedUser.setLoggedIn(true);
         messageList.add(PRIVATE_REPLY);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
      
@@ -513,10 +515,10 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -524,11 +526,11 @@ public class TestClientRunnable {
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
         User u = new User(SENDER_NAME, null, SENDER_NAME,null, true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,null);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,null);
         messageList.clear();
         messageList.add(PRIVATE_MESSAGE);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
 
@@ -543,20 +545,20 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         Field userService = ClientRunnable.class.getDeclaredField("userService");
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         messageList.clear();
         messageList.add(REGISTER2);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
 
@@ -571,19 +573,19 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         Field userService = ClientRunnable.class.getDeclaredField("userService");
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
         messageList.clear();
         messageList.add(REGISTER);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
     
@@ -601,10 +603,10 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         UserService mockedUserService = Mockito.mock(UserService.class);
         Field userService = ClientRunnable.class.getDeclaredField("userService");
         userService.setAccessible(true);
@@ -613,12 +615,12 @@ public class TestClientRunnable {
         Field groupService = ClientRunnable.class.getDeclaredField("groupService");
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         messageList.clear();
         messageList.add(DELETE_GROUP);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -635,7 +637,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -647,13 +649,13 @@ public class TestClientRunnable {
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         messageList.clear();
         messageList.add(DELETE_GROUP);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -671,7 +673,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -683,13 +685,13 @@ public class TestClientRunnable {
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
         Group g = Mockito.mock(Group.class);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
-        Mockito.when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         messageList.clear();
         messageList.add(DELETE_GROUP);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -706,7 +708,7 @@ public class TestClientRunnable {
         messageList.add(GET_GROUP);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -719,13 +721,13 @@ public class TestClientRunnable {
         groupService.set(clientRunnableObject, mockedGroupService);
         Group g = new Group();
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
         messageList.clear();
         messageList.add(GET_GROUP);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -745,9 +747,9 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         Field userService = ClientRunnable.class.getDeclaredField("userService");
@@ -758,13 +760,13 @@ public class TestClientRunnable {
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
         Group g = Mockito.mock(Group.class);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
-        Mockito.when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(g);
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         messageList.clear();
         messageList.add(DELETE_GROUP);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -781,8 +783,8 @@ public class TestClientRunnable {
         messageList.add(GET_GROUP);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -793,12 +795,12 @@ public class TestClientRunnable {
         Field groupService = ClientRunnable.class.getDeclaredField("groupService");
         groupService.setAccessible(true);
         groupService.set(clientRunnableObject, mockedGroupService);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         messageList.clear();
         messageList.add(GET_GROUP);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -813,21 +815,21 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         Field userService = ClientRunnable.class.getDeclaredField("userService");
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
         User u = Mockito.mock(User.class);
-        Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
-        Mockito.when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(false);
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
+        when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(false);
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
     
@@ -843,7 +845,7 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -854,12 +856,12 @@ public class TestClientRunnable {
         Field userService = ClientRunnable.class.getDeclaredField("userService");
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(true);
         messageList.clear();
         messageList.add(DELETE_USER);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
 
@@ -874,21 +876,21 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         Field userService = ClientRunnable.class.getDeclaredField("userService");
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Mockito.when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(false);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(false);
         messageList.clear();
         messageList.add(DELETE_USER);
         messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         clientRunnableObject.run();
     }
     
@@ -902,7 +904,7 @@ public class TestClientRunnable {
         List<Message> messageList = new ArrayList<>();
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         assertEquals(clientRunnableObject.isInitialized(), false);
@@ -927,7 +929,7 @@ public class TestClientRunnable {
         messageList.add(helloMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
 
@@ -952,7 +954,7 @@ public class TestClientRunnable {
         messageList.add(helloMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnection = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnection.iterator()).thenReturn(messageIter);
+        when(networkConnection.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnection);
         clientRunnableObject.enqueueMessage(helloMessage);
         assertEquals(clientRunnableObject.isInitialized(), false);
@@ -979,18 +981,18 @@ public class TestClientRunnable {
         messageList.add(quitMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ClientTimer ct = Mockito.mock(ClientTimer.class);
         Field privateStringField = ClientRunnable.class.getDeclaredField("timer");
         privateStringField.setAccessible(true);
         privateStringField.set(clientRunnableObject, ct);
-        Mockito.when(ct.isBehind()).thenReturn(true);
+        when(ct.isBehind()).thenReturn(true);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
                 ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1014,7 +1016,7 @@ public class TestClientRunnable {
         ml.add(quit);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -1037,7 +1039,7 @@ public class TestClientRunnable {
         List<Message> messageList = new ArrayList<>();
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnection = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnection.iterator()).thenReturn(messageIter);
+        when(networkConnection.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnection);
         privateStringField.set(clientRunnableObject, USER_ID);
         assertEquals(USER_ID, clientRunnableObject.getUserId());
@@ -1116,9 +1118,9 @@ public class TestClientRunnable {
         ml.add(quit);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertNotEquals(clientRunnableObject.getUserId(), -1);
@@ -1145,7 +1147,7 @@ public class TestClientRunnable {
         ml.add(BROADCAST);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         assertNotEquals(clientRunnableObject.getUserId(), -1);
@@ -1155,7 +1157,7 @@ public class TestClientRunnable {
         ml2.add(BROADCAST);
         Iterator<Message> messageIter2 = ml2.iterator();
         NetworkConnection networkConnectionMock2 = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock2.iterator()).thenReturn(messageIter2);
+        when(networkConnectionMock2.iterator()).thenReturn(messageIter2);
         ClientRunnable clientRunnableObject2 = new ClientRunnable(networkConnectionMock2);
         clientRunnableObject2.run();
         assertEquals(clientRunnableObject2.getUserId(), -1);
@@ -1178,17 +1180,17 @@ public class TestClientRunnable {
         ml.add(CREATE_GROUP);
         ml.add(CREATE_GROUP);
         GroupService mgs = Mockito.mock(GroupService.class);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1217,18 +1219,18 @@ public class TestClientRunnable {
         ml.add(CREATE_GROUP);
         Group g = new Group();
         GroupService mgs = Mockito.mock(GroupService.class);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(g);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(g);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1256,17 +1258,17 @@ public class TestClientRunnable {
         ml.add(CREATE_GROUP);
         ml.add(CREATE_GROUP);
         GroupService mgs = Mockito.mock(GroupService.class);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(null);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(null);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1297,19 +1299,19 @@ public class TestClientRunnable {
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1340,22 +1342,22 @@ public class TestClientRunnable {
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(mgs.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(mgs.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
         
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1386,22 +1388,22 @@ public class TestClientRunnable {
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(mgs.addUserToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(mgs.addUserToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
         
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1432,24 +1434,24 @@ public class TestClientRunnable {
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(mgs.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false); 
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(mgs.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -1478,24 +1480,24 @@ public class TestClientRunnable {
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(Mockito.anyString())).thenReturn(null);
+        when(mgs.getGroup(Mockito.anyString())).thenReturn(null);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(mgs.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false); 
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(mgs.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -1524,20 +1526,20 @@ public class TestClientRunnable {
         temp.setModeratorName("Josh");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1567,23 +1569,23 @@ public class TestClientRunnable {
         Group temp = new Group();
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(null);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(null);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -1611,20 +1613,20 @@ public class TestClientRunnable {
         temp.setModeratorName("Josh");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1654,19 +1656,19 @@ public class TestClientRunnable {
         Group temp = new Group();
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);  
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(null);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(null);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1696,19 +1698,19 @@ public class TestClientRunnable {
         Group temp = new Group();
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(null);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(null);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1739,19 +1741,19 @@ public class TestClientRunnable {
         temp.setModeratorName("Carol");
         User tempUser = new User("", "", "Carol", "pass", true);
         User tempUser2 = new User("", "", "Bob", "pass", true);
-        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
+        when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
-        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -1776,19 +1778,19 @@ public class TestClientRunnable {
     public void testInvalidHandle() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
     	List<Message> ml = new ArrayList<>();
         Message mockMsg = Mockito.mock(Message.class);
-        Mockito.when(mockMsg.isBroadcastMessage()).thenReturn(false);
-        Mockito.when(mockMsg.isCreateGroupMessage()).thenReturn(false);
-        Mockito.when(mockMsg.isDeleteGroupMessage()).thenReturn(false);
-        Mockito.when(mockMsg.isLoginMessage()).thenReturn(true,false);
-        Mockito.when(mockMsg.isRegisterMessage()).thenReturn(false);
-        Mockito.when(mockMsg.isAddUserToGroupMessage()).thenReturn(false);
-        Mockito.when(mockMsg.isUserProfileUpdateMessage()).thenReturn(false);
-        Mockito.when(mockMsg.getName()).thenReturn(SENDER_NAME);
+        when(mockMsg.isBroadcastMessage()).thenReturn(false);
+        when(mockMsg.isCreateGroupMessage()).thenReturn(false);
+        when(mockMsg.isDeleteGroupMessage()).thenReturn(false);
+        when(mockMsg.isLoginMessage()).thenReturn(true,false);
+        when(mockMsg.isRegisterMessage()).thenReturn(false);
+        when(mockMsg.isAddUserToGroupMessage()).thenReturn(false);
+        when(mockMsg.isUserProfileUpdateMessage()).thenReturn(false);
+        when(mockMsg.getName()).thenReturn(SENDER_NAME);
         ml.add(mockMsg);
         ml.add(mockMsg);
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -1808,7 +1810,7 @@ public class TestClientRunnable {
         messageList.add(quitMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -1819,8 +1821,8 @@ public class TestClientRunnable {
         f.setAccessible(true);
         f.set(clientRunnableObject, mockedService);
         User loggedInUser = new User(null, null, SENDER_NAME, null, true);
-        Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
-        Mockito.when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(true);
+        when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
+        when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1838,9 +1840,9 @@ public class TestClientRunnable {
         messageList.add(quitMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
                 ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
@@ -1851,8 +1853,8 @@ public class TestClientRunnable {
         f.setAccessible(true);
         f.set(clientRunnableObject, mockedService);
         User loggedInUser = new User(null, null, SENDER_NAME, null, true);
-        Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
-        Mockito.when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(false);
+        when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
+        when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(false);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1983,7 +1985,7 @@ public class TestClientRunnable {
         messageList.add(quitMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -1993,7 +1995,7 @@ public class TestClientRunnable {
         Field f = ClientRunnable.class.getDeclaredField("userService");
         f.setAccessible(true);
         f.set(clientRunnableObject, mockedService);
-        Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+        when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(null);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2014,10 +2016,10 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -2042,10 +2044,10 @@ public class TestClientRunnable {
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -2070,11 +2072,11 @@ public class TestClientRunnable {
         messageList.add(LOGIN);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -2099,7 +2101,7 @@ public class TestClientRunnable {
         messageList.add(REGISTER);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -2107,7 +2109,7 @@ public class TestClientRunnable {
         clientRunnableObject.setFuture(future);
         
         UserService us = Mockito.mock(UserService.class);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
@@ -2132,20 +2134,20 @@ public class TestClientRunnable {
         messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         Field connField = ClientRunnable.class.getDeclaredField("connection");
         connField.setAccessible(true);
         connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"first_name","Predna"))
+        when(us.updateUserAttributes(SENDER_NAME,"first_name","Predna"))
                 .thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -2168,20 +2170,20 @@ public class TestClientRunnable {
         messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         Field connField = ClientRunnable.class.getDeclaredField("connection");
         connField.setAccessible(true);
         connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"last_name","Predna"))
+        when(us.updateUserAttributes(SENDER_NAME,"last_name","Predna"))
                 .thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -2203,20 +2205,20 @@ public class TestClientRunnable {
         messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         Field connField = ClientRunnable.class.getDeclaredField("connection");
         connField.setAccessible(true);
         connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"user_password","Predna")).thenReturn(true);
+        when(us.updateUserAttributes(SENDER_NAME,"user_password","Predna")).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2238,20 +2240,20 @@ public class TestClientRunnable {
         messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         Field connField = ClientRunnable.class.getDeclaredField("connection");
         connField.setAccessible(true);
         connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"user_searchable","True")).thenReturn(true);
+        when(us.updateUserAttributes(SENDER_NAME,"user_searchable","True")).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2272,20 +2274,20 @@ public class TestClientRunnable {
         messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         Field connField = ClientRunnable.class.getDeclaredField("connection");
         connField.setAccessible(true);
         connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,null,"Predna")).thenThrow(SQLException.class);
+        when(us.updateUserAttributes(SENDER_NAME,null,"Predna")).thenThrow(SQLException.class);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2306,20 +2308,20 @@ public class TestClientRunnable {
         messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         Field connField = ClientRunnable.class.getDeclaredField("connection");
         connField.setAccessible(true);
         connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"last_name","Predna")).thenReturn(false);
+        when(us.updateUserAttributes(SENDER_NAME,"last_name","Predna")).thenReturn(false);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2339,7 +2341,7 @@ public class TestClientRunnable {
         messageList.add(NULL_PRIVATE_MESSAGE);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
         ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
@@ -2347,17 +2349,270 @@ public class TestClientRunnable {
         clientRunnableObject.setFuture(future);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"Alex","Predna")).thenReturn(false);
+        when(us.updateUserAttributes(SENDER_NAME,"Alex","Predna")).thenReturn(false);
         clientRunnableObject.run();
         clientRunnableObject.run();
         Assertions.assertTrue(clientRunnableObject.isInitialized());
         USER_LOGGED_ON.setLoggedIn(true);
     }
+
+
+    /**
+     * Test update group message when group is not present.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsNotPresent() throws SQLException,IllegalAccessException,NoSuchFieldException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"NoSuchGroup","1:0");
+        messageList.add(updateGroupMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        GroupService mockedGS = Mockito.mock(GroupService.class);
+        when(mockedGS.getGroup("NoSuchGroup")).thenReturn(null);
+        Field gs = ClientRunnable.class.getDeclaredField("groupService");
+        gs.setAccessible(true);
+        gs.set(clientRunnableObject,mockedGS);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+
+    /**
+     * Test update group message when group is present but user is not moderator.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsNotModerator() throws
+            SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"PresentGroup","1:0");
+        messageList.add(updateGroupMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Group mockedGroup = Mockito.mock(Group.class);
+        GroupService mockedGS = Mockito.mock(GroupService.class);
+        when(mockedGS.getGroup("PresentGroup")).thenReturn(mockedGroup);
+        Field gs = ClientRunnable.class.getDeclaredField("groupService");
+        gs.setAccessible(true);
+        gs.set(clientRunnableObject,mockedGS);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test update group message when group is present but user is moderator for true.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForTrue() throws
+            SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"PresentGroup","1:0");
+        messageList.add(updateGroupMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Group mockedGroup = Mockito.mock(Group.class);
+        GroupService mockedGS = Mockito.mock(GroupService.class);
+        when(mockedGS.getGroup("PresentGroup")).thenReturn(mockedGroup);
+        when(mockedGS.isModerator("PresentGroup",SENDER_NAME)).thenReturn(true);
+        when(mockedGS.updateGroupSettings("PresentGroup","is_searchable","0")).thenReturn(true);
+        Field gs = ClientRunnable.class.getDeclaredField("groupService");
+        gs.setAccessible(true);
+        gs.set(clientRunnableObject,mockedGS);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test update group message when group is present but user is moderator for false.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForFalse() throws
+            SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"PresentGroup","1:0");
+        messageList.add(updateGroupMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Group mockedGroup = Mockito.mock(Group.class);
+        GroupService mockedGS = Mockito.mock(GroupService.class);
+        when(mockedGS.getGroup("PresentGroup")).thenReturn(mockedGroup);
+        when(mockedGS.isModerator("PresentGroup",SENDER_NAME)).thenReturn(true);
+        when(mockedGS.updateGroupSettings("PresentGroup","is_searchable","0"))
+                .thenReturn(false);
+        Field gs = ClientRunnable.class.getDeclaredField("groupService");
+        gs.setAccessible(true);
+        gs.set(clientRunnableObject,mockedGS);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test update group message when group is present but user is moderator for exception.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForException() throws
+            SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"PresentGroup","1:0");
+        messageList.add(updateGroupMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Group mockedGroup = Mockito.mock(Group.class);
+        GroupService mockedGS = Mockito.mock(GroupService.class);
+        when(mockedGS.getGroup("PresentGroup")).thenReturn(mockedGroup);
+        when(mockedGS.isModerator("PresentGroup",SENDER_NAME)).thenReturn(true);
+        when(mockedGS.updateGroupSettings("PresentGroup","is_searchable","0"))
+                .thenThrow(SQLException.class);
+        Field gs = ClientRunnable.class.getDeclaredField("groupService");
+        gs.setAccessible(true);
+        gs.set(clientRunnableObject,mockedGS);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test update group message when group is present but user is moderator when attribute number is out of bounds.
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorWhenAttributeNumberIsOutOfBounds() throws
+            SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"PresentGroup","2:0");
+        messageList.add(updateGroupMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Group mockedGroup = Mockito.mock(Group.class);
+        GroupService mockedGS = Mockito.mock(GroupService.class);
+        when(mockedGS.getGroup("PresentGroup")).thenReturn(mockedGroup);
+        when(mockedGS.isModerator("PresentGroup",SENDER_NAME)).thenReturn(true);
+        when(mockedGS.updateGroupSettings("PresentGroup","is_searchable","0"))
+                .thenReturn(true);
+        Field gs = ClientRunnable.class.getDeclaredField("groupService");
+        gs.setAccessible(true);
+        gs.set(clientRunnableObject,mockedGS);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+
 
     //Private fields to be used in tests
     private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);

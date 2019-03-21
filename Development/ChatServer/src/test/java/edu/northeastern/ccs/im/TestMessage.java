@@ -249,8 +249,24 @@ public class TestMessage {
         strBuild.append(toStringHelper(MESSAGE_TEXT));
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
+        assertFalse(message.isFollowUserMessage());
     }
-
+    
+    /**
+     * Test for message Follow_User
+     */
+    @Test
+    public void testFollowUserMessage() {
+        Message message = Message.makeMessage(FWU, SENDER_NAME, SENDER_NAME, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(FWU);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isFollowUserMessage());
+    }
+    
     /**
      * Test toString method to return the expected output when
      * ReceiverorPassword not null
@@ -523,6 +539,7 @@ public class TestMessage {
     private static final String AUG = "AUG";
     private static final String PRE = "PRE";
     private static final String PRM = "PRM";
+    private static final String FWU = "FWU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

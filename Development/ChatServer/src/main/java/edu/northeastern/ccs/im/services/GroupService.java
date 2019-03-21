@@ -62,8 +62,12 @@ public class GroupService implements GroupDao {
         return groupServiceInstance;
     }
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#getGroup(java.lang.String)
+    /**
+     * Fetches the group from the database.
+     *
+     * @param groupName the group name
+     * @return the group
+     * @throws SQLException the SQL exception
      */
     @Override
     public Group getGroup(String groupName) throws SQLException {
@@ -93,8 +97,13 @@ public class GroupService implements GroupDao {
         return g;
     }
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#createGroup(edu.northeastern.ccs.im.models.Group)
+    /**
+     * Creates the group in the database.
+     *
+     * @param groupName the group name
+     * @param modName   the mod name
+     * @return true, if successful else return false
+     * @throws SQLException the SQL exception
      */
     @Override
     public boolean createGroup(String groupName, String modName) throws SQLException {
@@ -107,8 +116,12 @@ public class GroupService implements GroupDao {
         return (qResult > 0);
     }
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#deleteGroup(edu.northeastern.ccs.im.models.Group)
+    /**
+     * Delete group.
+     *
+     * @param groupName the group name
+     * @return true, if successful else return false
+     * @throws SQLException the SQL exception
      */
     @Override
     public boolean deleteGroup(String groupName) throws SQLException {
@@ -121,8 +134,12 @@ public class GroupService implements GroupDao {
         return (qResult > 0);
     }
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#getMemberUsers(edu.northeastern.ccs.im.models.Group)
+    /**
+     * Gets the member users.
+     *
+     * @param groupName the group name
+     * @return the member users in the group
+     * @throws SQLException the SQL exception
      */
     @Override
     public Set<User> getMemberUsers(String groupName) throws SQLException {
@@ -144,8 +161,12 @@ public class GroupService implements GroupDao {
         return users;
     }
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#getMemberGroups(edu.northeastern.ccs.im.models.Group)
+    /**
+     * Gets the member groups.
+     *
+     * @param groupName the group name
+     * @return the member groups
+     * @throws SQLException the SQL exception
      */
     @Override
     public Set<String> getMemberGroups(String groupName) throws SQLException {
@@ -162,8 +183,11 @@ public class GroupService implements GroupDao {
         return groups;
     }
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#getAllGroups()
+    /**
+     * Gets the all groups.
+     *
+     * @return the all groups
+     * @throws SQLException the SQL exception
      */
     @Override
     public Set<Group> getAllGroups() throws SQLException {
@@ -186,9 +210,15 @@ public class GroupService implements GroupDao {
     }
 
 
-	/* (non-Javadoc)
-	 * @see edu.northeastern.ccs.im.services.GroupDao#isModerator(java.lang.String, java.lang.String)
-	 */
+    /**
+     * Checks if the passed username matches the moderator name for the
+     * group having the passed group name.
+     *
+     * @param groupName the group name
+     * @param userName  the user name
+     * @return true, if is moderator
+     * @throws SQLException the SQL exception
+     */
 	@Override
 	public boolean isModerator(String groupName, String userName) throws SQLException {
 		final String GET_MODERATOR_NAME = "SELECT moderator_name from prattle.groups where group_name = ?";
@@ -206,8 +236,13 @@ public class GroupService implements GroupDao {
 
 
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#addUserToGroup(java.lang.String, java.lang.String)
+    /**
+     * Adds the user to this group.
+     *
+     * @param hostGroupName the host group name
+     * @param guestUserName the guest user name
+     * @return true, if successful
+     * @throws SQLException the SQL exception
      */
     public boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
         Set<User> users = getMemberUsers(hostGroupName);
@@ -221,16 +256,16 @@ public class GroupService implements GroupDao {
         pstmt.close();
         return (qResult > 0);
     }
-    
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#addUserToGroup(java.lang.String, java.lang.String)
-     */
+
     /**
+     * Removes the user from the given group
+     *
      * @param hostGroupName
      * @param guestUserName
-     * @return
+     * @return true, if successful
      * @throws SQLException
      */
+    @Override
     public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
     	final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_removed = 1 WHERE host_group_name = ? and guest_user_name = ?";
     	pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
@@ -256,9 +291,13 @@ public class GroupService implements GroupDao {
         return descGroups;
     }
 
-
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#addGroupToGroup(java.lang.String, java.lang.String)
+    /**
+     * Adds the group to group.
+     *
+     * @param hostGroupName  the host group name
+     * @param guestGroupName the guest group name
+     * @return true, if successful
+     * @throws SQLException the SQL exception
      */
     @Override
     public boolean addGroupToGroup(String hostGroupName, String guestGroupName) throws SQLException {
@@ -287,6 +326,7 @@ public class GroupService implements GroupDao {
      * @return the boolean   True if the attribute was successfully updated, false otherwise
      * @throws SQLException the sql exception
      */
+    @Override
     public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
             throws SQLException{
         final String UPDATE_GROUP = "UPDATE prattle.groups SET " + attributeName + " = ? WHERE group_name = ?";

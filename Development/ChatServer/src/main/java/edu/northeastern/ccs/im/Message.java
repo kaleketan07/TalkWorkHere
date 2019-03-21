@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.models.User;
@@ -44,7 +45,7 @@ public class Message {
     /**
      * The recipients of this message.
      */
-    private Set<User> messageRecipients = null;
+    private Set<User> messageRecipients;
 
     /**
      * Create a new message that contains actual IM text. The type of distribution
@@ -62,6 +63,8 @@ public class Message {
         msgSender = srcName;
         // Save the text of the message.
         msgTextOrPassword = text;
+        // initialize an empty set of recipients
+        messageRecipients = new HashSet<>();
     }
 
     /**
@@ -83,6 +86,8 @@ public class Message {
         msgTextOrPassword = textorpassword;
         // Save the receiver or password
         msgReceiverOrPassword = receiverorPassword;
+        // initialize an empty set of recipients
+        messageRecipients = new HashSet<>();
     }
 
     /**

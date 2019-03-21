@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import edu.northeastern.ccs.im.models.User;
+
 /**
  * TestMessage class contains the test suite tests the Message.java class under
  * the im.client package. It tests all the different type of message creations,
@@ -64,13 +66,14 @@ public class TestMessage {
      * output for a login message
      */
     @Test
-    private void testLoginMessage() {
+    public void testLoginMessage() {
         Message message = Message.makeLoginMessage(SENDER_NAME, PASS);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(LGN);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(PASS));
-        assertEquals(message.toString(), strBuild.toString());
+        strBuild.append(" "+NULL_OUTPUT.length()+" "+NULL_OUTPUT);
+        assertEquals(strBuild.toString(), message.toString());
     }
 
     /**
@@ -379,6 +382,50 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
     }
 
+    
+    /**
+     * Test message already sent for true.
+     */
+    @Test
+    public void testMessageAlreadySentForTrue() {
+    	Message msg = Message.makeHelloMessage(HLO);
+    	User u = new User("","",SENDER_NAME, PASS, false);
+    	assertTrue(msg.addUserToRecipients(u));
+    	assertTrue(msg.messageAlreadySent(u));
+    }
+    
+    /**
+     * Test message already sent for false.
+     */
+    @Test
+    public void testMessageAlreadySentForFalse() {
+    	Message msg = Message.makeHelloMessage(HLO);
+    	User u = new User("","",SENDER_NAME, PASS, false);
+    	assertFalse(msg.messageAlreadySent(u));
+    }
+    
+    /**
+     * Test add user to recipients for true.
+     */
+    @Test
+    public void testAddUserToRecipientsForTrue() {
+    	Message msg = Message.makeHelloMessage(HLO);
+    	User u = new User("","",SENDER_NAME, PASS, false);
+    	assertTrue(msg.addUserToRecipients(u));
+    }
+
+    /**
+     * Test add user to recipients for false.
+     */
+    @Test
+    public void testAddUserToRecipientsForFalse() {
+    	Message msg = Message.makeHelloMessage(HLO);
+    	User u = new User("","",SENDER_NAME, PASS, false);
+    	assertTrue(msg.addUserToRecipients(u));
+    }
+    
+    
+    
 
     /**
      * A private helper method to generate toString output for the given
@@ -392,7 +439,7 @@ public class TestMessage {
         final String SPACE = " ";
         return SPACE + parameter.length() + SPACE + parameter;
     }
-
+    
     /**
      * CONSTANTS to be used as expected values or method arguments
      **/

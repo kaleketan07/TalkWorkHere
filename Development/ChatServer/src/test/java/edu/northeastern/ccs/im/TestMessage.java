@@ -555,7 +555,35 @@ public class TestMessage {
     	User u = new User("","",SENDER_NAME, PASS, false);
     	assertTrue(msg.addUserToRecipients(u));
     }
-    
+
+    /**
+     * Test make search message.
+     */
+    @Test
+    public void testMakeSearchMessage(){
+        Message message = Message.makeSearchMessage(SENDER_NAME,"Group","searchString");
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Assertions.assertEquals("Group",message.getTextOrPassword());
+        Assertions.assertEquals("searchString",message.getReceiverOrPassword());
+    }
+
+    /**
+     * Test make message for search message.
+     */
+    @Test
+    public void testMakeMessageForSearchMessage(){
+        Message message = Message.makeMessage(SRH,SENDER_NAME,"Group","A");
+        Assertions.assertTrue(message.isSearchMessage());
+    }
+
+    /**
+     * Test is search message for false.
+     */
+    @Test
+    public void testIsSearchMessageForFalse(){
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isSearchMessage());
+    }
     
     
 
@@ -592,6 +620,7 @@ public class TestMessage {
     private static final String PRM = "PRM";
     private static final String FWU = "FWU";
     private static final String UFU = "UFU";
+    private static final String SRH = "SRH";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

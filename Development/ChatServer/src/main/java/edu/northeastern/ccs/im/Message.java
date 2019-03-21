@@ -202,6 +202,8 @@ public class Message {
             result = makeFollowUserMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
             result = makeUnfollowUserMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
+            result = makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return result;
     }
@@ -388,6 +390,18 @@ public class Message {
     public static Message makeUnfollowUserMessage(String follower, String followee) {
         return new Message(MessageType.UNFOLLOW_USER, follower, followee);
     }
+
+    /**
+     * Make search message message.
+     *
+     * @param userName     the user name of the user asking for the search results
+     * @param userOrGroup  the User or Group keyword specifying the filter for search criteria
+     * @param searchString the search string
+     * @return the message object of type search_message
+     */
+    public static Message makeSearchMessage(String userName, String userOrGroup, String searchString){
+        return new Message(MessageType.SEARCH_MESSAGE,userName, userOrGroup, searchString);
+    }
     
     /**
      * Add's the UniqueKey details to the existing message
@@ -570,6 +584,13 @@ public class Message {
      * @return true if the message is a update_group message, false otherwise
      */
     public boolean isUpdateGroupMessage(){ return (msgType == MessageType.UPDATE_GROUP);}
+
+    /**
+     * Verify if the message Is a search message.
+     *
+     * @return the boolean, true if the message is a search_message, false otherwise
+     */
+    public boolean isSearchMessage(){ return (msgType == MessageType.SEARCH_MESSAGE);}
     /**
      * Determine if this message is a message signing off from the IM server.
      *

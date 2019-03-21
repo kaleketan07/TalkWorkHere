@@ -552,7 +552,7 @@ public class ClientRunnable implements Runnable {
      * Handle the update message sent by the user. This just updates the first name and
      * last name for the time being.
      *
-     * @param msg The incoming user profile update message (for firstName and lastName only)
+     * @param msg The incoming user profile update message
      * @throws SQLException thrown by wrong database queries
      */
     private void handleUserProfileUpdateMessage(Message msg){
@@ -567,9 +567,27 @@ public class ClientRunnable implements Runnable {
                     "using HELP UPU");
         }
     }
+    
+    /**
+     * Handle a user following other user of the other user exists in the database
+     *
+     * @param msg The incoming follow user message
+     * @throws SQLException thrown by wrong database queries
+     */
+    private void handleFollowUserMessage(Message msg) throws SQLException{
+       User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
+       User followerUser = userService.getUserByUserName(msg.getName());
+       
+       if (followeeUser == null) {
+    	   this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
+    	   return;
+       }
+       userService.followUser(followeeUser, followerUser);
+    }
 
     /**
-     * Helper function to help map the attribute name to the number value sent by the user
+     * Helper function to help map the attribute name 
+     * to the number value sent by the user
      * @param attributeNumber The number of the attribute to be mapped
      * @return the mapped attribute name to be updated
      */
@@ -698,6 +716,8 @@ public class ClientRunnable implements Runnable {
         	handlePrivateReplyMessage(msg);
         } else if (msg.isUpdateGroupMessage()) {
             handleUpdateGroupMessage(msg);
+        } else if (msg.isFollowUserMessage()) {
+        	handleFollowUserMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

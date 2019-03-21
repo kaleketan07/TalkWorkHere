@@ -203,4 +203,23 @@ public class UserService implements UserDao {
         pstmt.close();
         return qResult > 0;
     }
+    
+    
+    /**
+     * add a entry for a user following other user
+     * @param followee user who is the followee
+     * @param follower user who is the follower
+     * @return true if the relation was inserted successfully
+     * @throws SQLException  the sql exception
+     */
+    @Override
+    public boolean followUser(User followee, User follower ) throws SQLException {
+        final String FOLLOW_USER =
+                "INSERT INTO user_follows (followee_user, follower_user) VALUES (?,?)";
+        pstmt = conn.getPreparedStatement(FOLLOW_USER);
+        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName() , follower.getUserName());
+        int qResult = pstmt.executeUpdate();
+        pstmt.close();
+        return (qResult > 0);
+    }
 }

@@ -38,7 +38,6 @@ public interface GroupDao {
      * Delete group.
      *
      * @param groupName the group name
-     * @param userName  the user name
      * @return true, if successful else return false
      * @throws SQLException the SQL exception
      */
@@ -93,6 +92,15 @@ public interface GroupDao {
      */
     boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException;
 
+    /**
+     * Removes the user from the given group
+     *
+     * @param hostGroupName
+     * @param guestUserName
+     * @return true, if successful
+     * @throws SQLException
+     */
+    boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException;
 
     /**
      * Adds the group to group.
@@ -103,4 +111,16 @@ public interface GroupDao {
      * @throws SQLException the SQL exception
      */
     boolean addGroupToGroup(String hostGroupName, String guestGroupName) throws SQLException;
+
+    /**
+     * Updates the group settings. For now a moderator can just change the group_searchable attribute
+     * as a setting.
+     *
+     * @param groupName      the group name
+     * @param attributeName  the attribute name
+     * @param attributeValue the attribute value
+     * @return the boolean   True if the attribute was successfully updated, false otherwise
+     * @throws SQLException the sql exception
+     */
+    boolean updateGroupSettings(String groupName, String attributeName, String attributeValue) throws SQLException;
 }

@@ -25,7 +25,7 @@ public interface UserDao {
     boolean createUser(User u) throws SQLException;
 
     // update a User details in database
-    boolean updateUser(User u) throws SQLException;
+    boolean updateUserAttributes(String username, String attributeName, String attributeValue) throws SQLException;
 
     // delete a User from database
     boolean deleteUser(User u) throws SQLException;

@@ -399,9 +399,9 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForUserProfileUpdateMessage(){
-        Message message = Message.makeMessage(UPU, SENDER_NAME,"Alex","Predna");
+        Message message = Message.makeMessage(UPU, SENDER_NAME,"3","Predna");
         Assertions.assertEquals(SENDER_NAME, message.getName());
-        Assertions.assertEquals("Alex", message.getTextOrPassword());
+        Assertions.assertEquals("3", message.getTextOrPassword());
         Assertions.assertEquals("Predna", message.getReceiverOrPassword());
         Assertions.assertTrue(message.isUserProfileUpdateMessage());
     }
@@ -411,9 +411,9 @@ public class TestMessage {
      */
     @Test
     public void testMakeUserProfileUpdateMessage(){
-        Message message = Message.makeUserProfileUpdateMessage(SENDER_NAME,"Alex","Predna");
+        Message message = Message.makeUserProfileUpdateMessage(SENDER_NAME,"1","Predna");
         Assertions.assertEquals(SENDER_NAME,message.getName());
-        Assertions.assertEquals("Alex",message.getTextOrPassword());
+        Assertions.assertEquals("1",message.getTextOrPassword());
         Assertions.assertEquals("Predna",message.getReceiverOrPassword());
     }
 

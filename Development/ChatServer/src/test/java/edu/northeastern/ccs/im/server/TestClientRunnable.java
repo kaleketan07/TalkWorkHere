@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,6 +12,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
+
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
@@ -19,6 +26,7 @@ import edu.northeastern.ccs.im.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import com.mysql.cj.x.protobuf.MysqlxDatatypes.Any;
@@ -315,7 +323,7 @@ public class TestClientRunnable {
         userService.set(clientRunnableObject, mockedUserService);
         User u = Mockito.mock(User.class);
         Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
-        Mockito.when(mockedUserService.updateUser(u)).thenReturn(true);
+        Mockito.when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(true);
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
@@ -815,7 +823,7 @@ public class TestClientRunnable {
         userService.set(clientRunnableObject, mockedUserService);
         User u = Mockito.mock(User.class);
         Mockito.when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(u);
-        Mockito.when(mockedUserService.updateUser(u)).thenReturn(false);
+        Mockito.when(mockedUserService.updateUserAttributes(u.getUserName(),"logged_in","1")).thenReturn(false);
         messageList.clear();
         messageList.add(LOGIN);
         messageIter = messageList.iterator();
@@ -1812,7 +1820,7 @@ public class TestClientRunnable {
         f.set(clientRunnableObject, mockedService);
         User loggedInUser = new User(null, null, SENDER_NAME, null, true);
         Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
-        Mockito.when(mockedService.updateUser(Mockito.any())).thenReturn(true);
+        Mockito.when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1844,7 +1852,7 @@ public class TestClientRunnable {
         f.set(clientRunnableObject, mockedService);
         User loggedInUser = new User(null, null, SENDER_NAME, null, true);
         Mockito.when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(loggedInUser);
-        Mockito.when(mockedService.updateUser(Mockito.any())).thenReturn(false);
+        Mockito.when(mockedService.updateUserAttributes(loggedInUser.getUserName(),"logged_in","0")).thenReturn(false);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1996,23 +2004,27 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
-
     /**
-     * Test handle user profile update message when there is a successful update.
+     * Test handle user profile update message for first name.
      *
      * @throws NoSuchFieldException   the no such field exception
      * @throws IllegalAccessException the illegal access exception
      * @throws SQLException           the sql exception
      */
     @Test
-    public void testHandleUserProfileUpdateMessage() throws NoSuchFieldException,IllegalAccessException,SQLException{
+    public void testHandleUserProfileUpdateMessageForFirstName() throws NoSuchFieldException,IllegalAccessException,SQLException{
         List<Message> messageList = new ArrayList<>();
         messageList.add(REGISTER);
-        messageList.add(USER_PROFILE_UPDATE);
+        Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME,"1","Predna");
+        messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
         UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
         Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
@@ -2020,44 +2032,186 @@ public class TestClientRunnable {
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"Alex","Predna")).thenReturn(true);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"first_name","Predna"))
+                .thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
-        Assertions.assertTrue(clientRunnableObject.isInitialized());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
-     * Test handle user profile update message for false.
+     * Test handle user profile update message for last name.
      *
-     * @throws SQLException           the sql exception
-     * @throws IllegalAccessException the illegal access exception
      * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws SQLException           the sql exception
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForFalse() throws
-            SQLException,IllegalAccessException,NoSuchFieldException{
+    public void testHandleUserProfileUpdateMessageForLastName() throws NoSuchFieldException,IllegalAccessException,SQLException{
         List<Message> messageList = new ArrayList<>();
-        messageList.add(REGISTER);
-        messageList.add(USER_PROFILE_UPDATE);
+        messageList.add(LOGIN);
+        Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME,"2","Predna");
+        messageList.add(someMessage);
+        messageList.add(someMessage);
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        UserService us = Mockito.mock(UserService.class);
         Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"last_name","Predna"))
+                .thenReturn(true);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle user profile update message for user password.
+     *
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testHandleUserProfileUpdateMessageForUserPassword() throws NoSuchFieldException,IllegalAccessException,SQLException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME,"3","Predna");
+        messageList.add(someMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
         USER_LOGGED_ON.setLoggedIn(true);
         Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         Field privateUserService = ClientRunnable.class.
                 getDeclaredField("userService");
         privateUserService.setAccessible(true);
         privateUserService.set(clientRunnableObject, us);
-        Mockito.when(us.updateUserAttributes(SENDER_NAME,"Alex","Predna")).thenReturn(false);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"user_password","Predna")).thenReturn(true);
         clientRunnableObject.run();
         clientRunnableObject.run();
-        Assertions.assertTrue(clientRunnableObject.isInitialized());
+        assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
+    /**
+     * Test handle user profile update message for user searchability attribute.
+     *
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testHandleUserProfileUpdateMessageForUserSearchability() throws NoSuchFieldException,
+            IllegalAccessException,SQLException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME,"4","True");
+        messageList.add(someMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"user_searchable","True")).thenReturn(true);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle user profile update message for an incorrect number. Should return false
+     *
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testHandleUserProfileUpdateMessageForIncorrectNumber() throws NoSuchFieldException,IllegalAccessException,SQLException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME,"5","Pred");
+        messageList.add(someMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,null,"Predna")).thenThrow(SQLException.class);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle user profile update message for last name when database operations don't get executed
+     *
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testHandleUserProfileUpdateMessageForLastNameFalse() throws NoSuchFieldException,IllegalAccessException,SQLException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(REGISTER);
+        Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME,"2","Predna");
+        messageList.add(someMessage);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Mockito.when(us.updateUserAttributes(SENDER_NAME,"last_name","Predna")).thenReturn(false);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
     /**
      * Test handle message with null output for msg.getName() (Invalid sender specified).
      *

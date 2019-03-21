@@ -2,8 +2,13 @@ package edu.northeastern.ccs.im.models;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import edu.northeastern.ccs.im.Message;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,6 +80,59 @@ public class TestGroup {
         Assertions.assertEquals(testUsers, testGroup.getMemberUsers());
     }
 
+    /**
+     * Test group send message with no member group.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test 
+    public void testGroupSendMessageWithNoMemberGroup() throws SQLException {
+    	Group testGroup = new Group();
+        testGroup.setGroupName(TEST_GROUP_NAME);
+        testGroup.setModeratorName(TEST_MODERATOR_NAME);
+        Set<User> users = new HashSet<>(Arrays.asList(CAROL, DAN));
+        testGroup.setMemberUsers(users);
+        Message msg = Message.makeLoginMessage(TEST_LOGIN, "");
+        Mockito.doNothing().when(DAN).userSendMessage(msg);
+        Mockito.doNothing().when(CAROL).userSendMessage(msg);
+        testGroup.groupSendMessage(msg);
+        
+    }
+    
+    /**
+     * Test group send message with user present in sub groups.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test 
+    public void testGroupSendMessageWithUserPresentInSubGroups() throws SQLException {
+    	Group testGroup = new Group();
+        testGroup.setGroupName(TEST_GROUP_NAME);
+        testGroup.setModeratorName(TEST_MODERATOR_NAME);
+        Set<User> users = new HashSet<>(Arrays.asList(DAN, CAROL));
+        testGroup.setMemberUsers(users);
+        Group testGroup2 = new Group();
+        testGroup2.setGroupName(TEST_GROUP_NAME_1);
+        testGroup2.setModeratorName(TEST_MODERATOR_NAME);
+        Set<User> users2 = new HashSet<>(Arrays.asList(DAN, GARY,BOB));
+        testGroup2.setMemberUsers(users2);
+        Set<Group> groups = new HashSet<>(Arrays.asList(testGroup2));
+        testGroup.setMemberGroups(groups);
+        Message msg = Message.makeLoginMessage(TEST_LOGIN, "");
+        Mockito.doNothing().when(DAN).userSendMessage(msg);
+        Mockito.doNothing().when(CAROL).userSendMessage(msg);
+        Mockito.doNothing().when(GARY).userSendMessage(msg);
+        testGroup.groupSendMessage(msg);
+        
+    }
+    
+   
+    private static final User CAROL = Mockito.mock(User.class);
+    private static final User DAN = Mockito.mock(User.class);
+    private static final User BOB = Mockito.mock(User.class);
+    private static final User GARY = Mockito.mock(User.class);
     private final String TEST_GROUP_NAME = "Group201";
+    private final String TEST_GROUP_NAME_1 = "Group202";
     private final String TEST_MODERATOR_NAME = "Alice";
+    private final String TEST_LOGIN = "login";
 }

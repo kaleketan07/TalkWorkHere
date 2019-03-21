@@ -71,7 +71,11 @@ public enum MessageType {
 	/**
 	 * Handle To send prattle messages to the client 
 	 */
-	PRATTLE_MESSAGE("PRM");
+	PRATTLE_MESSAGE("PRM"),
+	/**
+	 * Handle To send prattle messages to the client 
+	 */
+	MESSAGE_GROUP("MSG");
 	
 	/**
      * Store the short name of this message type.

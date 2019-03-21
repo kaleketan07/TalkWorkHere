@@ -413,6 +413,15 @@ public class TestGroupService {
         when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
         Assertions.assertTrue(testGS.addGroupToGroup("ABC", "ABC"));
     }
+    
+    @Test
+    public void testIsUserAMemberOfTheGroup() throws SQLException{
+    	when(mockedRS.next()).thenReturn(true, true, false, true, true, false);
+        when(mockedRS.getString("group_name")).thenReturn("Group201", "Group202");
+        when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
+        when(mockedRS.getString("username")).thenReturn("AB");
+        Assertions.assertTrue(testGS.isUserMemberOfTheGroup("ABC", "AB"));
+    }
 
 
 }

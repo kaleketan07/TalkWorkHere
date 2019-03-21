@@ -2246,6 +2246,129 @@ public class TestClientRunnable {
         USER_LOGGED_ON.setLoggedIn(true);
     }
 
+    
+    
+    /**
+     * Test group message when group does not exist.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testGroupMessageWhenGroupDoesNotExist() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    	List<Message> ml = new ArrayList<>();
+        ml.add(GROUP_MESSAGE);
+        ml.add(GROUP_MESSAGE);
+        GroupService mgs = Mockito.mock(GroupService.class);
+        Group temp = new Group();
+        temp.setModeratorName("Carol");
+        User tempUser = new User("", "", "Carol", "pass", true);
+        User tempUser2 = new User("", "", "Bob", "pass", true);
+        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
+        Field privateGroupService = ClientRunnable.class.
+                getDeclaredField("groupService");
+        privateGroupService.setAccessible(true);
+        Iterator<Message> messageIter = ml.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        privateGroupService.set(clientRunnableObject, mgs);
+        UserService us = Mockito.mock(UserService.class);
+        Mockito.when(us.getUserByUserName(SENDER_NAME)).thenReturn(tempUser);
+        Mockito.when(us.getUserByUserName(DUMMY_USER)).thenReturn(tempUser2);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        privateGroupService.setAccessible(false);
+        assertNotEquals(clientRunnableObject.getUserId(), -1);
+        assertEquals(clientRunnableObject.getName(), SENDER_NAME);
+    }
+    
+    
+    /**
+     * Test group message when user not A member of group.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testGroupMessageWhenUserNotAMemberOfGroup() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    	List<Message> ml = new ArrayList<>();
+        ml.add(GROUP_MESSAGE);
+        ml.add(GROUP_MESSAGE);
+        GroupService mgs = Mockito.mock(GroupService.class);
+        Group temp = new Group();
+        temp.setModeratorName("Carol");
+        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        Mockito.when(mgs.isUserMemberOfTheGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        Field privateGroupService = ClientRunnable.class.
+                getDeclaredField("groupService");
+        privateGroupService.setAccessible(true);
+        Iterator<Message> messageIter = ml.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        privateGroupService.set(clientRunnableObject, mgs);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        privateGroupService.setAccessible(false);
+        assertNotEquals(clientRunnableObject.getUserId(), -1);
+        assertEquals(clientRunnableObject.getName(), SENDER_NAME);
+    }
+    
+    @Test
+    public void testGroupMessage() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    	List<Message> ml = new ArrayList<>();
+    	ml.add(GROUP_MESSAGE);
+        ml.add(GROUP_MESSAGE);
+        GroupService mgs = Mockito.mock(GroupService.class);
+        Group temp = Mockito.mock(Group.class);
+        Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
+        Mockito.when(mgs.isUserMemberOfTheGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        Mockito.doNothing().when(temp).groupSendMessage(Mockito.any());
+        Field privateGroupService = ClientRunnable.class.
+                getDeclaredField("groupService");
+        privateGroupService.setAccessible(true);
+        Iterator<Message> messageIter = ml.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        privateGroupService.set(clientRunnableObject, mgs);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        Mockito.when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        privateGroupService.setAccessible(false);
+        assertNotEquals(clientRunnableObject.getUserId(), -1);
+        assertEquals(clientRunnableObject.getName(), SENDER_NAME);
+    }
+    
+    
+    
     //Private fields to be used in tests
     private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS, TestClientRunnable.PASS);
@@ -2270,5 +2393,6 @@ public class TestClientRunnable {
     private static final String PASS = "some_p@$$worD";
     private static final User USER_LOGGED_ON = new User(null,null,SENDER_NAME,"QWERTY",true);
     private static final User USER_LOGGED_OFF = new User(null,null,SENDER_NAME,"QWERTY",false);
+    private static final Message GROUP_MESSAGE = Message.makeGroupMessage(TestClientRunnable.SENDER_NAME, MESSAGE_TEXT, DUMMY_GROUP_NAME);
 
 }

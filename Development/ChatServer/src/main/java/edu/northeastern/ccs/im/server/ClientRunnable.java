@@ -597,6 +597,25 @@ public class ClientRunnable implements Runnable {
         return mappedAttribute;
     }
 
+    
+    /**
+     * Handles the messages sent on Groups.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleGroupMessage(Message msg) throws SQLException {
+    	User currUser = userService.getUserByUserName(msg.getName());
+    	Group currGroup = groupService.getGroup(msg.getReceiverOrPassword());
+    	if (currGroup == null) {
+    		this.enqueuePrattleResponseMessage("The destination group does not exist");
+    	} else if (!groupService.isUserMemberOfTheGroup(currGroup.getGroupName(), currUser.getUserName())) {
+    		this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() +" to send a message on it");
+    	} else {
+    		this.enqueuePrattleResponseMessage("message sent successfully");
+    		currGroup.groupSendMessage(msg);
+    	}
+    }
 
     /**
      * This method handles different types of messages and delegates works to its respective methods
@@ -631,6 +650,8 @@ public class ClientRunnable implements Runnable {
         	handleDeleteUserMessage(msg);
         } else if (msg.isPrivateReplyMessage()) {
         	handlePrivateReplyMessage(msg);
+        } else if (msg.isGroupMessage()){
+        	handleGroupMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

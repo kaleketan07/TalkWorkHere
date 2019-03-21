@@ -103,4 +103,14 @@ public interface GroupDao {
      * @throws SQLException the SQL exception
      */
     boolean addGroupToGroup(String hostGroupName, String guestGroupName) throws SQLException;
+    
+    /**
+     * Checks if is user member of the group.
+     *
+     * @param grpName the name of the group in which the user name is to be searched 
+     * @param userName the user name to be searched
+     * @return true, if is user is a member of the group
+     * @throws SQLException the SQL exception
+     */
+    boolean isUserMemberOfTheGroup(String grpName, String userName) throws SQLException;
 }

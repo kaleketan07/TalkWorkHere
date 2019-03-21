@@ -222,4 +222,22 @@ public class UserService implements UserDao {
         pstmt.close();
         return (qResult > 0);
     }
+    
+    /**
+     * delete a entry for a user following other user
+     * @param followee user who is the followee
+     * @param follower user who is the follower
+     * @return true if the relation was deleted successfully
+     * @throws SQLException  the sql exception
+     */
+    @Override
+    public boolean unfollowUser(User followee, User follower) throws SQLException {
+        final String FOLLOW_USER =
+                "DELETE FROM user_follows WHERE followee_user = ? and follower_user = ?";
+        pstmt = conn.getPreparedStatement(FOLLOW_USER);
+        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName() , follower.getUserName());
+        int qResult = pstmt.executeUpdate();
+        pstmt.close();
+        return (qResult > 0);
+    }
 }

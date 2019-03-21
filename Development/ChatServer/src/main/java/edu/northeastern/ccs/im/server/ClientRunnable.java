@@ -2,10 +2,7 @@ package edu.northeastern.ccs.im.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
 
@@ -88,12 +85,6 @@ public class ClientRunnable implements Runnable {
      * Stores the groupService instance to be used across multiple conditions.
      */
     private GroupService groupService;
-
-    /**
-     * Error message to be sent
-     */
-    private Message responseMessage;
-
 
     /**
      * Store instance of ConversationalMessage to be used to retrive messages 
@@ -597,6 +588,80 @@ public class ClientRunnable implements Runnable {
         return mappedAttribute;
     }
 
+    /**
+     * Handle the update group message method
+     *
+     * @param msg the message sent by the client
+     * @throws SQLException
+     */
+    private void handleUpdateGroupMessage(Message msg) throws SQLException{
+        try {
+            User user = userService.getUserByUserName(msg.getName());
+            Group group = groupService.getGroup(msg.getTextOrPassword());
+            if (group == null) {
+                enqueuePrattleResponseMessage("This group does not exist yet.");
+            } else if (groupService.isModerator(msg.getTextOrPassword(), user.getUserName())) {
+                //User is allowed to make changes to this group
+                ArrayList<String> keyValue = helperForHandleUpdateGroupMessage(msg.getReceiverOrPassword());
+                Iterator<String> it = keyValue.iterator();
+                while (it.hasNext()) {
+                    if (groupService.updateGroupSettings(msg.getTextOrPassword(), it.next(), it.next()))
+                        enqueuePrattleResponseMessage("Group setting updated successfully");
+                    else
+                        enqueuePrattleResponseMessage("Failed updating the group setting.");
+                }
+            } else {
+                this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
+            }
+        }catch(Exception e){
+            this.enqueuePrattleResponseMessage("Something went wrong with the update. Please refer to the correct " +
+                    "group update syntax using HELP UPG");
+        }
+    }
+
+    /**
+     * Helper function for handling update group message. This helper will basically return the attribute names
+     * and their values in a list. index and index+1 have the key and values respectively.
+     *
+     * @param attributeKeyValueString the attributes and their values to be updated in the format
+     *                                attributeName:attributeValue
+     * @return the ArrayList with the attribute names and their values.
+     * @throws SQLException the SQL exception
+     */
+
+    private ArrayList<String> helperForHandleUpdateGroupMessage(String attributeKeyValueString) throws SQLException{
+        ArrayList<String> keyValuePair = new ArrayList<>();
+        String[] arrayKeyPair = attributeKeyValueString.split(":");
+        int index=0;
+        for(String s : arrayKeyPair) {
+            if(index % 2 == 0){
+                //Map the attribute number to attribute name
+                String attributeName = getGroupAttributeName(s);
+                keyValuePair.add(attributeName);
+            }
+            else keyValuePair.add(s);
+            index++;
+        }
+        return keyValuePair;
+    }
+
+    /**
+     * This method is used for mapping the group setting number sent in the update group message
+     * to the group setting name that is present in the database. This is a separate function since
+     * more group settings may get added later on.
+     *
+     * @param attributeNumber the number of the attribute
+     * @return a String which is the name of the attribute as defined in the database
+     * @throws SQLException the SQL exception.
+     */
+    private String getGroupAttributeName(String attributeNumber) throws SQLException{
+        String attributeName;
+        if(attributeNumber.compareTo("1") == 0)
+            attributeName = "is_searchable";
+        else
+            throw new SQLException("Group setting number out of bounds");
+        return attributeName;
+    }
 
     /**
      * This method handles different types of messages and delegates works to its respective methods
@@ -631,6 +696,8 @@ public class ClientRunnable implements Runnable {
         	handleDeleteUserMessage(msg);
         } else if (msg.isPrivateReplyMessage()) {
         	handlePrivateReplyMessage(msg);
+        } else if (msg.isUpdateGroupMessage()) {
+            handleUpdateGroupMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

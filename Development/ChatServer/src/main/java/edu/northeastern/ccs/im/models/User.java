@@ -159,13 +159,11 @@ public class User {
         String msgText = msg.getTextOrPassword();
         String uniqueKey = null;
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
-        if (clientRunnable != null) {
-            if(clientRunnable.isInitialized())
-            {
-            	uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
-        		clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() + 
-        					System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
-            }
+        if (clientRunnable != null && clientRunnable.isInitialized()) {
+            uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
+            clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
+                    System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
+
         }
         
         cms.insertConversationalMessage(src, this.getUserName(), msgText, false);

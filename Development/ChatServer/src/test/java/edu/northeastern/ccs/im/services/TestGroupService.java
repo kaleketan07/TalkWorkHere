@@ -414,5 +414,33 @@ public class TestGroupService {
         Assertions.assertTrue(testGS.addGroupToGroup("ABC", "ABC"));
     }
 
+    /**
+     * Test update group for true.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupForTrue() throws SQLException{
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","1"));
+    }
+
+    /**
+     * Test update group for false.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupForFalse() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(testGS.updateGroupSettings("testGroup","is_searchable","1"));
+    }
+
+    @Test
+    public void testUpdateGroupForException() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
+        Assertions.assertThrows(SQLException.class,
+                ()->testGS.updateGroupSettings("testGroup","is_searchable","1"));
+    }
+
 
 }

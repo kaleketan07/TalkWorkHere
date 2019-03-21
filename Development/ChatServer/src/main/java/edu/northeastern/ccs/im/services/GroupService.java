@@ -29,6 +29,7 @@ public class GroupService implements GroupDao {
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
     private static final String GROUP_NAME = "group_name";
+    private static final String GUEST_GROUP_NAME = "guest_group_name";
     private static final String MODERATOR_NAME = "moderator_name";
     private static final String LOGGED_IN = "logged_in";
 
@@ -148,13 +149,13 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Set<String> getMemberGroups(String groupName) throws SQLException {
-        final String FETCH_MEMBER_GROUPS = "SELECT prattle.membership_groups.guest_group_name FROM prattle.groups JOIN prattle.membership_groups on prattle.groups.group_name = prattle.membership_groups.host_group_name where group_name = ?";
+        final String FETCH_MEMBER_GROUPS = "SELECT prattle.membership_groups.guest_group_name FROM prattle.groups JOIN prattle.membership_groups on prattle.groups.group_name = prattle.membership_groups.host_group_name where prattle.groups.group_name = ?";
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_GROUPS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<String> groups = new HashSet<>();
         result = pstmt.executeQuery();
         while (result.next()) {
-            String gName = result.getString(GROUP_NAME);
+            String gName = result.getString(GUEST_GROUP_NAME);
             groups.add(gName);
         }
         pstmt.close();
@@ -275,5 +276,26 @@ public class GroupService implements GroupDao {
             return (qResult > 0);
         }
     }
+
+    /**
+     * Updates the group settings. For now a moderator can just change the group_searchable attribute
+     * as a setting.
+     *
+     * @param groupName      the group name
+     * @param attributeName  the attribute name
+     * @param attributeValue the attribute value
+     * @return the boolean   True if the attribute was successfully updated, false otherwise
+     * @throws SQLException the sql exception
+     */
+    public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
+            throws SQLException{
+        final String UPDATE_GROUP = "UPDATE prattle.groups SET " + attributeName + " = ? WHERE group_name = ?";
+        pstmt = conn.getPreparedStatement(UPDATE_GROUP);
+        pstmt = utils.setPreparedStatementArgs(pstmt,attributeValue,groupName);
+        int qResult = pstmt.executeUpdate();
+        pstmt.close();
+        return qResult>0;
+    }
+
 
 }

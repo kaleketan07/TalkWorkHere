@@ -426,6 +426,41 @@ public class TestMessage {
         Assertions.assertFalse(message.isUserProfileUpdateMessage());
     }
 
+    /**
+     * Test make update group message.
+     */
+    @Test
+    public void testMakeUpdateGroupMessage(){
+        Message message = Message.makeUpdateGroupMessage(SENDER_NAME,"testGroup","attributes");
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Assertions.assertEquals("testGroup",message.getTextOrPassword());
+        Assertions.assertEquals("attributes",message.getReceiverOrPassword());
+    }
+
+    /**
+     * Test is update group message true.
+     */
+    @Test
+    public void testIsUpdateGroupMessageTrue(){
+        Message message = Message.makeUpdateGroupMessage(SENDER_NAME,"testGroup","attributes");
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Assertions.assertEquals("testGroup",message.getTextOrPassword());
+        Assertions.assertEquals("attributes",message.getReceiverOrPassword());
+        Assertions.assertTrue(message.isUpdateGroupMessage());
+    }
+
+    /**
+     * Test is update group message for false.
+     */
+    @Test
+    public void testIsUpdateGroupMessageForFalse(){
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isUpdateGroupMessage());
+    }
+
+    /**
+     * Test make message add user group message condition.
+     */
     @Test
     public void testMakeMessageAddUserGroupMessageCondition() {
         Message message = Message.makeMessage(AUG, SENDER_NAME, GROUP_NAME, ANOTHER_USER);

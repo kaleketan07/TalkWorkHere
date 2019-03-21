@@ -196,6 +196,8 @@ public class Message {
             result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword); 			
         } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
             result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
+            result = makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return result;
     }
@@ -347,6 +349,19 @@ public class Message {
     public static Message makePrivateReplyMessage(String srcName, String text, String msgUniqueKey) {
         return new Message(MessageType.PRIVATE_REPLY_MESSAGE, srcName , text, msgUniqueKey);
     }
+
+    /**
+     * Make update group message message.
+     *
+     * @param userName          the username of the sender of the update message
+     * @param groupName         the group name whose settings needs to be updated
+     * @param attributeKeyValue the attribute key and it's value separated by ':'
+     * @return the message object of type UPDATE_GROUP
+     */
+    public static Message makeUpdateGroupMessage(String userName, String groupName, String attributeKeyValue){
+        return new Message(MessageType.UPDATE_GROUP, userName, groupName, attributeKeyValue);
+    }
+
     
     /**
      * Add's the UniqueKey details to the existing message
@@ -505,6 +520,12 @@ public class Message {
         return (msgType == MessageType.GET_GROUP);
     }
 
+    /**
+     * Verify if the message is a update group message.
+     *
+     * @return true if the message is a update_group message, false otherwise
+     */
+    public boolean isUpdateGroupMessage(){ return (msgType == MessageType.UPDATE_GROUP);}
     /**
      * Determine if this message is a message signing off from the IM server.
      *

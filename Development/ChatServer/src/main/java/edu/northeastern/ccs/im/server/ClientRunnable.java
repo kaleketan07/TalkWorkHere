@@ -12,8 +12,10 @@ import java.util.concurrent.ScheduledFuture;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+import edu.northeastern.ccs.im.models.ConversationalMessage;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
+import edu.northeastern.ccs.im.services.ConversationalMessageService;
 import edu.northeastern.ccs.im.services.GroupService;
 import edu.northeastern.ccs.im.services.UserService;
 
@@ -86,10 +88,17 @@ public class ClientRunnable implements Runnable {
      * Stores the groupService instance to be used across multiple conditions.
      */
     private GroupService groupService;
+
     /**
      * Error message to be sent
      */
     private Message responseMessage;
+
+
+    /**
+     * Store instance of ConversationalMessage to be used to retrive messages 
+     */
+    private ConversationalMessageService conversationalMessagesService;
     
     /**
      * This static data structure stores the client runnable instances
@@ -136,6 +145,7 @@ public class ClientRunnable implements Runnable {
         try {
             userService = UserService.getInstance();
             groupService = GroupService.getGroupServiceInstance();
+            conversationalMessagesService = ConversationalMessageService.getInstance();
         } catch (ClassNotFoundException | SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
         }
@@ -479,6 +489,32 @@ public class ClientRunnable implements Runnable {
             return true;
         return false;
     }
+    
+    
+    /**
+     * Handle PrivateReplyMessage to group message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handlePrivateReplyMessage(Message msg) throws SQLException {
+        String destName = conversationalMessagesService.getSender(msg.getReceiverOrPassword());
+    	if (destName != null)
+        {
+    		User destUser = userService.getUserByUserName(destName);
+            if (destUser == null) 
+            {
+       		 ChatLogger.error("msg_UniqueKey provided is wrong");
+       	 	}
+       	 	else {
+       	 		destUser.userSendMessage(msg);
+       	 	}
+        }
+    	else
+    		this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
+    				+ " Please try again with the right msg_uniqueKey");
+    }
+
     /**
      * Handle add user to group message.
      *
@@ -522,6 +558,8 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle the update message sent by the user. Check which number value was sent,
      * 1 is first name, 2 is second name, 3 is password, 4 is searchability and call updateUserAttributes accordingly
+     * Handle the update message sent by the user. This just updates the first name and
+     * last name for the time being.
      *
      * @param msg The incoming user profile update message (for firstName and lastName only)
      * @throws SQLException thrown by wrong database queries
@@ -534,9 +572,8 @@ public class ClientRunnable implements Runnable {
             else
                 this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
         }catch (SQLException e){
-            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages: \n" +
-                    " UPU;[AttributeNumber];Value \n Where AttributeNumber is \n 1 - First Name" +
-                    "\n 2 - Last Name \n 3 - Password \n 4 - User Searchable (1/0 True/False)");
+            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages " +
+                    "using HELP UPU");
         }
     }
 
@@ -592,6 +629,8 @@ public class ClientRunnable implements Runnable {
             handleUserProfileUpdateMessage(msg);
         } else if (msg.isDeleteUserMessage()) {
         	handleDeleteUserMessage(msg);
+        } else if (msg.isPrivateReplyMessage()) {
+        	handlePrivateReplyMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

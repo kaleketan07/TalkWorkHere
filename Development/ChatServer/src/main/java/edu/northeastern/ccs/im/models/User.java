@@ -157,15 +157,18 @@ public class User {
     public void userSendMessage(Message msg) throws SQLException {
         String src = msg.getName();
         String msgText = msg.getTextOrPassword();
-        boolean flag = false;
+        String uniqueKey = null;
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
         if (clientRunnable != null) {
-            flag = true;
             if(clientRunnable.isInitialized())
-                clientRunnable.enqueueMessage(msg);
-
+            {
+            	uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
+        		clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() + 
+        					System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
+            }
         }
-        cms.insertConversationalMessage(src, this.getUserName(), msgText, flag);
+        
+        cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
 }
 

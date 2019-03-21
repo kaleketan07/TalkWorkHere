@@ -163,4 +163,25 @@ public class ConversationalMessageService {
         pstmt.close();
         return cm;
     }
+    
+    /**
+     * gets the username of the sender of the message based on the msg_uniquekey
+     *
+     * @param msgUniqueKey UniqueKey for the message to be deleted
+     * @throws SQLException the sql exception
+     */
+    public String getSender(String msgUniqueKey) throws SQLException {
+        final String GET_SENDER = "SELECT * FROM messages WHERE msg_uniquekey = ?";
+        pstmt = conn.getPreparedStatement(GET_SENDER);
+        pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
+        String msgSrc = null;
+        result = pstmt.executeQuery();
+        if (result.first()) {
+        	msgSrc = result.getString(DB_COL_MSG_SRC);
+        }
+        pstmt.close();
+        return msgSrc;
+    }
+    
+    
 }

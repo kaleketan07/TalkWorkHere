@@ -280,6 +280,38 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isDeleteGroupMessage());
         assertFalse(message.isDeleteUserMessage());
+        assertFalse(message.isPrivateReplyMessage());
+    }
+    
+    /**
+     * Test makeMessage with Private_Reply as the handle
+     */
+    @Test
+    public void testMakeMessagePrivateReplyCondition() {
+        Message message = Message.makeMessage(PRE, SENDER_NAME, PASS, PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(PRE);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(PASS));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isPrivateReplyMessage());
+    }
+    
+    
+    /**
+     * Test makePrattleMessage()
+     */
+    @Test
+    public void testMakeMessagePrattleMessage() {
+        Message message = Message.makePrattleMessage(PASS);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(PRM);
+        strBuild.append(toStringHelper(PRATTLE));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        
     }
     
     /**
@@ -298,6 +330,39 @@ public class TestMessage {
         assertFalse(message.isRemoveUserFromGroupMessage());
     }
     
+    /**
+    * Test addUniqueKey with PrivateReply as the handle
+    */
+   @Test
+   public void testAddUniqueKeyWithPrivateReply() {
+       Message message = Message.makeMessage(PRE, SENDER_NAME, PASS,NULL_OUTPUT);
+       message = Message.addUniqueKeyToMsg(message, "ABC");
+       assertEquals(message.getTextOrPassword(), "ABC");
+   }
+    
+   /**
+    * Test addUniqueKey with MessageUser as the handle
+    */
+   @Test
+   public void testAddUniqueKeyWithMessageUser() {
+       Message message = Message.makeMessage(MSU, SENDER_NAME, PASS,NULL_OUTPUT);
+       message = Message.addUniqueKeyToMsg(message, "ABC");
+       assertEquals(message.getTextOrPassword(), "ABC");
+   }
+   
+    
+   /**
+    * Test addUniqueKey with DeleteUser as the handle
+    */
+   @Test
+   public void testAddUniqueKeyWithInvalidHandle() {
+       Message message = Message.makeMessage(DLU, SENDER_NAME, PASS,NULL_OUTPUT);
+       String msgText = message.getTextOrPassword();
+       message = Message.addUniqueKeyToMsg(message, "ABC");
+       assertEquals(message.getTextOrPassword(), msgText);
+   }
+   
+   
     /**
      * Test makeMessage with Remove_user as the handle
      */
@@ -456,8 +521,11 @@ public class TestMessage {
     private static final String DLU = "DLU";
     private static final String RUG = "RUG";
     private static final String AUG = "AUG";
+    private static final String PRE = "PRE";
+    private static final String PRM = "PRM";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
+    private static final String PRATTLE = "Prattle";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final String PASS = "some_p@$$worD";
     private static final String GROUP_NAME = "group";

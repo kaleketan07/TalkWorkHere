@@ -193,8 +193,10 @@ public class Message {
         } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
             result = makeDeleteUserMessage(srcName);
         } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
-            result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        }  			
+            result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword); 			
+        } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
+            result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
+        }
         return result;
     }
     
@@ -321,6 +323,7 @@ public class Message {
     public static Message makeGetGroupMessage(String srcName, String groupName) {
         return new Message(MessageType.GET_GROUP, srcName, groupName);
     }
+    
     /**
      * The method creates a message that handles the user's request for updating
      * his profile details
@@ -334,6 +337,30 @@ public class Message {
         return new Message(MessageType.UPDATE_PROFILE_USER, uname, firstName, lastName);
     }
 
+    /**
+     * This method creates a private reply message
+     *
+     * @param msgUniqueKey - msg_uniqueKey to which the the reply is 
+     * @param text - text in the message
+     * @return a Message object of type Private_Reply
+     */
+    public static Message makePrivateReplyMessage(String srcName, String text, String msgUniqueKey) {
+        return new Message(MessageType.PRIVATE_REPLY_MESSAGE, srcName , text, msgUniqueKey);
+    }
+    
+    /**
+     * Add's the UniqueKey details to the existing message
+     * @param msg   The message to be sent
+     * @param text 	The text to be replaced in msg object
+     * @return msg 
+     */
+    public static Message addUniqueKeyToMsg(Message msg , String text) {
+    	if (msg.isPrivateUserMessage() || msg.isPrivateReplyMessage()) {
+    		return new Message(msg.msgType, msg.msgSender , text, msg.msgReceiverOrPassword);
+    	}
+    	return msg;
+    }
+    
     /**
      * Return the name of the sender of this message.
      *
@@ -449,6 +476,15 @@ public class Message {
      */
     public boolean isPrivateUserMessage() {
         return (msgType == MessageType.MESSAGE_USER);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle PRE (is a PRIVATE_REPLY_MESSAGE)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isPrivateReplyMessage() {
+        return (msgType == MessageType.PRIVATE_REPLY_MESSAGE);
     }
 
     /**

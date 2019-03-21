@@ -133,7 +133,7 @@ public class TestUser {
         mapField.set(mockedClientRunnable, userClients);
         ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
-                "Hello, Alice", true);
+                "Hello, Alice", false);
     }
 
     private static final User TOM = new User("Tom", "Harris", "tomharris", "123", false);

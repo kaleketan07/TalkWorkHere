@@ -1,6 +1,10 @@
 package edu.northeastern.ccs.im.models;
 
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
+
+import edu.northeastern.ccs.im.Message;
 
 /**
  * The Group class depicts the concept of a group.
@@ -16,8 +20,8 @@ public class Group implements Member {
      * @param name, the name of the group
      */
     public Group() {
-        this.groupName = null;
-        this.moderatorName = null;
+        this.memberUsers = new HashSet<>();
+        this.memberGroups = new HashSet<>();
     }
 
     /**
@@ -110,5 +114,26 @@ public class Group implements Member {
      */
     public void setMemberGroups(Set<Group> groups) {
         this.memberGroups = groups;
+    }
+    
+    /**
+     * Send message to members of this group
+     *
+     * @param msg the message to be sent
+     * @throws SQLException the SQL exception
+     */
+    public void groupSendMessage(Message msg) throws SQLException {
+    	// send message to member users
+    	for (User u : memberUsers) {
+    		// a user can also be a part of a group at a higher level in the hierarchy. Do not send the message again
+    		if (!msg.messageAlreadySent(u)) {
+    			msg.addUserToRecipients(u);
+    			u.userSendMessage(msg);
+    		}
+    	}
+    	// send message to member groups
+    	for (Group g: memberGroups) {
+    		g.groupSendMessage(msg);
+    	}
     }
 }

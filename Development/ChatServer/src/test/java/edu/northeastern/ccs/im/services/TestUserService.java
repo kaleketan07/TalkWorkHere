@@ -136,6 +136,16 @@ public class TestUserService {
     public void testCreateUser() throws SQLException {
         Assertions.assertTrue(us.createUser(testUser));
     }
+    
+    /**
+     * Test create user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testFollowUser() throws SQLException {
+        Assertions.assertTrue(us.followUser(testUser, testUser));
+    }
 
     /**
      * Test delete user.
@@ -201,6 +211,17 @@ public class TestUserService {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
         Assertions.assertThrows(SQLException.class, () -> us.createUser(testUser));
     }
+    
+    /**
+     * Test create user exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testFollowUserException() throws SQLException {
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
+        Assertions.assertThrows(SQLException.class, () -> us.followUser(testUser,testUser));
+    }
 
 
     /**
@@ -235,6 +256,17 @@ public class TestUserService {
     public void testCreateUserFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.createUser(testUser));
+    }
+    
+    /**
+     * Test follow user false.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testFollowUserFalse() throws SQLException {
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.followUser(testUser,testUser));
     }
 
     /**

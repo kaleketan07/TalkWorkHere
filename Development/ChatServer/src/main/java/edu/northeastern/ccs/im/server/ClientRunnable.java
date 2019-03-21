@@ -733,8 +733,6 @@ public class ClientRunnable implements Runnable {
         	handleFollowUserMessage(msg);
         } else if (msg.isUnfollowUserMessage()) {
         	handleUnfollowUserMessage(msg);
-        } else if (msg.isFollowUserMessage()) {
-        	handleFollowUserMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

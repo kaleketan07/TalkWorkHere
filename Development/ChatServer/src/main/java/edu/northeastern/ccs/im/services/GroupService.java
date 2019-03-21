@@ -316,6 +316,37 @@ public class GroupService implements GroupDao {
             return (qResult > 0);
         }
     }
+    
+    
+    
+    /* (non-Javadoc)
+     * @see edu.northeastern.ccs.im.services.GroupDao#isUserMemberOfTheGroup(java.lang.String, java.lang.String)
+     */
+    public boolean isUserMemberOfTheGroup(String grpName, String userName) throws SQLException {
+    	Group group = getGroup(grpName);
+    	Set<String> memberUserNames = new HashSet<>();
+    	memberUserNames = getFlatListOfUsers(group, memberUserNames);
+    	return memberUserNames.contains(userName);
+    }
+    
+    
+    
+    /**
+     * Gets the flat list of member users of a group.
+     *
+     * @param grp the group object of the group
+     * @param userNames the set of user names of member users of the group
+     * @return the flat list of user names strings
+     */
+    private Set<String> getFlatListOfUsers(Group grp, Set<String> userNames) {
+    	for (User u : grp.getMemberUsers()) {
+    		userNames.add(u.getUserName());
+    	}
+        for (Group g : grp.getMemberGroups()) {
+        	userNames = getFlatListOfUsers(g, userNames);
+        }
+        return userNames;
+    }
 
     /**
      * Updates the group settings. For now a moderator can just change the group_searchable attribute

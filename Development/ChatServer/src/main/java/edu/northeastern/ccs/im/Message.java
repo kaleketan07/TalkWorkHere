@@ -181,9 +181,9 @@ public class Message {
         } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
             result = makeDeleteGroupMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
-        	result = makeCreateGroupMessage(srcName, textOrPassword);  
+        	  result = makeCreateGroupMessage(srcName, textOrPassword);  
         } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
-        	result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        	  result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
             result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
@@ -196,6 +196,8 @@ public class Message {
             result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword); 			
         } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
             result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.MESSAGE_GROUP.toString()) == 0) {
+        	result = makeGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
             result = makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
@@ -417,6 +419,18 @@ public class Message {
     }
     
     /**
+     * This method creates a Group message to be sent on the specified group
+     *
+     * @param srcName the name of the sender
+     * @param text the text content of the message
+     * @param grpName the group name to which the message is to be sent
+     * @return the message object of type Group Message
+     */
+    public static Message makeGroupMessage(String srcName, String text, String grpName) {
+    	return new Message(MessageType.MESSAGE_GROUP, srcName, text, grpName);
+    }
+    
+    /**
      * Return the name of the sender of this message.
      *
      * @return String specifying the name of the message originator.
@@ -578,6 +592,14 @@ public class Message {
         return (msgType == MessageType.GET_GROUP);
     }
 
+    /**
+     * This method verifies if the current message has the handle MSG (is a group message)
+     * @return true if the message has the handle MSG else return false
+     */
+    public boolean isGroupMessage() {
+        return (msgType == MessageType.MESSAGE_GROUP);
+    }
+    
     /**
      * Verify if the message is a update group message.
      *

@@ -463,10 +463,15 @@ public class TestMessage {
      */
     @Test
     public void testMakeUpdateGroupMessage(){
-        Message message = Message.makeUpdateGroupMessage(SENDER_NAME,"testGroup","attributes");
-        Assertions.assertEquals(SENDER_NAME,message.getName());
-        Assertions.assertEquals("testGroup",message.getTextOrPassword());
-        Assertions.assertEquals("attributes",message.getReceiverOrPassword());
+    	Message message = Message.makeMessage(UPG,SENDER_NAME, MESSAGE_TEXT, GROUP_NAME);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(UPG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(MESSAGE_TEXT));
+        strBuild.append(toStringHelper(GROUP_NAME));
+        assertEquals(strBuild.toString(), message.toString());
+        assertFalse(message.isGroupMessage());
+        assertTrue(message.isUpdateGroupMessage());
     }
 
     /**
@@ -554,6 +559,23 @@ public class TestMessage {
     	Message msg = Message.makeHelloMessage(HLO);
     	User u = new User("","",SENDER_NAME, PASS, false);
     	assertTrue(msg.addUserToRecipients(u));
+    	assertFalse(msg.isGroupMessage());
+    }
+    
+    /**
+     * Test make group message.
+     */
+    @Test
+    public void testMakeGroupMessage() {
+        Message message = Message.makeMessage(MSG,SENDER_NAME, MESSAGE_TEXT, GROUP_NAME);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(MSG);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(MESSAGE_TEXT));
+        strBuild.append(toStringHelper(GROUP_NAME));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isGroupMessage());
+        assertFalse(message.isUpdateGroupMessage());
     }
 
     /**
@@ -621,6 +643,8 @@ public class TestMessage {
     private static final String FWU = "FWU";
     private static final String UFU = "UFU";
     private static final String SRH = "SRH";
+    private static final String MSG = "MSG";
+    private static final String UPG = "UPG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

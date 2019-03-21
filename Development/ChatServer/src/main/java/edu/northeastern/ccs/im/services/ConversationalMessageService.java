@@ -17,7 +17,7 @@ import edu.northeastern.ccs.im.models.ConversationalMessage;
  *
  * @author rahul
  */
-public class ConversationalMessageService {
+public class ConversationalMessageService implements ConversationalMessageDAO  {
 
 
     private DBConnection conn;

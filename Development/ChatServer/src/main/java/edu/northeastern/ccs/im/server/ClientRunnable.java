@@ -593,6 +593,23 @@ public class ClientRunnable implements Runnable {
        }
        userService.followUser(followeeUser, followerUser);
     }
+    
+    /**
+     * Handle a user unfollowing other user if the other user exists in the database
+     *
+     * @param msg The incoming follow user message
+     * @throws SQLException thrown by wrong database queries
+     */
+    private void handleUnfollowUserMessage(Message msg) throws SQLException{
+       User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
+       User followerUser = userService.getUserByUserName(msg.getName());
+       
+       if (followeeUser == null) {
+    	   this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
+    	   return;
+       }
+       userService.unfollowUser(followeeUser, followerUser);
+    }
 
     /**
      * Helper function to help map the attribute name 
@@ -651,6 +668,8 @@ public class ClientRunnable implements Runnable {
         	handlePrivateReplyMessage(msg);
         } else if (msg.isFollowUserMessage()) {
         	handleFollowUserMessage(msg);
+        } else if (msg.isUnfollowUserMessage()) {
+        	handleUnfollowUserMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

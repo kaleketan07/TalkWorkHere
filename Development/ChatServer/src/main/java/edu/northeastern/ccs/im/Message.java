@@ -204,6 +204,10 @@ public class Message {
             result = makeFollowUserMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
             result = makeUnfollowUserMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
+            result = makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
+            result = makeGetFollowersMessage(srcName);
         }
         return result;
     }
@@ -381,6 +385,16 @@ public class Message {
     }
     
     /**
+     * This method creates a follow Get Followers
+     *
+     * @param followee - string of the followee user name
+     * @return a Message object of type Follow_User
+     */
+    public static Message makeGetFollowersMessage(String followee) {
+        return new Message(MessageType.GET_FOLLOWERS, followee);
+    }
+    
+    /**
      * This method creates a unfollow user message
      *
      * @param follower - String of the follower user name
@@ -389,6 +403,18 @@ public class Message {
      */
     public static Message makeUnfollowUserMessage(String follower, String followee) {
         return new Message(MessageType.UNFOLLOW_USER, follower, followee);
+    }
+
+    /**
+     * Make search message message.
+     *
+     * @param userName     the user name of the user asking for the search results
+     * @param userOrGroup  the User or Group keyword specifying the filter for search criteria
+     * @param searchString the search string
+     * @return the message object of type search_message
+     */
+    public static Message makeSearchMessage(String userName, String userOrGroup, String searchString){
+        return new Message(MessageType.SEARCH_MESSAGE,userName, userOrGroup, searchString);
     }
     
     /**
@@ -568,6 +594,15 @@ public class Message {
     public boolean isUserProfileUpdateMessage(){
         return (msgType == MessageType.UPDATE_PROFILE_USER);
     }
+    
+    /**
+     * This method verifies if the current message has the handle GFR (is a Get_Followers message)
+     *
+     * @return the boolean
+     */
+    public boolean isGetFollowersMessage(){
+        return (msgType == MessageType.GET_FOLLOWERS);
+    }
 
     /**
      * This method verifies if the current message has the handle GTG (is a GET_GROUP message)
@@ -593,6 +628,12 @@ public class Message {
      */
     public boolean isUpdateGroupMessage(){ return (msgType == MessageType.UPDATE_GROUP);}
 
+    /**
+     * Verify if the message Is a search message.
+     *
+     * @return the boolean, true if the message is a search message, false otherwise
+     */
+    public boolean isSearchMessage(){ return (msgType == MessageType.SEARCH_MESSAGE);}
     /**
      * Determine if this message is a message signing off from the IM server.
      *

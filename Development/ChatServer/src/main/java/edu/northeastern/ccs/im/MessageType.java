@@ -64,6 +64,11 @@ public enum MessageType {
     */ 
     DELETE_USER("DLU"),
     
+    /**
+     * Message to get followers of the followee
+     */
+    GET_FOLLOWERS("GFR"),
+    
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 
@@ -80,7 +85,6 @@ public enum MessageType {
 	 * Handle To send prattle messages to the client 
 	 */
 	PRATTLE_MESSAGE("PRM"),
-
 	/**
 	 * Handle To send prattle messages to the client 
 	 */
@@ -89,7 +93,12 @@ public enum MessageType {
     /**
      * Handle to Update group settings.
      */
-    UPDATE_GROUP("UPG");
+    UPDATE_GROUP("UPG"),
+
+    /**
+     * Handle to search a user or a group
+     */
+    SEARCH_MESSAGE("SRH");
 	
 	/**
      * Store the short name of this message type.

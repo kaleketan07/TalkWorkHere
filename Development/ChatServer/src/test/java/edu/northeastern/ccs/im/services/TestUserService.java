@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import static org.mockito.Mockito.*;
 
@@ -79,6 +80,7 @@ public class TestUserService {
         when(mockedRS.getString("last_name")).thenReturn("BCD");
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
+        when(mockedRS.getString("follower_user")).thenReturn("ABC");
         when(mockedRS.getBoolean("logged_in")).thenReturn(false);
         when(mockedRS.next()).thenReturn(true, false);
         Field rs = UserService.class.getDeclaredField("result");
@@ -320,6 +322,28 @@ public class TestUserService {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.updateUserAttributes("ABC","last_name","DEF"));
     }
+    
+    /**
+     * Test get followers with 1 followers.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFollowersOne() throws SQLException {
+    	when(mockedRS.next()).thenReturn(true,false);
+        Assertions.assertTrue(us.getFollower(testUser).contains("ABC"));
+    }
+    
+    /**
+     * Test get followers with 0 followers.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFollowersZero() throws SQLException {
+    	when(mockedRS.next()).thenReturn(false);
+        Assertions.assertEquals(us.getFollower(testUser), "Number of followers 0");
+    }
 
     /**
      * Test if a null is sent instead of user when no matching result is found
@@ -433,6 +457,28 @@ public class TestUserService {
                 "SomethingElse"));
     }
 
+    /**
+     * Test search user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSearchUser() throws SQLException{
+        HashMap<String,String> testSet = new HashMap<>();
+        testSet.put("AB","ABC BCD");
+        Assertions.assertEquals(testSet.size(),us.searchUser("AB").size());
+    }
+
+    /**
+     * Test search user for exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSearchUserForException() throws SQLException{
+        doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
+        Assertions.assertThrows(SQLException.class,()->us.searchUser("AB"));
+    }
     private static final String USER = "user";
     private static final String PASS = "pass";
 }

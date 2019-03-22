@@ -623,7 +623,17 @@ public class ClientRunnable implements Runnable {
         return mappedAttribute;
     }
 
-
+    
+    /**
+     * Handles the messages get followers.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleGetFollowersMessage(Message msg) throws SQLException {
+    	User currUser = userService.getUserByUserName(msg.getName());
+    	this.enqueuePrattleResponseMessage("Followers are " + userService.getFollower(currUser));
+    }
     
     /**
      * Handles the messages sent on Groups.
@@ -813,6 +823,8 @@ public class ClientRunnable implements Runnable {
         	handleUnfollowUserMessage(msg);
         } else if (msg.isSearchMessage()) {
             handleSearchMessage(msg);
+        } else if (msg.isGetFollowersMessage()) {
+        	handleGetFollowersMessage(msg);
         } else {
             ChatLogger.warning("Message not one of the required types " + msg);
         }

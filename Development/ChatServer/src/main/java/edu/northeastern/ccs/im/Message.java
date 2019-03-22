@@ -206,6 +206,8 @@ public class Message {
             result = makeUnfollowUserMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
             result = makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
+            result = makeGetFollowersMessage(srcName);
         }
         return result;
     }
@@ -380,6 +382,16 @@ public class Message {
      */
     public static Message makeFollowUserMessage(String follower, String followee) {
         return new Message(MessageType.FOLLOW_USER, follower, followee);
+    }
+    
+    /**
+     * This method creates a follow Get Followers
+     *
+     * @param followee - string of the followee user name
+     * @return a Message object of type Follow_User
+     */
+    public static Message makeGetFollowersMessage(String followee) {
+        return new Message(MessageType.GET_FOLLOWERS, followee);
     }
     
     /**
@@ -582,6 +594,15 @@ public class Message {
     public boolean isUserProfileUpdateMessage(){
         return (msgType == MessageType.UPDATE_PROFILE_USER);
     }
+    
+    /**
+     * This method verifies if the current message has the handle GFR (is a Get_Followers message)
+     *
+     * @return the boolean
+     */
+    public boolean isGetFollowersMessage(){
+        return (msgType == MessageType.GET_FOLLOWERS);
+    }
 
     /**
      * This method verifies if the current message has the handle GTG (is a GET_GROUP message)
@@ -610,7 +631,7 @@ public class Message {
     /**
      * Verify if the message Is a search message.
      *
-     * @return the boolean, true if the message is a search_message, false otherwise
+     * @return the boolean, true if the message is a search message, false otherwise
      */
     public boolean isSearchMessage(){ return (msgType == MessageType.SEARCH_MESSAGE);}
     /**

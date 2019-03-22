@@ -2519,7 +2519,38 @@ public class TestClientRunnable {
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
     }
     
-
+    /**
+     * Test Get Followers .
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testGetFollowers() throws SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(GET_FOLLOWERS);
+        messageList.add(GET_FOLLOWERS);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
     /**
      * Test update group message when group is present but user is not moderator.
      *
@@ -2528,8 +2559,7 @@ public class TestClientRunnable {
      * @throws NoSuchFieldException   the no such field exception
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsNotModerator() throws
-            SQLException,IllegalAccessException,NoSuchFieldException {
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsNotModerator() throws SQLException,IllegalAccessException,NoSuchFieldException {
         List<Message> messageList = new ArrayList<>();
         messageList.add(REGISTER);
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME,"PresentGroup","1:0");
@@ -3013,6 +3043,7 @@ public class TestClientRunnable {
     private static final Message PRIVATE_REPLY = Message.makePrivateReplyMessage(TestClientRunnable.SENDER_NAME,"Alex","MESSAGEKEY");    
     private static final Message FOLLOW_USER_MESSAGE = Message.makeFollowUserMessage(TestClientRunnable.SENDER_NAME,"Alex");  
     private static final Message UNFOLLOW_USER_MESSAGE = Message.makeUnfollowUserMessage(TestClientRunnable.SENDER_NAME,"Alex");  
+    private static final Message GET_FOLLOWERS = Message.makeGetFollowersMessage(TestClientRunnable.SENDER_NAME);
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

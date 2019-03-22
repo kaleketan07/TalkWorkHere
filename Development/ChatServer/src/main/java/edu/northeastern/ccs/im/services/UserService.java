@@ -189,8 +189,8 @@ public class UserService implements UserDao {
 
     /**
      * Deletes the user details from the database.
-     * NOTE: This basically means that the user is inactive and this function only sets another the is_deleted
-     * attribute of the user to true
+     * NOTE: This basically means that the user is inactive and this function only sets is_deleted
+     * column in the database of the user to true
      *
      * @param u The user object, that needs to be deleted
      * @return True, if the deletion operation was successful, false otherwise
@@ -254,18 +254,43 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String,String> searchUser(String searchString) throws SQLException {
-        Map<String,String> resultUsers = new HashMap<>();
+        Map<String, String> resultUsers = new HashMap<>();
         final String SEARCH_USER =
                 "SELECT first_name, last_name, username FROM prattle.user_profile WHERE user_searchable = 1 AND (username REGEXP concat(\"^\",?,\".*\") OR first_name REGEXP concat(\"^\",?,\".*\"))";
         pstmt = conn.getPreparedStatement(SEARCH_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,searchString,searchString);
+        pstmt = utils.setPreparedStatementArgs(pstmt, searchString, searchString);
         result = pstmt.executeQuery();
-        while(result.next()){
+        while (result.next()) {
             String username = result.getString(USER_NAME);
             String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
-            resultUsers.put(username,fullName);
+            resultUsers.put(username, fullName);
         }
         pstmt.close();
         return resultUsers;
+    }
+
+    /**
+     * Returns a string which contains username of all the followers of a given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
+    @Override
+    public String getFollower(User followee) throws SQLException {
+        final String GET_FOLLOWERS =
+                "SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?";
+        StringBuilder followers = new StringBuilder();
+        int count = 0;
+        pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
+        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName());
+        result = pstmt.executeQuery();
+        while(result.next()) {
+        	followers.append(result.getString("follower_user"));
+        	followers.append(System.lineSeparator());
+        	count += 1;
+        }
+        followers.append("Number of followers " + Integer.toString(count));
+        pstmt.close();
+        return followers.toString();
     }
 }

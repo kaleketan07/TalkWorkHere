@@ -374,9 +374,8 @@ public class TestClientRunnable {
         userService.setAccessible(true);
         userService.set(clientRunnableObject, mockedUserService);
         User u = new User(SENDER_NAME, null, SENDER_NAME,null, true);
-        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUser.userSendMessage(mockedMessage)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,mockedUser);
-        
         messageList.clear();
         messageList.add(PRIVATE_MESSAGE);
         messageIter = messageList.iterator();
@@ -409,7 +408,7 @@ public class TestClientRunnable {
         Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
         cmService.setAccessible(true);
         cmService.set(clientRunnableObject, mockedcms);
-        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUser.userSendMessage(mockedMessage)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,mockedUser);
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
         messageList.clear();
@@ -446,7 +445,7 @@ public class TestClientRunnable {
         cmService.setAccessible(true);
         cmService.set(clientRunnableObject, mockedcms);
         USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUser.userSendMessage(mockedMessage)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(null);
@@ -483,7 +482,7 @@ public class TestClientRunnable {
         Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
         cmService.setAccessible(true);
         cmService.set(clientRunnableObject, mockedcms);
-        Mockito.doNothing().when(mockedUser).userSendMessage(mockedMessage);
+        Mockito.when(mockedUser.userSendMessage(mockedMessage)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,null);
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
         messageList.clear();
@@ -2495,7 +2494,7 @@ public class TestClientRunnable {
         Group temp = Mockito.mock(Group.class);
         Mockito.when(mgs.getGroup(DUMMY_GROUP_NAME)).thenReturn(temp);
         Mockito.when(mgs.isUserMemberOfTheGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        Mockito.doNothing().when(temp).groupSendMessage(Mockito.any());
+        Mockito.doNothing().when(temp).groupSendMessage(Mockito.any(), Mockito.anyString());
         Field privateGroupService = ClientRunnable.class.
                 getDeclaredField("groupService");
         privateGroupService.setAccessible(true);
@@ -3057,5 +3056,5 @@ public class TestClientRunnable {
     private static final User USER_LOGGED_ON = new User(null,null,SENDER_NAME,"QWERTY",true);
     private static final User USER_LOGGED_OFF = new User(null,null,SENDER_NAME,"QWERTY",false);
     private static final Message GROUP_MESSAGE = Message.makeGroupMessage(TestClientRunnable.SENDER_NAME, MESSAGE_TEXT, DUMMY_GROUP_NAME);
-
+    private static final String DUMMY_MSG_UNIQUE_KEY = "dummy_key";
 }

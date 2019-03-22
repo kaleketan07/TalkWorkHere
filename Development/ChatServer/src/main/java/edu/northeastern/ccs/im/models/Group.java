@@ -1,10 +1,13 @@
 package edu.northeastern.ccs.im.models;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
+import edu.northeastern.ccs.im.services.ConversationalMessageService;
 
 /**
  * The Group class depicts the concept of a group.
@@ -44,6 +47,18 @@ public class Group implements Member {
      */
     private Set<Group> memberGroups;
 
+    
+    /** The static instance of the conversational Message Service */
+    private static ConversationalMessageService cms;
+    static {
+        try {
+            cms = ConversationalMessageService.getInstance();
+        } catch (ClassNotFoundException | IOException | SQLException e) {
+            ChatLogger.error("Conversational Message Service failed to initialize.");
+        }
+    }
+    
+    
     /**
      * Gets the group name.
      *
@@ -122,18 +137,20 @@ public class Group implements Member {
      * @param msg the message to be sent
      * @throws SQLException the SQL exception
      */
-    public void groupSendMessage(Message msg) throws SQLException {
+    public void groupSendMessage(Message msg, String uniqueGroupKey) throws SQLException {
     	// send message to member users
     	for (User u : memberUsers) {
     		// a user can also be a part of a group at a higher level in the hierarchy. Do not send the message again
     		if (!msg.messageAlreadySent(u)) {
     			msg.addUserToRecipients(u);
-    			u.userSendMessage(msg);
+    			String uniqueMessageKey = u.userSendMessage(msg);
+    			// add the uniqueMsgKey and the UniqueGroupKey to the new table
+    			cms.insertGroupConversationalMessage(uniqueGroupKey, uniqueMessageKey);
     		}
     	}
     	// send message to member groups
     	for (Group g: memberGroups) {
-    		g.groupSendMessage(msg);
+    		g.groupSendMessage(msg, uniqueGroupKey);
     	}
     }
 }

@@ -63,7 +63,8 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
      * @param msgSource      Username of the source of the message
      * @param msgDestination Username of the Destination of the message
      * @param msgText        Text in the message
-     * @return String            UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
+     * @param setFlag 		 Marks if this message has been sent to the user or queued
+     * @return String        UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
      * @throws SQLException the sql exception
      */
     public String insertConversationalMessage(String msgSource, String msgDestination, String msgText, boolean setFlag)
@@ -182,6 +183,23 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
         pstmt.close();
         return msgSrc;
     }
+    
+    /**
+     * Insert an entry to the group_messages table.
+     *
+     * @param uniqueGroupKey the unique group key
+     * @param uniqueMessageKey the unique message key
+     * @throws SQLException the SQL exception
+     * @return true, if the message was inserted successfully else return false
+     */
+    public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException {
+    	 final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
+         pstmt = conn.getPreparedStatement(ADD_MAPPING);
+         pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey,uniqueMessageKey);
+         int res = pstmt.executeUpdate();
+         pstmt.close();
+         return (res > 0);
+    }	
     
     
 }

@@ -154,7 +154,7 @@ public class User {
      *
      * @param msg The message to be sent to this user
      */
-    public void userSendMessage(Message msg) throws SQLException {
+    public String userSendMessage(Message msg) throws SQLException {
         String src = msg.getName();
         String msgText = msg.getTextOrPassword();
         String uniqueKey = null;
@@ -163,10 +163,10 @@ public class User {
             uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
             clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
                     System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
-
+            return uniqueKey;
         }
         
-        cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
+        return cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
 }
 

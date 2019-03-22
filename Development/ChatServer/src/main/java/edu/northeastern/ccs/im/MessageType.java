@@ -64,6 +64,11 @@ public enum MessageType {
     */ 
     DELETE_USER("DLU"),
     
+    /**
+     * Message to get followers of the followee
+     */
+    GET_FOLLOWERS("GFR"),
+    
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 

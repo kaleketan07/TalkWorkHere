@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -496,6 +497,11 @@ public class TestGroupService {
         Assertions.assertFalse(testGS.updateGroupSettings("testGroup","is_searchable","1"));
     }
 
+    /**
+     * Test update group for exception.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testUpdateGroupForException() throws SQLException{
         when(mockedPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
@@ -503,5 +509,27 @@ public class TestGroupService {
                 ()->testGS.updateGroupSettings("testGroup","is_searchable","1"));
     }
 
+    /**
+     * Test search group.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSearchGroup() throws SQLException{
+        HashMap<String,String> testSet = new HashMap<>();
+        testSet.put("Group201","Alice");
+        Assertions.assertEquals(testSet.size(),testGS.searchGroup("Gr").size());
+    }
+
+    /**
+     * Test search group for exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testSearchGroupForException() throws SQLException{
+        when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
+        Assertions.assertThrows(SQLException.class,()->testGS.searchGroup("Gr"));
+    }
 
 }

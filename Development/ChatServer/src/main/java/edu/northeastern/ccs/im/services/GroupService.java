@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.ChatLogger;
@@ -381,6 +383,29 @@ public class GroupService implements GroupDao {
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return qResult>0;
+    }
+
+    /**
+     * Searches and retrieves all the group that match the regular expression passed as a string.
+     *
+     * @param searchString the search string
+     * @return the hash map containing the group names with their respective moderator names
+     * @throws SQLException the sql exception
+     */
+    @Override
+    public Map<String,String> searchGroup(String searchString) throws SQLException{
+        Map<String,String> resultMap = new HashMap<>();
+        final String SEARCH_GROUP= "SELECT group_name, moderator_name FROM prattle.groups WHERE" +
+                " is_searchable = 1 AND (group_name REGEXP concat(\"^\",?,\".*\"))";
+        pstmt = conn.getPreparedStatement(SEARCH_GROUP);
+        pstmt = utils.setPreparedStatementArgs(pstmt,searchString);
+        result = pstmt.executeQuery();
+        while(result.next()){
+            String groupName = result.getString(GROUP_NAME);
+            String modName = result.getString(MODERATOR_NAME);
+            resultMap.put(groupName,modName);
+        }
+        return resultMap;
     }
 
 

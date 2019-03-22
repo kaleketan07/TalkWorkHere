@@ -7,7 +7,9 @@ import edu.northeastern.ccs.im.models.User;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -78,7 +80,7 @@ public class UserService implements UserDao {
 
     /**
      * This function returns the user details of a particular user when given their username
-     * and password. For now, it throws a NullPointerException if the user does not exist.
+     * and password.
      *
      * @param username of the User
      * @param password of the User
@@ -187,8 +189,8 @@ public class UserService implements UserDao {
 
     /**
      * Deletes the user details from the database.
-     * NOTE: For the time being, let the user get deleted from the database, till we decide to add another column
-     * that will make the user "Inactive"
+     * NOTE: This basically means that the user is inactive and this function only sets is_deleted
+     * column in the database of the user to true
      *
      * @param u The user object, that needs to be deleted
      * @return True, if the deletion operation was successful, false otherwise
@@ -240,7 +242,33 @@ public class UserService implements UserDao {
         pstmt.close();
         return (qResult > 0);
     }
-    
+
+    /**
+     * Search users who have set their searchable attribute to True
+     * This returns all the users whose usernames or first names start with
+     * the given search string
+     *
+     * @param searchString the search string
+     * @return the hash map containing the usernames mapped to the respective full names
+     * @throws SQLException the sql exception
+     */
+    @Override
+    public Map<String,String> searchUser(String searchString) throws SQLException {
+        Map<String, String> resultUsers = new HashMap<>();
+        final String SEARCH_USER =
+                "SELECT first_name, last_name, username FROM prattle.user_profile WHERE user_searchable = 1 AND (username REGEXP concat(\"^\",?,\".*\") OR first_name REGEXP concat(\"^\",?,\".*\"))";
+        pstmt = conn.getPreparedStatement(SEARCH_USER);
+        pstmt = utils.setPreparedStatementArgs(pstmt, searchString, searchString);
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String username = result.getString(USER_NAME);
+            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
+            resultUsers.put(username, fullName);
+        }
+        pstmt.close();
+        return resultUsers;
+    }
+
     /**
      * Returns a string which contains username of all the followers of a given user
      * @param followee user who is the followee

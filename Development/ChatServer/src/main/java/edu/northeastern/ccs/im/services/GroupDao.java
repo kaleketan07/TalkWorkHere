@@ -1,6 +1,7 @@
 package edu.northeastern.ccs.im.services;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.models.Group;
@@ -135,4 +136,12 @@ public interface GroupDao {
      * @throws SQLException the sql exception
      */
     boolean updateGroupSettings(String groupName, String attributeName, String attributeValue) throws SQLException;
+
+    /**
+     * Retrieve all the searchable groups from the given string
+     * @param searchString the string to be used in the regex to find all similar groups
+     * @return A hashmap containing the group names as keys and their moderator usernames as corresponding values
+     * @throws SQLException the sql exception
+     */
+    Map<String,String> searchGroup(String searchString) throws SQLException;
 }

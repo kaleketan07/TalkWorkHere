@@ -93,7 +93,12 @@ public enum MessageType {
     /**
      * Handle to Update group settings.
      */
-    UPDATE_GROUP("UPG");
+    UPDATE_GROUP("UPG"),
+
+    /**
+     * Handle to search a user or a group
+     */
+    SEARCH_MESSAGE("SRH");
 	
 	/**
      * Store the short name of this message type.

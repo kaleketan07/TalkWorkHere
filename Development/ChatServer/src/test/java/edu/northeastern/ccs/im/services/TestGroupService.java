@@ -485,14 +485,6 @@ public class TestGroupService {
         Assertions.assertTrue(testGS.updateGroupSettings("testGroup","another_attribute","Something"));
     }
 
-
-
-
-
-
-
-
-
     /**
      * Test update group for false.
      *

@@ -80,7 +80,6 @@ public enum MessageType {
 	 * Handle To send prattle messages to the client 
 	 */
 	PRATTLE_MESSAGE("PRM"),
-
 	/**
 	 * Handle To send prattle messages to the client 
 	 */

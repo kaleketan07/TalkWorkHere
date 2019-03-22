@@ -79,6 +79,7 @@ public class TestUserService {
         when(mockedRS.getString("last_name")).thenReturn("BCD");
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
+        when(mockedRS.getString("follower_user")).thenReturn("ABC");
         when(mockedRS.getBoolean("logged_in")).thenReturn(false);
         when(mockedRS.next()).thenReturn(true, false);
         Field rs = UserService.class.getDeclaredField("result");
@@ -319,6 +320,29 @@ public class TestUserService {
     public void testUpdateUserAttributesForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.updateUserAttributes("ABC","last_name","DEF"));
+    }
+    
+    /**
+     * Test get followers with 1 followers.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFollowersOne() throws SQLException {
+    	when(mockedRS.next()).thenReturn(true,false);
+        Assertions.assertEquals(us.getFollower(testUser), "ABC\r\n" + 
+        		"Number of followers 1");
+    }
+    
+    /**
+     * Test get followers with 0 followers.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFollowersZero() throws SQLException {
+    	when(mockedRS.next()).thenReturn(false);
+        Assertions.assertEquals(us.getFollower(testUser), "Number of followers 0");
     }
 
     /**

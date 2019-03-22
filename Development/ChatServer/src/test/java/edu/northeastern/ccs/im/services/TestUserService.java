@@ -330,8 +330,7 @@ public class TestUserService {
     @Test
     public void testGetFollowersOne() throws SQLException {
     	when(mockedRS.next()).thenReturn(true,false);
-        Assertions.assertEquals(us.getFollower(testUser), "ABC\r\n" + 
-        		"Number of followers 1");
+        Assertions.assertTrue(us.getFollower(testUser).contains("ABC"));
     }
     
     /**

@@ -47,6 +47,20 @@ public interface UserDao {
      * @throws SQLException  the sql exception
      */
 	boolean unfollowUser(User followee, User follower) throws SQLException;
-
+	
+	/**
+     * Returns a string which contains username of all the followers of a given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
 	String getFollower(User followee) throws SQLException;
+	
+	/**
+     * Returns a string which contains username of all the followee of a given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
+	String getFollowee(User follower) throws SQLException;
 }

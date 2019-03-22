@@ -113,11 +113,11 @@ public interface GroupDao {
      */
     boolean addGroupToGroup(String hostGroupName, String guestGroupName) throws SQLException;
 
-    
+
     /**
      * Checks if is user member of the group.
      *
-     * @param grpName the name of the group in which the user name is to be searched 
+     * @param grpName  the name of the group in which the user name is to be searched
      * @param userName the user name to be searched
      * @return true, if is user is a member of the group
      * @throws SQLException the SQL exception
@@ -139,9 +139,10 @@ public interface GroupDao {
 
     /**
      * Retrieve all the searchable groups from the given string
+     *
      * @param searchString the string to be used in the regex to find all similar groups
      * @return A hashmap containing the group names as keys and their moderator usernames as corresponding values
      * @throws SQLException the sql exception
      */
-    Map<String,String> searchGroup(String searchString) throws SQLException;
+    Map<String, String> searchGroup(String searchString) throws SQLException;
 }

@@ -57,9 +57,9 @@ public interface UserDao {
      * 0/False.
      * Other attributes assume Strings are passed.
      *
-     * @param username             the username
-     * @param attributeName     the attribute to be updated
-     * @param attributeValue    the value of the attribute that is to be set
+     * @param username       the username
+     * @param attributeName  the attribute to be updated
+     * @param attributeValue the value of the attribute that is to be set
      * @return the boolean
      * @throws SQLException the sql exception
      */
@@ -77,21 +77,23 @@ public interface UserDao {
 
     /**
      * add a entry for a user following other user
+     *
      * @param followee user who is the followee
      * @param follower user who is the follower
      * @return true if the relation was inserted successfully
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
-	boolean followUser(User followee, User follower) throws SQLException;
-	
-	/**
+    boolean followUser(User followee, User follower) throws SQLException;
+
+    /**
      * delete a entry for a user following other user
+     *
      * @param followee user who is the followee
      * @param follower user who is the follower
      * @return true if the relation was deleted successfully
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
-	boolean unfollowUser(User followee, User follower) throws SQLException;
+    boolean unfollowUser(User followee, User follower) throws SQLException;
 
     /**
      * Search users who have set their searchable attribute to True
@@ -102,13 +104,14 @@ public interface UserDao {
      * @return the hash map containing the usernames mapped to the respective full names
      * @throws SQLException the sql exception
      */
-    Map<String,String> searchUser(String searchString) throws SQLException;
+    Map<String, String> searchUser(String searchString) throws SQLException;
 
     /**
      * Returns a string which contains username of all the followers of a given user
+     *
      * @param followee user who is the followee
      * @return String which contains username of all the followers
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
-	String getFollower(User followee) throws SQLException;
+    String getFollower(User followee) throws SQLException;
 }

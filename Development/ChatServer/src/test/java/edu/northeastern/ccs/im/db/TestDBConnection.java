@@ -1,6 +1,7 @@
 package edu.northeastern.ccs.im.db;
 
 import java.sql.SQLNonTransientConnectionException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

@@ -54,7 +54,7 @@ public interface UserDao {
      * @return String which contains username of all the followers
      * @throws SQLException  the sql exception
      */
-	String getFollower(User followee) throws SQLException;
+	String getFollowers(User followee) throws SQLException;
 	
 	/**
      * Returns a string which contains username of all the followee of a given user
@@ -62,5 +62,5 @@ public interface UserDao {
      * @return String which contains username of all the followers
      * @throws SQLException  the sql exception
      */
-	String getFollowee(User follower) throws SQLException;
+	String getFollowees(User follower) throws SQLException;
 }

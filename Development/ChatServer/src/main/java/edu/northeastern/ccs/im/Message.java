@@ -206,6 +206,8 @@ public class Message {
             result = makeUnfollowUserMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
             result = makeGetFollowersMessage(srcName);
+        } else if (handle.compareTo(MessageType.GET_FOLLOWEES.toString()) == 0) {
+            result = makeGetFolloweesMessage(srcName);
         }
         return result;
     }
@@ -386,10 +388,20 @@ public class Message {
      * This method creates a follow Get Followers
      *
      * @param followee - string of the followee user name
-     * @return a Message object of type Follow_User
+     * @return a Message object of type Get_Followers
      */
     public static Message makeGetFollowersMessage(String followee) {
         return new Message(MessageType.GET_FOLLOWERS, followee);
+    }
+    
+    /**
+     * This method creates a follow Get Followees
+     *
+     * @param followee - string of the follower user name
+     * @return a Message object of type GET_Followees
+     */
+    public static Message makeGetFolloweesMessage(String follower) {
+        return new Message(MessageType.GET_FOLLOWEES, follower);
     }
     
     /**
@@ -588,6 +600,15 @@ public class Message {
      */
     public boolean isGetFollowersMessage(){
         return (msgType == MessageType.GET_FOLLOWERS);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle GFE (is a Get_Followees message)
+     *
+     * @return the boolean
+     */
+    public boolean isGetFolloweesMessage(){
+        return (msgType == MessageType.GET_FOLLOWEES);
     }
 
     /**

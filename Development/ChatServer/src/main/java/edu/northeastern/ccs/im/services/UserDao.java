@@ -47,4 +47,6 @@ public interface UserDao {
      * @throws SQLException  the sql exception
      */
 	boolean unfollowUser(User followee, User follower) throws SQLException;
+
+	String getFollower(User followee) throws SQLException;
 }

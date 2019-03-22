@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -252,14 +253,12 @@ public class UserService implements UserDao {
      * @throws SQLException the sql exception
      */
     @Override
-    public HashMap<String,String> searchUser(String searchString) throws SQLException {
-        HashMap<String,String> resultUsers = new HashMap<>();
+    public Map<String,String> searchUser(String searchString) throws SQLException {
+        Map<String,String> resultUsers = new HashMap<>();
         final String SEARCH_USER =
-                "SELECT first_name, last_name, username FROM prattle.user_profile WHERE" +
-                        " user_searchable = 1 AND (username REGEXP concat(\"^\",?,\".*\") OR" +
-                                                 " first_name REGEXP concat(\"^\",?,\".*\"))";
+                "SELECT first_name, last_name, username FROM prattle.user_profile WHERE user_searchable = 1 AND (username REGEXP concat(\"^\",?,\".*\") OR first_name REGEXP concat(\"^\",?,\".*\"))";
         pstmt = conn.getPreparedStatement(SEARCH_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt,searchString);
+        pstmt = utils.setPreparedStatementArgs(pstmt,searchString,searchString);
         result = pstmt.executeQuery();
         while(result.next()){
             String username = result.getString(USER_NAME);

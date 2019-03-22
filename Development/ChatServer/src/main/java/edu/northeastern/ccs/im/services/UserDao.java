@@ -1,7 +1,7 @@
 package edu.northeastern.ccs.im.services;
 
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.models.User;
@@ -103,5 +103,5 @@ public interface UserDao {
      * @return the hash map containing the usernames mapped to the respective full names
      * @throws SQLException the sql exception
      */
-    HashMap<String,String> searchUser(String searchString) throws SQLException;
+    Map<String,String> searchUser(String searchString) throws SQLException;
 }

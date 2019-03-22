@@ -700,8 +700,10 @@ public class ClientRunnable implements Runnable {
      * @param msg The message sent by the user
      */
     private void handleSearchMessage(Message msg){
-        if(msg.getTextOrPassword().equalsIgnoreCase("User"))
+        if(msg.getTextOrPassword().equalsIgnoreCase("user"))
             handleUserSearchMessage(msg.getReceiverOrPassword());
+        else if( msg.getTextOrPassword().equalsIgnoreCase("group"))
+            handleGroupSearchMessage(msg.getReceiverOrPassword());
         else
             this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check the syntax" +
                     " for SRH using HELP SRH.");
@@ -710,32 +712,62 @@ public class ClientRunnable implements Runnable {
 
     /**
      * This method is used to handle the search functionality for when users are to be searched.
-     * This method will enqueue all the usernames and the respective full names to the client.
      *
      * @param searchString The string that is used for the regex to retrieve all similar users
      */
     private void handleUserSearchMessage(String searchString){
-        HashMap<String,String> resultantSet;
+        Map<String,String> resultantSet;
         try {
-            StringBuilder workString = new StringBuilder();
             resultantSet = userService.searchUser(searchString);
             if(resultantSet.isEmpty()){
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
-            workString.append("The users with their usernames and full names: \n");
-            for(Map.Entry<String,String> pair : resultantSet.entrySet()){
-                workString.append(pair.getKey());
-                workString.append(" ");
-                workString.append(pair.getValue());
-                workString.append("\n");
-            }
-            String answerString = workString.toString();
-            this.enqueuePrattleResponseMessage(answerString);
+            helperForBuildingAndSendingSearchMessage(resultantSet);
         }catch(Exception e){
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
         }
+    }
+
+    /**
+     * Handle the search message when groups are supposed to be searched, given the search string
+     *
+     * @param searchString the string that is used by the regex to retrieve all the similar groups
+     */
+    private void handleGroupSearchMessage(String searchString){
+        Map<String,String> resultantSet;
+        try {
+            resultantSet = groupService.searchGroup(searchString);
+            if(resultantSet.isEmpty()){
+                this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
+                return;
+            }
+            helperForBuildingAndSendingSearchMessage(resultantSet);
+        }catch(Exception e){
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP SRH.");
+        }
+    }
+
+    /**
+     * Helper function that will build a string to be sent to the client. This builds a string
+     * with all the usernames and fullnames OR groupnames and their moderator usernames depending
+     * on the user's request. The string is then enqueued to be sent to the client
+     *
+     * @param resultantSet the set containing the mapped values that is retrieved from the database
+     */
+    private void helperForBuildingAndSendingSearchMessage(Map<String,String> resultantSet){
+        StringBuilder workString = new StringBuilder();
+        workString.append("\nResults: \n");
+        for(Map.Entry<String,String> pair : resultantSet.entrySet()){
+            workString.append(pair.getKey());
+            workString.append(" ");
+            workString.append(pair.getValue());
+            workString.append("\n");
+        }
+        String answerString = workString.toString();
+        this.enqueuePrattleResponseMessage(answerString);
     }
 
     /**

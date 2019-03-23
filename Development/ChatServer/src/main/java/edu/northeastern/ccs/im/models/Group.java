@@ -57,7 +57,7 @@ public class Group implements Member {
         try {
             cms = ConversationalMessageService.getInstance();
         } catch (ClassNotFoundException | IOException | SQLException e) {
-            ChatLogger.error("Conversational Message Service failed to initialize.");
+            ChatLogger.error("Conversational Message Service failed to initialize: " + e);
         }
     }
 

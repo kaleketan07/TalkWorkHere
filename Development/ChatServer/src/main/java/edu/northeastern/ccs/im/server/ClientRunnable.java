@@ -780,6 +780,104 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
+     * This method handles general messages
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
+    private boolean handleGeneralMessages(Message msg) throws SQLException {
+        if (msg.isBroadcastMessage()) {
+            Prattle.broadcastMessage(msg);
+            return true;
+        } else if (msg.isLoginMessage()) {
+            handleLoginMessage(msg);
+            return true;
+        } else if (msg.isRegisterMessage()) {
+            handleRegisterMessage(msg);
+            return true;
+        } else if (msg.isSearchMessage()) {
+            handleSearchMessage(msg);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method handles communication messages
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
+    private boolean handleCommunicationMessages(Message msg) throws SQLException {
+        if (msg.isPrivateUserMessage()) {
+            handlePrivateMessage(msg);
+            return true;
+        } else if (msg.isPrivateReplyMessage()) {
+            handlePrivateReplyMessage(msg);
+            return true;
+        } else if (msg.isGroupMessage()){
+            handleGroupMessage(msg);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method handles group messages
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
+    private boolean handleGroupMessages(Message msg) throws SQLException {
+        if (msg.isCreateGroupMessage()) {
+            handleCreateGroupMessage(msg);
+            return true;
+        } else if (msg.isDeleteGroupMessage()) {
+            handleDeleteGroupMessage(msg);
+            return true;
+        } else if(msg.isAddUserToGroupMessage()) {
+            handleAddUserToGroupMessage(msg);
+            return true;
+        } else if(msg.isRemoveUserFromGroupMessage()) {
+            handleRemoveUserFromGroupMessage(msg);
+            return true;
+        } else if (msg.isGetGroupMessage()) {
+            handleGetGroupMessage(msg);
+            return true;
+        } else if (msg.isUpdateGroupMessage()) {
+            handleUpdateGroupMessage(msg);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method handles user messages
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
+    private boolean handleUserMessages(Message msg) throws SQLException {
+        if (msg.isUserProfileUpdateMessage()){
+            handleUserProfileUpdateMessage(msg);
+            return true;
+        } else if (msg.isDeleteUserMessage()) {
+            handleDeleteUserMessage(msg);
+            return true;
+        } else if (msg.isFollowUserMessage()) {
+            handleFollowUserMessage(msg);
+            return true;
+        } else if (msg.isUnfollowUserMessage()) {
+            handleUnfollowUserMessage(msg);
+            return true;
+        } else if (msg.isGetFollowersMessage()) {
+            handleGetFollowersMessage(msg);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * This method handles different types of messages and delegates works to its respective methods
      *
      * @param msg - The incoming message
@@ -787,44 +885,13 @@ public class ClientRunnable implements Runnable {
      */
     private void handleMessageByType(Message msg) throws SQLException {
         // Check for our "special messages"
-        if (msg.isBroadcastMessage()) {
-            // Check for our "special messages"
-            Prattle.broadcastMessage(msg);
-        } else if (msg.isLoginMessage()) {
-            handleLoginMessage(msg);
-        } else if (msg.isRegisterMessage()) {
-            handleRegisterMessage(msg);
-        } else if (msg.isCreateGroupMessage()) {
-            handleCreateGroupMessage(msg);
-        } else if (msg.isDeleteGroupMessage()) {
-            handleDeleteGroupMessage(msg);
-        } else if (msg.isAddUserToGroupMessage()) {
-            handleAddUserToGroupMessage(msg);
-        } else if (msg.isRemoveUserFromGroupMessage()) {
-            handleRemoveUserFromGroupMessage(msg);
-        } else if (msg.isPrivateUserMessage()) {
-            handlePrivateMessage(msg);
-        } else if (msg.isGetGroupMessage()) {
-            handleGetGroupMessage(msg);
-        } else if (msg.isUserProfileUpdateMessage()) {
-            handleUserProfileUpdateMessage(msg);
-        } else if (msg.isDeleteUserMessage()) {
-            handleDeleteUserMessage(msg);
-        } else if (msg.isPrivateReplyMessage()) {
-            handlePrivateReplyMessage(msg);
-        } else if (msg.isGroupMessage()) {
-            handleGroupMessage(msg);
-        } else if (msg.isUpdateGroupMessage()) {
-            handleUpdateGroupMessage(msg);
-        } else if (msg.isFollowUserMessage()) {
-            handleFollowUserMessage(msg);
-        } else if (msg.isUnfollowUserMessage()) {
-            handleUnfollowUserMessage(msg);
-        } else if (msg.isSearchMessage()) {
-            handleSearchMessage(msg);
-        } else if (msg.isGetFollowersMessage()) {
-            handleGetFollowersMessage(msg);
-        } else {
+        boolean result;
+        result = handleGeneralMessages(msg);
+        result = result? result: handleGroupMessages(msg);
+        result = result? result: handleUserMessages(msg);
+        result = result? result: handleCommunicationMessages(msg);
+
+        if(!result) {
             ChatLogger.warning("Message not one of the required types " + msg);
         }
     }

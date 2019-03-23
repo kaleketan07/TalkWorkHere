@@ -366,7 +366,7 @@ public class ClientRunnable implements Runnable {
     		 this.enqueuePrattleResponseMessage("Destination username does not exist.");
     	 }
     	 else {
-    		 destUser.userSendMessage(msg);
+    		 this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
     	 }
     }
 
@@ -496,10 +496,10 @@ public class ClientRunnable implements Runnable {
     		User destUser = userService.getUserByUserName(destName);
             if (destUser == null) 
             {
-       		 ChatLogger.error("msg_UniqueKey provided is wrong");
+       		 	this.enqueuePrattleResponseMessage("msg_UniqueKey provided is wrong");
        	 	}
        	 	else {
-       	 		destUser.userSendMessage(msg);
+       	 		this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
        	 	}
         }
     	else
@@ -656,6 +656,7 @@ public class ClientRunnable implements Runnable {
             Timestamp sqlTimestamp = new Timestamp(time);
             String uniqueGroupKey = currUser.getUserName() +"::"+ currGroup.getGroupName() +"::"+ sqlTimestamp;
     		currGroup.groupSendMessage(msg, uniqueGroupKey);
+    		this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " + uniqueGroupKey);
     	}
     }
 

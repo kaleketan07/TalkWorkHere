@@ -376,6 +376,7 @@ public class TestClientRunnable {
         User u = new User(SENDER_NAME, null, SENDER_NAME,null, true);
         Mockito.when(mockedUser.userSendMessage(mockedMessage)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,mockedUser);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         messageList.clear();
         messageList.add(PRIVATE_MESSAGE);
         messageIter = messageList.iterator();
@@ -395,6 +396,7 @@ public class TestClientRunnable {
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -431,6 +433,7 @@ public class TestClientRunnable {
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -470,6 +473,7 @@ public class TestClientRunnable {
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);

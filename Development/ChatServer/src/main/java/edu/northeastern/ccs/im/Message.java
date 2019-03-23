@@ -156,6 +156,111 @@ public class Message {
         return new Message(MessageType.HELLO, null, text);
     }
 
+
+    /**
+     * Given a handle, name and textOrPassword, return the appropriate General message instance or an
+     * instance from a subclass of message.
+     *
+     * @param handle         Handle of the message to be generated.
+     * @param srcName        Name of the originator of the message (may be null)
+     * @param textOrPassword Text sent in this message (may be null)
+     * @param receiverOrPassword The third parameter which can have different values based on the type of the message
+     * @return Instance of Message (or its subclasses) representing the handle,
+     * name, & textOrPassword. Null if none of the handles match.
+     */
+    private static Message handleMakeGeneralMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+        if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
+            return makeQuitMessage(srcName);
+        } else if (handle.compareTo(MessageType.HELLO.toString()) == 0) {
+            return makeSimpleLoginMessage(srcName);
+        } else if (handle.compareTo(MessageType.BROADCAST.toString()) == 0) {
+            return makeBroadcastMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
+            return makeLoginMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
+            return makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);
+        }
+        return null;
+    }
+
+    /**
+     * Given a handle, name and textOrPassword, return the appropriate Group message instance or an
+     * instance from a subclass of message.
+     *
+     * @param handle         Handle of the message to be generated.
+     * @param srcName        Name of the originator of the message (may be null)
+     * @param textOrPassword Text sent in this message (may be null)
+     * @param receiverOrPassword The third parameter which can have different values based on the type of the message
+     * @return Instance of Message (or its subclasses) representing the handle,
+     * name, & textOrPassword. Null if none of the handles match.
+     */
+    private static Message handleMakeGroupMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+        if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
+            return makeDeleteGroupMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
+            return makeCreateGroupMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
+            return makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
+            return makeGetGroupMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
+            return makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
+            return makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        }
+        return null;
+    }
+
+    /**
+     * Given a handle, name and textOrPassword, return the appropriate User message instance or an
+     * instance from a subclass of message.
+     *
+     * @param handle         Handle of the message to be generated.
+     * @param srcName        Name of the originator of the message (may be null)
+     * @param textOrPassword Text sent in this message (may be null)
+     * @param receiverOrPassword The third parameter which can have different values based on the type of the message
+     * @return Instance of Message (or its subclasses) representing the handle,
+     * name, & textOrPassword. Null if none of the handles match.
+     */
+    private static Message handleMakeUserMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+        if(handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0){
+            return makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
+        } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
+            return makeDeleteUserMessage(srcName);
+        } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
+            return makeFollowUserMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
+            return makeUnfollowUserMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
+            return makeGetFollowersMessage(srcName);
+        }
+        return null;
+    }
+
+    /**
+     * Given a handle, name and textOrPassword, return the appropriate Communication message instance or an
+     * instance from a subclass of message.
+     *
+     * @param handle         Handle of the message to be generated.
+     * @param srcName        Name of the originator of the message (may be null)
+     * @param textOrPassword Text sent in this message (may be null)
+     * @param receiverOrPassword The third parameter which can have different values based on the type of the message
+     * @return Instance of Message (or its subclasses) representing the handle,
+     * name, & textOrPassword. Null if none of the handles match.
+     */
+    private static Message handleMakeCommunicationMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+        if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
+            return makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
+            return makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.MESSAGE_GROUP.toString()) == 0) {
+            return makeGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
+            return makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
+        }
+        return null;
+    }
+
     /**
      * Given a handle, name and textOrPassword, return the appropriate message instance or an
      * instance from a subclass of message.
@@ -168,50 +273,13 @@ public class Message {
      */
     protected static Message makeMessage(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
         Message result = null;
-        if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
-            result = makeQuitMessage(srcName);
-        } else if (handle.compareTo(MessageType.HELLO.toString()) == 0) {
-            result = makeSimpleLoginMessage(srcName);
-        } else if (handle.compareTo(MessageType.BROADCAST.toString()) == 0) {
-            result = makeBroadcastMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
-            result = makeLoginMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
-            result = makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
-            result = makeDeleteGroupMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
-        	  result = makeCreateGroupMessage(srcName, textOrPassword);  
-        } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
-        	  result = makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
-            result = makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
-            result = makeGetGroupMessage(srcName, textOrPassword);
-        } else if(handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0){
-            result = makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
-        } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
-            result = makeDeleteUserMessage(srcName);
-        } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
-            result = makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword); 			
-        } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
-            result = makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.MESSAGE_GROUP.toString()) == 0) {
-        	result = makeGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
-            result = makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
-            result = makeFollowUserMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
-            result = makeUnfollowUserMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
-            result = makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
-            result = makeGetFollowersMessage(srcName);
-        }
+        result = handleMakeGeneralMessages(handle, srcName, textOrPassword, receiverOrPassword);
+        result = (result == null)? handleMakeGroupMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
+        result = (result == null)? handleMakeUserMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
+        result = (result == null)? handleMakeCommunicationMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
         return result;
     }
-    
+
     /**
      * Creates a new message which updates the client with the responses from the prattle 
      * server(error/success information)

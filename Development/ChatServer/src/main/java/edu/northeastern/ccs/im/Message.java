@@ -207,6 +207,8 @@ public class Message {
             return makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
             return makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.DELETE_GROUP_MESSAGE.toString()) == 0) {
+        	return makeDeleteGroupMessageMessage(srcName, textOrPassword);
         }
         return null;
     }
@@ -257,6 +259,8 @@ public class Message {
             return makeGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
             return makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.DELETE_PRIVATE_MESSAGE.toString()) == 0) {
+        	return makeDeletePrivateMessageMessage(srcName, textOrPassword);
         }
         return null;
     }
@@ -510,6 +514,29 @@ public class Message {
     	return new Message(MessageType.MESSAGE_GROUP, srcName, text, grpName);
     }
     
+    
+    /**
+     * Make a message for deleting private message.
+     *
+     * @param srcName the name of the sender
+     * @param text the text representing the unique message key for the message to be deleted 
+     * @return the message object
+     */
+    public static Message makeDeletePrivateMessageMessage(String srcName, String text) {
+    	return new Message(MessageType.DELETE_PRIVATE_MESSAGE, srcName, text);
+    }
+    
+    /**
+     * Make a message for deleting a group message.
+     *
+     * @param srcName the name of the sender
+     * @param text the text representing the unique group message key for the message to be deleted
+     * @return the message object
+     */
+    public static Message makeDeleteGroupMessageMessage(String srcName, String text) {
+    	return new Message(MessageType.DELETE_GROUP_MESSAGE, srcName, text);
+    }
+    
     /**
      * Return the name of the sender of this message.
      *
@@ -702,6 +729,23 @@ public class Message {
      * @return the boolean, true if the message is a search message, false otherwise
      */
     public boolean isSearchMessage(){ return (msgType == MessageType.SEARCH_MESSAGE);}
+    
+    
+    /**
+     * Verify if the message is a message for deleting a private message
+     *
+     * @return true, if message is for deleting a private message 
+     */
+    public boolean isDeletePrivateMessageMessage() {return (msgType == MessageType.DELETE_PRIVATE_MESSAGE);}
+    
+    
+    /**
+     * Verify if the message is a message for deleting a group message
+     *
+     * @return true, if message is for deleting a group message
+     */
+    public boolean isDeleteGroupMessageMessage() {return (msgType == MessageType.DELETE_GROUP_MESSAGE);}
+    
     /**
      * Determine if this message is a message signing off from the IM server.
      *

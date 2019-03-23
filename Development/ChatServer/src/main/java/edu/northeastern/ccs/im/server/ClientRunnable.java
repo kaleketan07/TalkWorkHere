@@ -785,6 +785,46 @@ public class ClientRunnable implements Runnable {
         String answerString = workString.toString();
         this.enqueuePrattleResponseMessage(answerString);
     }
+    
+    
+    /**
+     * Handle message of type delete group message.
+     *
+     * @param msg the message object
+     * @throws SQLException the SQL exception
+     */
+    private void handleDeleteGroupMessageMessage(Message msg) throws SQLException {
+    	// check if the sender of this message is actually the sender of the message that he wants to delete
+    	String msgSender = msg.getTextOrPassword().split("::")[0];
+    	if (msg.getName().equals(msgSender)) {
+    		if(conversationalMessagesService.deleteGroupMessage(msg.getTextOrPassword())) {
+    			this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully." );
+    		} else {
+    			this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
+    		}    		
+    	} else {
+    		this.enqueuePrattleResponseMessage("You do not have the permissions to delete this message");
+    	}
+    }
+    
+    /**
+     * Handle delete private message message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleDeletePrivateMessageMessage(Message msg) throws SQLException {
+    	String messageSender = conversationalMessagesService.getSender(msg.getTextOrPassword());
+    	if (msg.getName().equals(messageSender)) {
+    		if(conversationalMessagesService.deleteMessage(msg.getTextOrPassword())) {
+    			this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully." );
+    		} else {
+    			this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
+    		}
+    	} else {
+    		this.enqueuePrattleResponseMessage("You do not have the permissions to delete this message");
+    	}
+    }
 
     /**
      * This method handles general messages
@@ -825,6 +865,9 @@ public class ClientRunnable implements Runnable {
         } else if (msg.isGroupMessage()){
             handleGroupMessage(msg);
             return true;
+        } else if (msg.isDeletePrivateMessageMessage()) {
+        	handleDeletePrivateMessageMessage(msg);
+        	return true;
         }
         return false;
     }
@@ -854,6 +897,9 @@ public class ClientRunnable implements Runnable {
         } else if (msg.isUpdateGroupMessage()) {
             handleUpdateGroupMessage(msg);
             return true;
+        } else if (msg.isDeleteGroupMessageMessage()) {
+        	handleDeleteGroupMessageMessage(msg);
+        	return true;
         }
         return false;
     }

@@ -98,7 +98,17 @@ public enum MessageType {
     /**
      * Handle to search a user or a group
      */
-    SEARCH_MESSAGE("SRH");
+    SEARCH_MESSAGE("SRH"),
+	
+	/** 
+	 * Handle to delete a private message.
+	 */
+	DELETE_PRIVATE_MESSAGE("DPM"),
+	
+	/** 
+	 * Handle to delete a group message. 
+	 */
+	DELETE_GROUP_MESSAGE("DGM");
 	
 	/**
      * Store the short name of this message type.

@@ -618,7 +618,6 @@ public class ClientRunnable implements Runnable {
         return mappedAttribute;
     }
 
-
     /**
      * Handles the messages get followers.
      *
@@ -626,8 +625,19 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the SQL exception
      */
     private void handleGetFollowersMessage(Message msg) throws SQLException {
-        User currUser = userService.getUserByUserName(msg.getName());
-        this.enqueuePrattleResponseMessage("Followers are " + userService.getFollower(currUser));
+    	User currUser = userService.getUserByUserName(msg.getName());
+    	this.enqueuePrattleResponseMessage(userService.getFollowers(currUser));
+    }
+    
+    /**
+     * Handles the messages get followees.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleGetFolloweesMessage(Message msg) throws SQLException {
+    	User currUser = userService.getUserByUserName(msg.getName());
+    	this.enqueuePrattleResponseMessage(userService.getFollowees(currUser));
     }
 
     /**
@@ -871,9 +881,12 @@ public class ClientRunnable implements Runnable {
             handleUnfollowUserMessage(msg);
             return true;
         } else if (msg.isGetFollowersMessage()) {
-            handleGetFollowersMessage(msg);
-            return true;
-        }
+        	handleGetFollowersMessage(msg);
+          return true;
+        } else if (msg.isGetFolloweesMessage()) {
+        	handleGetFolloweesMessage(msg);
+          return true;
+        } 
         return false;
     }
 

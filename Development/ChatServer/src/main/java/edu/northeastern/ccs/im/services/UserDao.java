@@ -93,7 +93,16 @@ public interface UserDao {
      * @return true if the relation was deleted successfully
      * @throws SQLException the sql exception
      */
-    boolean unfollowUser(User followee, User follower) throws SQLException;
+	boolean unfollowUser(User followee, User follower) throws SQLException;
+	
+	/**
+     * Returns a string which contains username of all the followers of a given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
+	String getFollowers(User followee) throws SQLException;
+	
 
     /**
      * Search users who have set their searchable attribute to True
@@ -107,11 +116,12 @@ public interface UserDao {
     Map<String, String> searchUser(String searchString) throws SQLException;
 
     /**
-     * Returns a string which contains username of all the followers of a given user
-     *
-     * @param followee user who is the followee
-     * @return String which contains username of all the followers
-     * @throws SQLException the sql exception
+     * Returns a string which contains username of all the followees of a given user
+     * @param follower user who is the follower
+     * @return String which contains username of all the followees
+     * @throws SQLException  the sql exception
      */
-    String getFollower(User followee) throws SQLException;
+  String getFollowees(User follower) throws SQLException;
+	
+
 }

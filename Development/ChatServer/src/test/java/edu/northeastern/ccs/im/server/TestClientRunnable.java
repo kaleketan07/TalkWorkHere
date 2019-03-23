@@ -1849,64 +1849,64 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-
-
+    
     /**
-     * Verify follow user is handled properly for valid followee
-     */
-    @Test
-    public void testUserFollowMessageValid() throws NoSuchFieldException, IllegalAccessException, SQLException {
+    * Verify follow user is handled properly for valid followee
+    */
+   @Test
+   public void testUserFollowMessageValid() throws NoSuchFieldException, IllegalAccessException, SQLException {
 
-        List<Message> messageList = new ArrayList<>();
-        messageList.add(BROADCAST);
-        Iterator<Message> messageIter = messageList.iterator();
-        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        clientRunnableObject.run();
-        UserService mockedUserService = Mockito.mock(UserService.class);
-        Field userService = ClientRunnable.class.getDeclaredField("userService");
-        userService.setAccessible(true);
-        userService.set(clientRunnableObject, mockedUserService);
-        USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
-        messageList.clear();
-        messageList.add(FOLLOW_USER_MESSAGE);
-        messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        clientRunnableObject.run();
-    }
+	   List<Message> messageList = new ArrayList<>();
+       messageList.add(BROADCAST);
+       Iterator<Message> messageIter = messageList.iterator();
+       NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       clientRunnableObject.run();
+       UserService mockedUserService = Mockito.mock(UserService.class);
+       Field userService = ClientRunnable.class.getDeclaredField("userService");
+       userService.setAccessible(true);
+       userService.set(clientRunnableObject, mockedUserService);
+       USER_LOGGED_ON.setLoggedIn(true);
+       Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON,USER_LOGGED_ON);
+       messageList.clear();
+       messageList.add(FOLLOW_USER_MESSAGE);
+       messageIter = messageList.iterator();
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       clientRunnableObject.run();
+   }
+   
+   
+   /**
+    * Verify unfollow user is handled properly for valid followee
+    */
+   @Test
+   public void testUserUnfollowMessageValid() throws NoSuchFieldException, IllegalAccessException, SQLException {
 
-    /**
-     * Verify unfollow user is handled properly for valid followee
-     */
-    @Test
-    public void testUserUnfollowMessageValid() throws NoSuchFieldException, IllegalAccessException, SQLException {
-
-        List<Message> messageList = new ArrayList<>();
-        messageList.add(BROADCAST);
-        Iterator<Message> messageIter = messageList.iterator();
-        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        clientRunnableObject.run();
-        UserService mockedUserService = Mockito.mock(UserService.class);
-        Field userService = ClientRunnable.class.getDeclaredField("userService");
-        userService.setAccessible(true);
-        userService.set(clientRunnableObject, mockedUserService);
-        USER_LOGGED_ON.setLoggedIn(true);
-        Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
-        messageList.clear();
-        messageList.add(UNFOLLOW_USER_MESSAGE);
-        messageIter = messageList.iterator();
-        Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        clientRunnableObject.run();
-    }
-
+	   List<Message> messageList = new ArrayList<>();
+       messageList.add(BROADCAST);
+       Iterator<Message> messageIter = messageList.iterator();
+       NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+       Mockito.when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+       clientRunnableObject.run();
+       UserService mockedUserService = Mockito.mock(UserService.class);
+       Field userService = ClientRunnable.class.getDeclaredField("userService");
+       userService.setAccessible(true);
+       userService.set(clientRunnableObject, mockedUserService);
+       USER_LOGGED_ON.setLoggedIn(true);
+       Mockito.when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON,USER_LOGGED_ON);
+       messageList.clear();
+       messageList.add(UNFOLLOW_USER_MESSAGE);
+       messageIter = messageList.iterator();
+       Mockito.when(networkConnectionMock.iterator()).thenReturn(messageIter);
+       clientRunnableObject.run();
+   }
+   
     /**
      * Verify follow user is handled properly for invalid followee
      **/
@@ -2552,6 +2552,39 @@ public class TestClientRunnable {
     }
 
     /**
+     * Test Get Followees .
+     *
+     * @throws SQLException           the sql exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws NoSuchFieldException   the no such field exception
+     */
+    @Test
+    public void testGetFollowees() throws SQLException,IllegalAccessException,NoSuchFieldException {
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(GET_FOLLOWEES);
+        messageList.add(GET_FOLLOWEES);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        Field connField = ClientRunnable.class.getDeclaredField("connection");
+        connField.setAccessible(true);
+        connField.set(clientRunnableObject,networkConnectionMock);
+        UserService us = Mockito.mock(UserService.class);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(us.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    
+    /**
      * Test update group message when group is present but user is not moderator.
      *
      * @throws SQLException           the sql exception
@@ -3041,6 +3074,7 @@ public class TestClientRunnable {
     private static final Message FOLLOW_USER_MESSAGE = Message.makeFollowUserMessage(TestClientRunnable.SENDER_NAME, "Alex");
     private static final Message UNFOLLOW_USER_MESSAGE = Message.makeUnfollowUserMessage(TestClientRunnable.SENDER_NAME, "Alex");
     private static final Message GET_FOLLOWERS = Message.makeGetFollowersMessage(TestClientRunnable.SENDER_NAME);
+    private static final Message GET_FOLLOWEES = Message.makeGetFolloweesMessage(TestClientRunnable.SENDER_NAME);
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

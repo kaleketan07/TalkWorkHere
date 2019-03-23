@@ -1,11 +1,7 @@
 package edu.northeastern.ccs.im.db;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public interface IDBConnection {
 

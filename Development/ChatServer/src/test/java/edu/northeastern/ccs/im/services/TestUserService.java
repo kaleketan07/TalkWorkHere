@@ -81,6 +81,7 @@ public class TestUserService {
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
         when(mockedRS.getString("follower_user")).thenReturn("ABC");
+        when(mockedRS.getString("followee_user")).thenReturn("ABC");
         when(mockedRS.getBoolean("logged_in")).thenReturn(false);
         when(mockedRS.next()).thenReturn(true, false);
         Field rs = UserService.class.getDeclaredField("result");
@@ -330,19 +331,42 @@ public class TestUserService {
      */
     @Test
     public void testGetFollowersOne() throws SQLException {
-        when(mockedRS.next()).thenReturn(true, false);
-        Assertions.assertTrue(us.getFollower(testUser).contains("ABC"));
+    	when(mockedRS.next()).thenReturn(true,false);
+        Assertions.assertTrue(us.getFollowers(testUser).contains("ABC"));
     }
 
     /**
-     * Test get followers with 0 followers.
+     * Test get followees with 1 followees.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFolloweesOne() throws SQLException {
+    	when(mockedRS.next()).thenReturn(true,false);
+        Assertions.assertTrue(us.getFollowees(testUser).contains("ABC"));
+    }
+    
+    
+    /**
+     * Test get followees with 0 followers.
      *
      * @throws SQLException the sql exception
      */
     @Test
     public void testGetFollowersZero() throws SQLException {
-        when(mockedRS.next()).thenReturn(false);
-        Assertions.assertEquals(us.getFollower(testUser), "Number of followers 0");
+    	when(mockedRS.next()).thenReturn(false);
+        Assertions.assertEquals(us.getFollowers(testUser), "Number of followers 0");
+    }
+    
+    /**
+     * Test get followers with 0 followees.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFolloweesZero() throws SQLException {
+    	when(mockedRS.next()).thenReturn(false);
+        Assertions.assertEquals(us.getFollowees(testUser), "Number of followees 0");
     }
 
     /**

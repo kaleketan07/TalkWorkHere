@@ -68,11 +68,17 @@ public enum MessageType {
      * Message to get followers of the followee
      */
     GET_FOLLOWERS("GFR"),
-
+    
     /**
-     * Message whose contents are to delete a user profile from a group
+     * Message to get followees of the follower
      */
-    REMOVE_USER_GROUP("RUG"),
+    GET_FOLLOWEES("GFE"),
+    
+	/**
+    * Message whose contents are to delete a user profile from a group
+    */ 
+    REMOVE_USER_GROUP("RUG"),  
+
     /**
      * Message whose contents are to follow a user
      */

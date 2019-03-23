@@ -277,7 +277,7 @@ public class UserService implements UserDao {
      * @throws SQLException the sql exception
      */
     @Override
-    public String getFollower(User followee) throws SQLException {
+    public String getFollowers(User followee) throws SQLException {
         final String GET_FOLLOWERS =
                 "SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?";
         StringBuilder followers = new StringBuilder();
@@ -294,4 +294,32 @@ public class UserService implements UserDao {
         pstmt.close();
         return followers.toString();
     }
+    
+    /**
+     * Returns a string which contains username of all the followee of a given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
+    @Override
+    public String getFollowees(User follower) throws SQLException {
+        final String GET_FOLLOWERS =
+                "SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?";
+        StringBuilder followers = new StringBuilder();
+        int count = 0;
+        pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
+        pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
+        result = pstmt.executeQuery();
+        while(result.next()) {
+        	followers.append(result.getString("followee_user"));
+        	followers.append(System.lineSeparator());
+        	count += 1;
+        }
+        followers.append("Number of followees " + Integer.toString(count));
+        pstmt.close();
+        return followers.toString();
+    }
+
+
 }
+

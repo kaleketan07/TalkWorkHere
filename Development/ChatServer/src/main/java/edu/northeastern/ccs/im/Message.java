@@ -234,6 +234,8 @@ public class Message {
             return makeUnfollowUserMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
             return makeGetFollowersMessage(srcName);
+        } else if (handle.compareTo(MessageType.GET_FOLLOWEES.toString()) == 0) {
+            return makeGetFolloweesMessage(srcName);
         }
         return null;
     }
@@ -448,28 +450,38 @@ public class Message {
      *
      * @param follower - String of the follower user name
      * @param followee - string of the followee user name
-     * @return a Message object of type Follow_User
+     * @return a Message object of type Follow User
      */
     public static Message makeFollowUserMessage(String follower, String followee) {
         return new Message(MessageType.FOLLOW_USER, follower, followee);
     }
 
     /**
-     * This method creates a follow Get Followers
+     * This method creates a Get Followers message
      *
      * @param followee - string of the followee user name
-     * @return a Message object of type Follow_User
+     * @return a Message object of type Get Followers
      */
     public static Message makeGetFollowersMessage(String followee) {
         return new Message(MessageType.GET_FOLLOWERS, followee);
     }
 
     /**
+     * This method creates a Get Followees message 
+     *
+     * @param followee - string of the follower user name
+     * @return a Message object of type Get Followees
+     */
+    public static Message makeGetFolloweesMessage(String follower) {
+        return new Message(MessageType.GET_FOLLOWEES, follower);
+    }
+    
+    /**
      * This method creates a unfollow user message
      *
      * @param follower - String of the follower user name
      * @param followee - string of the followee user name
-     * @return a Message object of type Unfollow_User
+     * @return a Message object of type Unfollow User
      */
     public static Message makeUnfollowUserMessage(String follower, String followee) {
         return new Message(MessageType.UNFOLLOW_USER, follower, followee);
@@ -669,10 +681,19 @@ public class Message {
     /**
      * This method verifies if the current message has the handle GFR (is a Get_Followers message)
      *
-     * @return the boolean
+     * @return true or false based on the comparison result
      */
     public boolean isGetFollowersMessage() {
         return (msgType == MessageType.GET_FOLLOWERS);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle GFE (is a Get_Followees message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isGetFolloweesMessage(){
+        return (msgType == MessageType.GET_FOLLOWEES);
     }
 
     /**

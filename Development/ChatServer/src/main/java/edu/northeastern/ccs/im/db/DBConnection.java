@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DBConnection {
+public class DBConnection implements IDBConnection {
 
     /**
      * getDBConnection - Method to create a new Database connection and return the

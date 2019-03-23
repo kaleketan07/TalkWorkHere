@@ -12,6 +12,7 @@ import java.util.Set;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
+import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 
@@ -22,7 +23,7 @@ import edu.northeastern.ccs.im.models.User;
  * @author - Team-201 - Ketan Kale
  */
 public class GroupService implements GroupDao {
-    private DBConnection conn;
+    private IDBConnection conn;
     private PreparedStatement pstmt = null;
     private DBUtils utils;
     private ResultSet result;

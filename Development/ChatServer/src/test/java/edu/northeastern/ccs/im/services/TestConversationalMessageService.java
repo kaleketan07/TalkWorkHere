@@ -1,5 +1,6 @@
 package edu.northeastern.ccs.im.services;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
@@ -232,6 +233,28 @@ public class TestConversationalMessageService {
     public void testDeleteMessage() throws SQLException {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
         Assertions.assertThrows(SQLException.class, () -> cs.deleteMessage("ABCBCD2018:05:05"));
+    }
+    
+    /**
+     * Test insert group conversational message for true.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testInsertGroupConversationalMessageForTrue() throws SQLException{
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(1);
+        assertTrue(cs.insertGroupConversationalMessage("ABC","BCD"));
+    }
+    
+    /**
+     * Test insert group conversational message for false.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testInsertGroupConversationalMessageForFalse() throws SQLException{
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        assertFalse(cs.insertGroupConversationalMessage("ABC","BCD"));
     }
 
 }

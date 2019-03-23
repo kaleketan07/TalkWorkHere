@@ -13,6 +13,7 @@ public interface ConversationalMessageDAO {
      * @param msgSource      Username of the source of the message
      * @param msgDestination Username of the Destination of the message
      * @param msgText        Text in the message
+     * @param setFlag 		 marks if this message has been sent to the user or queued
      * @return String            UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
      * @throws SQLException the sql exception
      */
@@ -51,6 +52,16 @@ public interface ConversationalMessageDAO {
      */
     boolean deleteMessage(String msgUniqueKey) throws SQLException;
 
+    
+    /**
+     * Insert an entry to the group_messages table.
+     *
+     * @param uniqueGroupKey the unique group key
+     * @param uniqueMessageKey the unique message key
+     * @throws SQLException the SQL exception
+     * @return true if the message was inserted successfully else return false
+     */
+    boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException;
     
     
 }

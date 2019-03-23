@@ -2,6 +2,7 @@ package edu.northeastern.ccs.im.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -660,7 +661,11 @@ public class ClientRunnable implements Runnable {
     		this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() +" to send a message on it");
     	} else {
     		this.enqueuePrattleResponseMessage("message sent successfully");
-    		currGroup.groupSendMessage(msg);
+    		// generate the group key to mark all individual messages sent as a result of this group message
+    		long time = System.currentTimeMillis();
+            Timestamp sqlTimestamp = new Timestamp(time);
+            String uniqueGroupKey = currUser.getUserName() +"::"+ currGroup.getGroupName() +"::"+ sqlTimestamp;
+    		currGroup.groupSendMessage(msg, uniqueGroupKey);
     	}
     }
 
@@ -712,6 +717,84 @@ public class ClientRunnable implements Runnable {
         return attributeName;
     }
 
+
+    /**
+     * Handles the search message type when encountered. Will call search method for users or groups
+     * depending on the parameter passed by the user.
+     *
+     * @param msg The message sent by the user
+     */
+    private void handleSearchMessage(Message msg){
+        if(msg.getTextOrPassword().equalsIgnoreCase("user"))
+            handleUserSearchMessage(msg.getReceiverOrPassword());
+        else if( msg.getTextOrPassword().equalsIgnoreCase("group"))
+            handleGroupSearchMessage(msg.getReceiverOrPassword());
+        else
+            this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check the syntax" +
+                    " for SRH using HELP SRH.");
+    }
+
+
+    /**
+     * This method is used to handle the search functionality for when users are to be searched.
+     *
+     * @param searchString The string that is used for the regex to retrieve all similar users
+     */
+    private void handleUserSearchMessage(String searchString){
+        Map<String,String> resultantSet;
+        try {
+            resultantSet = userService.searchUser(searchString);
+            if(resultantSet.isEmpty()){
+                this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
+                return;
+            }
+            helperForBuildingAndSendingSearchMessage(resultantSet);
+        }catch(Exception e){
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP SRH.");
+        }
+    }
+
+    /**
+     * Handle the search message when groups are supposed to be searched, given the search string
+     *
+     * @param searchString the string that is used by the regex to retrieve all the similar groups
+     */
+    private void handleGroupSearchMessage(String searchString){
+        Map<String,String> resultantSet;
+        try {
+            resultantSet = groupService.searchGroup(searchString);
+            if(resultantSet.isEmpty()){
+                this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
+                return;
+            }
+            helperForBuildingAndSendingSearchMessage(resultantSet);
+        }catch(Exception e){
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP SRH.");
+        }
+    }
+
+    /**
+     * Helper function that will build a string to be sent to the client. This builds a string
+     * with all the usernames and fullnames OR groupnames and their moderator usernames depending
+     * on the user's request. The string is then enqueued to be sent to the client
+     *
+     * @param resultantSet the set containing the mapped values that is retrieved from the database
+     */
+    private void helperForBuildingAndSendingSearchMessage(Map<String,String> resultantSet){
+        StringBuilder workString = new StringBuilder();
+        workString.append("\nResults: \n");
+        for(Map.Entry<String,String> pair : resultantSet.entrySet()){
+            workString.append(pair.getKey());
+            workString.append(" ");
+            workString.append(pair.getValue());
+            workString.append("\n");
+        }
+        String answerString = workString.toString();
+        this.enqueuePrattleResponseMessage(answerString);
+    }
+
     /**
      * This method handles different types of messages and delegates works to its respective methods
      *
@@ -753,6 +836,8 @@ public class ClientRunnable implements Runnable {
         	handleFollowUserMessage(msg);
         } else if (msg.isUnfollowUserMessage()) {
         	handleUnfollowUserMessage(msg);
+        } else if (msg.isSearchMessage()) {
+            handleSearchMessage(msg);
         } else if (msg.isGetFollowersMessage()) {
         	handleGetFollowersMessage(msg);
         } else if (msg.isGetFolloweesMessage()) {

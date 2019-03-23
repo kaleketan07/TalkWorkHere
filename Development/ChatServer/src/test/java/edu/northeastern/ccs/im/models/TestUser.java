@@ -81,7 +81,7 @@ public class TestUser {
 
 
     /**
-     * Test user send message when ClientRunnable is Null
+     * Test user send message when ClientRunnable is Null and not initialized
      *
      * @throws SQLException           the sql exception
      * @throws ClassNotFoundException the class not found exception
@@ -90,13 +90,14 @@ public class TestUser {
      * @throws IllegalAccessException the illegal access exception
      */
     @Test
-    public void testUserSendMessageWhenClientRunnableIsNull() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
+    public void testUserSendMessageWhenClientRunnableIsNull() throws SQLException, NoSuchFieldException,
             IllegalAccessException {
         ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
         Field fieldCMS = User.class.getDeclaredField("cms");
         fieldCMS.setAccessible(true);
         fieldCMS.set(ALICE, mockedCMS);
         ClientRunnable mockedClientRunnable = mock(ClientRunnable.class);
+        when(mockedClientRunnable.isInitialized()).thenReturn(false);
         Field fieldCR = User.class.getDeclaredField("clientRunnable");
         fieldCR.setAccessible(true);
         fieldCR.set(ALICE, mockedClientRunnable);
@@ -106,7 +107,32 @@ public class TestUser {
     }
 
     /**
-     * Test user send message when clientRunnable is not null.
+     * Test user send message when client runnable is null but initialized.
+     *
+     * @throws SQLException           the sql exception
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testUserSendMessageWhenClientRunnableIsNullButInitialized() throws SQLException, NoSuchFieldException,
+            IllegalAccessException {
+        ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
+        Field fieldCMS = User.class.getDeclaredField("cms");
+        fieldCMS.setAccessible(true);
+        fieldCMS.set(ALICE, mockedCMS);
+        ClientRunnable mockedClientRunnable = mock(ClientRunnable.class);
+        when(mockedClientRunnable.isInitialized()).thenReturn(true);
+        Field fieldCR = User.class.getDeclaredField("clientRunnable");
+        fieldCR.setAccessible(true);
+        fieldCR.set(ALICE, mockedClientRunnable);
+        ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
+        verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
+                "Hello, Alice", false);
+    }
+
+
+    /**
+     * Test user send message when clientRunnable is not null and initialized.
      *
      * @throws SQLException           the sql exception
      * @throws ClassNotFoundException the class not found exception
@@ -122,6 +148,39 @@ public class TestUser {
         fieldCMS.setAccessible(true);
         fieldCMS.set(ALICE, mockedCMS);
         ClientRunnable mockedClientRunnable = mock(ClientRunnable.class);
+        when(mockedClientRunnable.isInitialized()).thenReturn(true);
+        Field fieldCR = User.class.getDeclaredField("clientRunnable");
+        fieldCR.setAccessible(true);
+        fieldCR.set(ALICE, mockedClientRunnable);
+        //Set the mockedMap in ClientRunnable so the static instance will retrieve it
+        Map<String, ClientRunnable> userClients = new HashMap<>();
+        userClients.put(ALICE.getUserName(), mockedClientRunnable);
+        Field mapField = ClientRunnable.class.getDeclaredField("userClients");
+        mapField.setAccessible(true);
+        mapField.set(mockedClientRunnable, userClients);
+        ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
+        verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
+                "Hello, Alice", true);
+    }
+
+    /**
+     * Test user send message when client runnable not null but not initialized.
+     *
+     * @throws SQLException           the sql exception
+     * @throws ClassNotFoundException the class not found exception
+     * @throws IOException            the io exception
+     * @throws NoSuchFieldException   the no such field exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testUserSendMessageWhenClientRunnableNotNullButNotInitialized() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
+            IllegalAccessException {
+        ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
+        Field fieldCMS = User.class.getDeclaredField("cms");
+        fieldCMS.setAccessible(true);
+        fieldCMS.set(ALICE, mockedCMS);
+        ClientRunnable mockedClientRunnable = mock(ClientRunnable.class);
+        when(mockedClientRunnable.isInitialized()).thenReturn(false);
         Field fieldCR = User.class.getDeclaredField("clientRunnable");
         fieldCR.setAccessible(true);
         fieldCR.set(ALICE, mockedClientRunnable);

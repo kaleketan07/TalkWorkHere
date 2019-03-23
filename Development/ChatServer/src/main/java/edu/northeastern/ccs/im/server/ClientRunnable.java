@@ -631,7 +631,7 @@ public class ClientRunnable implements Runnable {
      */
     private void handleGetFollowersMessage(Message msg) throws SQLException {
     	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage("Followers are " + userService.getFollowers(currUser));
+    	this.enqueuePrattleResponseMessage(userService.getFollowers(currUser));
     }
     
     /**
@@ -642,7 +642,7 @@ public class ClientRunnable implements Runnable {
      */
     private void handleGetFolloweesMessage(Message msg) throws SQLException {
     	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage("Followees are " + userService.getFollowees(currUser));
+    	this.enqueuePrattleResponseMessage(userService.getFollowees(currUser));
     }
     
     /**

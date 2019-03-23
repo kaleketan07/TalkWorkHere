@@ -38,7 +38,7 @@ public enum MessageType {
     /**
      * Message whose content is a groupname of the group of which details are needed
      */
-	GET_GROUP("GTG"),
+    GET_GROUP("GTG"),
     /**
      * Message whose contents are to send a message from one user to another
      */
@@ -53,26 +53,32 @@ public enum MessageType {
      * Message whose contents are to update a user's profile
      */
     UPDATE_PROFILE_USER("UPU"),
-    
+
     /**
      * Message to privately reply to a group Message
      */
     PRIVATE_REPLY_MESSAGE("PRE"),
-    
-	/**
-    * Message whose contents are to delete a user profile
-    */ 
+
+    /**
+     * Message whose contents are to delete a user profile
+     */
     DELETE_USER("DLU"),
-    
+
     /**
      * Message to get followers of the followee
      */
     GET_FOLLOWERS("GFR"),
     
+    /**
+     * Message to get followees of the follower
+     */
+    GET_FOLLOWEES("GFE"),
+    
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 
     REMOVE_USER_GROUP("RUG"),  
+
     /**
      * Message whose contents are to follow a user
      */
@@ -81,14 +87,14 @@ public enum MessageType {
      * Message whose contents are to unfollow a user
      */
     UNFOLLOW_USER("UFU"),
-	/**
-	 * Handle To send prattle messages to the client 
-	 */
-	PRATTLE_MESSAGE("PRM"),
-	/**
-	 * Handle To send prattle messages to the client 
-	 */
-	MESSAGE_GROUP("MSG"),
+    /**
+     * Handle To send prattle messages to the client
+     */
+    PRATTLE_MESSAGE("PRM"),
+    /**
+     * Handle To send prattle messages to the client
+     */
+    MESSAGE_GROUP("MSG"),
 
     /**
      * Handle to Update group settings.

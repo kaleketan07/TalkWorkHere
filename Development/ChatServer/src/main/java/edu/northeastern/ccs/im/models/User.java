@@ -120,7 +120,7 @@ public class User {
      *
      * @param searchableStatus - true or false status of the user's searchable preference
      */
-    public void setSearchable(boolean searchableStatus){
+    public void setSearchable(boolean searchableStatus) {
         searchable = searchableStatus;
     }
 
@@ -134,7 +134,7 @@ public class User {
     /**
      * @return the searchable status of the user
      */
-    public boolean isSearchable(){
+    public boolean isSearchable() {
         return searchable;
     }
 
@@ -171,7 +171,7 @@ public class User {
             
             return uniqueKey;
         }
-        
+
         return cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
 }

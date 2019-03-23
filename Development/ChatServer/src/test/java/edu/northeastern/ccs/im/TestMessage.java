@@ -72,7 +72,7 @@ public class TestMessage {
         strBuild.append(LGN);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(PASS));
-        strBuild.append(" "+NULL_OUTPUT.length()+" "+NULL_OUTPUT);
+        strBuild.append(" " + NULL_OUTPUT.length() + " " + NULL_OUTPUT);
         assertEquals(strBuild.toString(), message.toString());
     }
 
@@ -125,7 +125,7 @@ public class TestMessage {
         assertFalse(message.isCreateGroupMessage());
         assertFalse(message.isPrivateUserMessage());
     }
-    
+
     /**
      * Test to check if makeMessage creates the correct object
      * based on the first parameter passed - Message_User Message.
@@ -252,7 +252,7 @@ public class TestMessage {
         assertFalse(message.isFollowUserMessage());
         assertFalse(message.isUnfollowUserMessage());
     }
-    
+
     /**
      * Test for message Follow_User
      */
@@ -267,7 +267,7 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isFollowUserMessage());
     }
-    
+
     /**
      * Test for message Follow_User
      */
@@ -282,7 +282,7 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isUnfollowUserMessage());
     }
-    
+
     /**
      * Test toString method to return the expected output when
      * ReceiverorPassword not null
@@ -314,7 +314,7 @@ public class TestMessage {
         assertFalse(message.isDeleteUserMessage());
         assertFalse(message.isPrivateReplyMessage());
     }
-    
+
     /**
      * Test makeMessage with Private_Reply as the handle
      */
@@ -329,8 +329,8 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isPrivateReplyMessage());
     }
-    
-    
+
+
     /**
      * Test makePrattleMessage()
      */
@@ -343,9 +343,9 @@ public class TestMessage {
         strBuild.append(toStringHelper(PASS));
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
-        
+
     }
-    
+
     /**
      * Test makeMessage with Delete_User as the handle
      */
@@ -361,40 +361,40 @@ public class TestMessage {
         assertTrue(message.isDeleteUserMessage());
         assertFalse(message.isRemoveUserFromGroupMessage());
     }
-    
+
     /**
-    * Test addUniqueKey with PrivateReply as the handle
-    */
-   @Test
-   public void testAddUniqueKeyWithPrivateReply() {
-       Message message = Message.makeMessage(PRE, SENDER_NAME, PASS,NULL_OUTPUT);
-       message = Message.addUniqueKeyToMsg(message, "ABC");
-       assertEquals(message.getTextOrPassword(), "ABC");
-   }
-    
-   /**
-    * Test addUniqueKey with MessageUser as the handle
-    */
-   @Test
-   public void testAddUniqueKeyWithMessageUser() {
-       Message message = Message.makeMessage(MSU, SENDER_NAME, PASS,NULL_OUTPUT);
-       message = Message.addUniqueKeyToMsg(message, "ABC");
-       assertEquals(message.getTextOrPassword(), "ABC");
-   }
-   
-    
-   /**
-    * Test addUniqueKey with DeleteUser as the handle
-    */
-   @Test
-   public void testAddUniqueKeyWithInvalidHandle() {
-       Message message = Message.makeMessage(DLU, SENDER_NAME, PASS,NULL_OUTPUT);
-       String msgText = message.getTextOrPassword();
-       message = Message.addUniqueKeyToMsg(message, "ABC");
-       assertEquals(message.getTextOrPassword(), msgText);
-   }
-   
-   
+     * Test addUniqueKey with PrivateReply as the handle
+     */
+    @Test
+    public void testAddUniqueKeyWithPrivateReply() {
+        Message message = Message.makeMessage(PRE, SENDER_NAME, PASS, NULL_OUTPUT);
+        message = Message.addUniqueKeyToMsg(message, "ABC");
+        assertEquals(message.getTextOrPassword(), "ABC");
+    }
+
+    /**
+     * Test addUniqueKey with MessageUser as the handle
+     */
+    @Test
+    public void testAddUniqueKeyWithMessageUser() {
+        Message message = Message.makeMessage(MSU, SENDER_NAME, PASS, NULL_OUTPUT);
+        message = Message.addUniqueKeyToMsg(message, "ABC");
+        assertEquals(message.getTextOrPassword(), "ABC");
+    }
+
+
+    /**
+     * Test addUniqueKey with DeleteUser as the handle
+     */
+    @Test
+    public void testAddUniqueKeyWithInvalidHandle() {
+        Message message = Message.makeMessage(DLU, SENDER_NAME, PASS, NULL_OUTPUT);
+        String msgText = message.getTextOrPassword();
+        message = Message.addUniqueKeyToMsg(message, "ABC");
+        assertEquals(message.getTextOrPassword(), msgText);
+    }
+
+
     /**
      * Test makeMessage with Remove_user as the handle
      */
@@ -409,13 +409,13 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isRemoveUserFromGroupMessage());
     }
-    
+
     /**
      * Test makeMessage with Get_Group as the handle
      */
     @Test
     public void testMakeMessageGetGroupCondition() {
-        Message message = Message.makeMessage(GTG, SENDER_NAME, GROUP_NAME,PASS );
+        Message message = Message.makeMessage(GTG, SENDER_NAME, GROUP_NAME, PASS);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(GTG);
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -430,8 +430,8 @@ public class TestMessage {
      * Test make message for user profile update message.
      */
     @Test
-    public void testMakeMessageForUserProfileUpdateMessage(){
-        Message message = Message.makeMessage(UPU, SENDER_NAME,"3","Predna");
+    public void testMakeMessageForUserProfileUpdateMessage() {
+        Message message = Message.makeMessage(UPU, SENDER_NAME, "3", "Predna");
         Assertions.assertEquals(SENDER_NAME, message.getName());
         Assertions.assertEquals("3", message.getTextOrPassword());
         Assertions.assertEquals("Predna", message.getReceiverOrPassword());
@@ -442,18 +442,18 @@ public class TestMessage {
      * Test make user profile update message.
      */
     @Test
-    public void testMakeUserProfileUpdateMessage(){
-        Message message = Message.makeUserProfileUpdateMessage(SENDER_NAME,"1","Predna");
-        Assertions.assertEquals(SENDER_NAME,message.getName());
-        Assertions.assertEquals("1",message.getTextOrPassword());
-        Assertions.assertEquals("Predna",message.getReceiverOrPassword());
+    public void testMakeUserProfileUpdateMessage() {
+        Message message = Message.makeUserProfileUpdateMessage(SENDER_NAME, "1", "Predna");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("1", message.getTextOrPassword());
+        Assertions.assertEquals("Predna", message.getReceiverOrPassword());
     }
 
     /**
      * Test is user profile update message for false.
      */
     @Test
-    public void testIsUserProfileUpdateMessageForFalse(){
+    public void testIsUserProfileUpdateMessageForFalse() {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isUserProfileUpdateMessage());
     }
@@ -462,8 +462,8 @@ public class TestMessage {
      * Test make update group message.
      */
     @Test
-    public void testMakeUpdateGroupMessage(){
-    	Message message = Message.makeMessage(UPG,SENDER_NAME, MESSAGE_TEXT, GROUP_NAME);
+    public void testMakeUpdateGroupMessage() {
+        Message message = Message.makeMessage(UPG, SENDER_NAME, MESSAGE_TEXT, GROUP_NAME);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(UPG);
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -478,11 +478,11 @@ public class TestMessage {
      * Test is update group message true.
      */
     @Test
-    public void testIsUpdateGroupMessageTrue(){
-        Message message = Message.makeUpdateGroupMessage(SENDER_NAME,"testGroup","attributes");
-        Assertions.assertEquals(SENDER_NAME,message.getName());
-        Assertions.assertEquals("testGroup",message.getTextOrPassword());
-        Assertions.assertEquals("attributes",message.getReceiverOrPassword());
+    public void testIsUpdateGroupMessageTrue() {
+        Message message = Message.makeUpdateGroupMessage(SENDER_NAME, "testGroup", "attributes");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("testGroup", message.getTextOrPassword());
+        Assertions.assertEquals("attributes", message.getReceiverOrPassword());
         Assertions.assertTrue(message.isUpdateGroupMessage());
     }
 
@@ -490,7 +490,7 @@ public class TestMessage {
      * Test is update group message for false.
      */
     @Test
-    public void testIsUpdateGroupMessageForFalse(){
+    public void testIsUpdateGroupMessageForFalse() {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isUpdateGroupMessage());
     }
@@ -519,36 +519,36 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
     }
 
-    
+
     /**
      * Test message already sent for true.
      */
     @Test
     public void testMessageAlreadySentForTrue() {
-    	Message msg = Message.makeHelloMessage(HLO);
-    	User u = new User("","",SENDER_NAME, PASS, false);
-    	assertTrue(msg.addUserToRecipients(u));
-    	assertTrue(msg.messageAlreadySent(u));
+        Message msg = Message.makeHelloMessage(HLO);
+        User u = new User("", "", SENDER_NAME, PASS, false);
+        assertTrue(msg.addUserToRecipients(u));
+        assertTrue(msg.messageAlreadySent(u));
     }
-    
+
     /**
      * Test message already sent for false.
      */
     @Test
     public void testMessageAlreadySentForFalse() {
-    	Message msg = Message.makeHelloMessage(HLO);
-    	User u = new User("","",SENDER_NAME, PASS, false);
-    	assertFalse(msg.messageAlreadySent(u));
+        Message msg = Message.makeHelloMessage(HLO);
+        User u = new User("", "", SENDER_NAME, PASS, false);
+        assertFalse(msg.messageAlreadySent(u));
     }
-    
+
     /**
      * Test add user to recipients for true.
      */
     @Test
     public void testAddUserToRecipientsForTrue() {
-    	Message msg = Message.makeHelloMessage(HLO);
-    	User u = new User("","",SENDER_NAME, PASS, false);
-    	assertTrue(msg.addUserToRecipients(u));
+        Message msg = Message.makeHelloMessage(HLO);
+        User u = new User("", "", SENDER_NAME, PASS, false);
+        assertTrue(msg.addUserToRecipients(u));
     }
 
     /**
@@ -556,18 +556,18 @@ public class TestMessage {
      */
     @Test
     public void testAddUserToRecipientsForFalse() {
-    	Message msg = Message.makeHelloMessage(HLO);
-    	User u = new User("","",SENDER_NAME, PASS, false);
-    	assertTrue(msg.addUserToRecipients(u));
-    	assertFalse(msg.isGroupMessage());
+        Message msg = Message.makeHelloMessage(HLO);
+        User u = new User("", "", SENDER_NAME, PASS, false);
+        assertTrue(msg.addUserToRecipients(u));
+        assertFalse(msg.isGroupMessage());
     }
-    
+
     /**
      * Test make group message.
      */
     @Test
     public void testMakeGroupMessage() {
-        Message message = Message.makeMessage(MSG,SENDER_NAME, MESSAGE_TEXT, GROUP_NAME);
+        Message message = Message.makeMessage(MSG, SENDER_NAME, MESSAGE_TEXT, GROUP_NAME);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(MSG);
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -582,19 +582,19 @@ public class TestMessage {
      * Test make search message.
      */
     @Test
-    public void testMakeSearchMessage(){
-        Message message = Message.makeSearchMessage(SENDER_NAME,"Group","searchString");
-        Assertions.assertEquals(SENDER_NAME,message.getName());
-        Assertions.assertEquals("Group",message.getTextOrPassword());
-        Assertions.assertEquals("searchString",message.getReceiverOrPassword());
+    public void testMakeSearchMessage() {
+        Message message = Message.makeSearchMessage(SENDER_NAME, "Group", "searchString");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("Group", message.getTextOrPassword());
+        Assertions.assertEquals("searchString", message.getReceiverOrPassword());
     }
 
     /**
      * Test make message for search message.
      */
     @Test
-    public void testMakeMessageForSearchMessage(){
-        Message message = Message.makeMessage(SRH,SENDER_NAME,"Group","A");
+    public void testMakeMessageForSearchMessage() {
+        Message message = Message.makeMessage(SRH, SENDER_NAME, "Group", "A");
         Assertions.assertTrue(message.isSearchMessage());
     }
 
@@ -602,12 +602,11 @@ public class TestMessage {
      * Test is search message for false.
      */
     @Test
-    public void testIsSearchMessageForFalse(){
+    public void testIsSearchMessageForFalse() {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isSearchMessage());
     }
-    
-    
+
 
     /**
      * A private helper method to generate toString output for the given
@@ -621,7 +620,7 @@ public class TestMessage {
         final String SPACE = " ";
         return SPACE + parameter.length() + SPACE + parameter;
     }
-    
+
     /**
      * CONSTANTS to be used as expected values or method arguments
      **/

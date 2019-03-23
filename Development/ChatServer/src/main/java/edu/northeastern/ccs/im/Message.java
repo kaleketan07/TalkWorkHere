@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.northeastern.ccs.im.models.User;
+
 /**
  * Each instance of this class represents a single transmission by our IM
  * clients.
@@ -41,7 +42,7 @@ public class Message {
      * The third argument used in the message.
      */
     private String msgReceiverOrPassword;
-    
+
     /**
      * The recipients of this message.
      */
@@ -72,10 +73,10 @@ public class Message {
      * is defined by the handle and we must also set the name of the message sender,
      * message recipient, and the text to send.
      *
-     * @param handle  Handle for the type of message being created.
-     * @param srcName Name of the individual sending this message
-     * @param textorpassword the text or the password to be sent
-     * @param receiverorPassword    receiver or password
+     * @param handle             Handle for the type of message being created.
+     * @param srcName            Name of the individual sending this message
+     * @param textorpassword     the text or the password to be sent
+     * @param receiverorPassword receiver or password
      */
     private Message(MessageType handle, String srcName, String textorpassword, String receiverorPassword) {
         msgType = handle;
@@ -103,7 +104,7 @@ public class Message {
         this(handle, srcName, null);
     }
 
-    
+
     /**
      * Checks if this message has already been sent to the user.
      *
@@ -111,19 +112,19 @@ public class Message {
      * @return true, if the user is already in the recipients else returns false
      */
     public boolean messageAlreadySent(User u) {
-    	return messageRecipients.contains(u);
+        return messageRecipients.contains(u);
     }
-    
+
     /**
      * Adds the user to recipients.
      *
      * @param u the user object
-     * @return true, if the user is added to the messageRecipients successfully else returns false 
+     * @return true, if the user is added to the messageRecipients successfully else returns false
      */
     public boolean addUserToRecipients(User u) {
-    	return messageRecipients.add(u);
+        return messageRecipients.add(u);
     }
-    
+
     /**
      * Create a new message to continue the logout process.
      *
@@ -235,6 +236,8 @@ public class Message {
             return makeUnfollowUserMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
             return makeGetFollowersMessage(srcName);
+        } else if (handle.compareTo(MessageType.GET_FOLLOWEES.toString()) == 0) {
+            return makeGetFolloweesMessage(srcName);
         }
         return null;
     }
@@ -285,15 +288,16 @@ public class Message {
     }
 
     /**
-     * Creates a new message which updates the client with the responses from the prattle 
+     * Creates a new message which updates the client with the responses from the prattle
      * server(error/success information)
+     *
      * @param responseMessage text of the response message
      * @return a message with Prattle_Message Handle
      */
     public static Message makePrattleMessage(String responseMessage) {
-    	return new Message(MessageType.PRATTLE_MESSAGE, "Prattle", responseMessage);
+        return new Message(MessageType.PRATTLE_MESSAGE, "Prattle", responseMessage);
     }
-    
+
     /**
      * Create a new message for the early stages when the user logs in without all
      * the special stuff.
@@ -329,26 +333,26 @@ public class Message {
 
     /**
      * This message creates a Private User message type of a message
-     * 
-     * @param srcName   the username of the sender of the message
-     * @param text		the text the sender wants to send
-     * @param destName	the username of the receiver of the message
+     *
+     * @param srcName  the username of the sender of the message
+     * @param text     the text the sender wants to send
+     * @param destName the username of the receiver of the message
      * @return
      */
     public static Message makePrivateUserMessage(String srcName, String text, String destName) {
         return new Message(MessageType.MESSAGE_USER, srcName, text, destName);
     }
-    
+
     /**
      * This message creates a Delete User message type of a message
-     * 
-     * @param srcName   the username of the sender whoes profile needs to be deleted
+     *
+     * @param srcName the username of the sender whoes profile needs to be deleted
      * @return Message of type DeleteUser Message
      */
     public static Message makeDeleteUserMessage(String srcName) {
         return new Message(MessageType.DELETE_USER, srcName);
     }
-    
+
     /**
      * This method creates a delete group message based on the given group_name and moderator
      *
@@ -370,33 +374,33 @@ public class Message {
     public static Message makeCreateGroupMessage(String myName, String groupName) {
         return new Message(MessageType.CREATE_GROUP, myName, groupName);
     }
-    
-    
+
+
     /**
      * This method creates a message to add a user to group.
      *
-     * @param myName the name of the sender
-     * @param userName the user name that is to be added in the group
+     * @param myName    the name of the sender
+     * @param userName  the user name that is to be added in the group
      * @param groupName the group name in which the user will be added
      * @return the message object with handle Add user to group
      */
     public static Message makeAddUserToGroupMessage(String myName, String userName, String groupName) {
-    	return new Message(MessageType.ADD_USER_GROUP, myName, userName, groupName);
+        return new Message(MessageType.ADD_USER_GROUP, myName, userName, groupName);
     }
-    
+
     /**
      * This method creates a message to remove a user from group.
      *
-     * @param myName the name of the sender
-     * @param userName the user name that is to be removed from the group
+     * @param myName    the name of the sender
+     * @param userName  the user name that is to be removed from the group
      * @param groupName the group name in which the user will be removed form
      * @return the message object with handle delete user from group
      */
     public static Message makeRemoveUserFromGroupMessage(String myName, String userName, String groupName) {
-    	return new Message(MessageType.REMOVE_USER_GROUP, myName, userName, groupName);
+        return new Message(MessageType.REMOVE_USER_GROUP, myName, userName, groupName);
     }
 
-    
+
     /**
      * This method creates a get group message based on the given group name
      *
@@ -407,29 +411,29 @@ public class Message {
     public static Message makeGetGroupMessage(String srcName, String groupName) {
         return new Message(MessageType.GET_GROUP, srcName, groupName);
     }
-    
+
     /**
      * The method creates a message that handles the user's request for updating
      * his profile details
      *
-     * @param uname             the username of the user
-     * @param attributeName     the attribute name (user profile attribute to be updated)
-     * @param attributeValue    the value of the attribute to be set
+     * @param uname          the username of the user
+     * @param attributeName  the attribute name (user profile attribute to be updated)
+     * @param attributeValue the value of the attribute to be set
      * @return the message
      */
-    public static Message makeUserProfileUpdateMessage(String uname, String attributeName, String attributeValue ){
+    public static Message makeUserProfileUpdateMessage(String uname, String attributeName, String attributeValue) {
         return new Message(MessageType.UPDATE_PROFILE_USER, uname, attributeName, attributeValue);
     }
 
     /**
      * This method creates a private reply message
      *
-     * @param msgUniqueKey - msg_uniqueKey to which the the reply is 
-     * @param text - text in the message
+     * @param msgUniqueKey - msg_uniqueKey to which the the reply is
+     * @param text         - text in the message
      * @return a Message object of type Private_Reply
      */
     public static Message makePrivateReplyMessage(String srcName, String text, String msgUniqueKey) {
-        return new Message(MessageType.PRIVATE_REPLY_MESSAGE, srcName , text, msgUniqueKey);
+        return new Message(MessageType.PRIVATE_REPLY_MESSAGE, srcName, text, msgUniqueKey);
     }
 
     /**
@@ -440,30 +444,40 @@ public class Message {
      * @param attributeKeyValue the attribute key and it's value separated by ':'
      * @return the message object of type UPDATE_GROUP
      */
-    public static Message makeUpdateGroupMessage(String userName, String groupName, String attributeKeyValue){
+    public static Message makeUpdateGroupMessage(String userName, String groupName, String attributeKeyValue) {
         return new Message(MessageType.UPDATE_GROUP, userName, groupName, attributeKeyValue);
     }
 
-    
+
     /**
      * This method creates a follow user message
      *
      * @param follower - String of the follower user name
      * @param followee - string of the followee user name
-     * @return a Message object of type Follow_User
+     * @return a Message object of type Follow User
      */
     public static Message makeFollowUserMessage(String follower, String followee) {
         return new Message(MessageType.FOLLOW_USER, follower, followee);
     }
-    
+
     /**
-     * This method creates a follow Get Followers
+     * This method creates a Get Followers message
      *
      * @param followee - string of the followee user name
-     * @return a Message object of type Follow_User
+     * @return a Message object of type Get Followers
      */
     public static Message makeGetFollowersMessage(String followee) {
         return new Message(MessageType.GET_FOLLOWERS, followee);
+    }
+
+    /**
+     * This method creates a Get Followees message 
+     *
+     * @param followee - string of the follower user name
+     * @return a Message object of type Get Followees
+     */
+    public static Message makeGetFolloweesMessage(String follower) {
+        return new Message(MessageType.GET_FOLLOWEES, follower);
     }
     
     /**
@@ -471,7 +485,7 @@ public class Message {
      *
      * @param follower - String of the follower user name
      * @param followee - string of the followee user name
-     * @return a Message object of type Unfollow_User
+     * @return a Message object of type Unfollow User
      */
     public static Message makeUnfollowUserMessage(String follower, String followee) {
         return new Message(MessageType.UNFOLLOW_USER, follower, followee);
@@ -485,33 +499,34 @@ public class Message {
      * @param searchString the search string
      * @return the message object of type search_message
      */
-    public static Message makeSearchMessage(String userName, String userOrGroup, String searchString){
-        return new Message(MessageType.SEARCH_MESSAGE,userName, userOrGroup, searchString);
+    public static Message makeSearchMessage(String userName, String userOrGroup, String searchString) {
+        return new Message(MessageType.SEARCH_MESSAGE, userName, userOrGroup, searchString);
     }
-    
+
     /**
      * Add's the UniqueKey details to the existing message
-     * @param msg   The message to be sent
-     * @param text 	The text to be replaced in msg object
-     * @return msg 
+     *
+     * @param msg  The message to be sent
+     * @param text The text to be replaced in msg object
+     * @return msg
      */
-    public static Message addUniqueKeyToMsg(Message msg , String text) {
-    	if (msg.isPrivateUserMessage() || msg.isPrivateReplyMessage()) {
-    		return new Message(msg.msgType, msg.msgSender , text, msg.msgReceiverOrPassword);
-    	}
-    	return msg;
+    public static Message addUniqueKeyToMsg(Message msg, String text) {
+        if (msg.isPrivateUserMessage() || msg.isPrivateReplyMessage()) {
+            return new Message(msg.msgType, msg.msgSender, text, msg.msgReceiverOrPassword);
+        }
+        return msg;
     }
-    
+
     /**
      * This method creates a Group message to be sent on the specified group
      *
      * @param srcName the name of the sender
-     * @param text the text content of the message
+     * @param text    the text content of the message
      * @param grpName the group name to which the message is to be sent
      * @return the message object of type Group Message
      */
     public static Message makeGroupMessage(String srcName, String text, String grpName) {
-    	return new Message(MessageType.MESSAGE_GROUP, srcName, text, grpName);
+        return new Message(MessageType.MESSAGE_GROUP, srcName, text, grpName);
     }
     
     
@@ -537,6 +552,7 @@ public class Message {
     	return new Message(MessageType.DELETE_GROUP_MESSAGE, srcName, text);
     }
     
+
     /**
      * Return the name of the sender of this message.
      *
@@ -608,7 +624,7 @@ public class Message {
     public boolean isDeleteGroupMessage() {
         return (msgType == MessageType.DELETE_GROUP);
     }
-    
+
     /**
      * This method verifies if the current message has the handle DLU (is a Delete_User message)
      *
@@ -617,7 +633,7 @@ public class Message {
     public boolean isDeleteUserMessage() {
         return (msgType == MessageType.DELETE_USER);
     }
-    
+
     /**
      * This method verifies if the current message has the handle CRG (is a create group message)
      *
@@ -633,18 +649,18 @@ public class Message {
      * @return true or false based on the comparison result
      */
     public boolean isAddUserToGroupMessage() {
-      return (msgType == MessageType.ADD_USER_GROUP);
+        return (msgType == MessageType.ADD_USER_GROUP);
     }
-    
+
     /**
      * This method verifies if the current message has the handle ADG (is a add user to group message)
      *
      * @return true or false based on the comparison result
      */
     public boolean isRemoveUserFromGroupMessage() {
-      return (msgType == MessageType.REMOVE_USER_GROUP);
+        return (msgType == MessageType.REMOVE_USER_GROUP);
     }
-    
+
     /**
      * This method verifies if the current message has the handle MSU (is a Message_User message)
      *
@@ -653,7 +669,7 @@ public class Message {
     public boolean isPrivateUserMessage() {
         return (msgType == MessageType.MESSAGE_USER);
     }
-    
+
     /**
      * This method verifies if the current message has the handle FWU (is a Follow_User message)
      *
@@ -671,7 +687,7 @@ public class Message {
     public boolean isUnfollowUserMessage() {
         return (msgType == MessageType.UNFOLLOW_USER);
     }
-    
+
     /**
      * This method verifies if the current message has the handle PRE (is a PRIVATE_REPLY_MESSAGE)
      *
@@ -686,17 +702,26 @@ public class Message {
      *
      * @return the boolean
      */
-    public boolean isUserProfileUpdateMessage(){
+    public boolean isUserProfileUpdateMessage() {
         return (msgType == MessageType.UPDATE_PROFILE_USER);
     }
-    
+
     /**
      * This method verifies if the current message has the handle GFR (is a Get_Followers message)
      *
-     * @return the boolean
+     * @return true or false based on the comparison result
      */
-    public boolean isGetFollowersMessage(){
+    public boolean isGetFollowersMessage() {
         return (msgType == MessageType.GET_FOLLOWERS);
+    }
+    
+    /**
+     * This method verifies if the current message has the handle GFE (is a Get_Followees message)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isGetFolloweesMessage(){
+        return (msgType == MessageType.GET_FOLLOWEES);
     }
 
     /**
@@ -710,24 +735,28 @@ public class Message {
 
     /**
      * This method verifies if the current message has the handle MSG (is a group message)
+     *
      * @return true if the message has the handle MSG else return false
      */
     public boolean isGroupMessage() {
         return (msgType == MessageType.MESSAGE_GROUP);
     }
-    
+
     /**
      * Verify if the message is a update group message.
      *
      * @return true if the message is a update_group message, false otherwise
      */
-    public boolean isUpdateGroupMessage(){ return (msgType == MessageType.UPDATE_GROUP);}
+    public boolean isUpdateGroupMessage() {
+        return (msgType == MessageType.UPDATE_GROUP);
+    }
 
     /**
      * Verify if the message Is a search message.
      *
      * @return the boolean, true if the message is a search message, false otherwise
      */
+
     public boolean isSearchMessage(){ return (msgType == MessageType.SEARCH_MESSAGE);}
     
     

@@ -303,9 +303,9 @@ public class TestGroupService {
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testIsModeratorForFalse() throws SQLException{
+    public void testIsModeratorForFalse() throws SQLException {
         when(mockedRS.first()).thenReturn(false);
-        Assertions.assertFalse(testGS.isModerator("ABC","Alice"));
+        Assertions.assertFalse(testGS.isModerator("ABC", "Alice"));
     }
 
     /**
@@ -336,9 +336,9 @@ public class TestGroupService {
      */
     @Test
     public void testRemoveUserFromGroupWithExistingUser() throws SQLException {
-    	Assertions.assertTrue(testGS.removeUserFromGroup("ABC", "AB"));
+        Assertions.assertTrue(testGS.removeUserFromGroup("ABC", "AB"));
     }
-    
+
     /**
      * Test add user to group with existing user.
      *
@@ -346,10 +346,10 @@ public class TestGroupService {
      */
     @Test
     public void testRemoveUserFromGroupWithNonUser() throws SQLException {
-    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-    	Assertions.assertFalse(testGS.removeUserFromGroup("ABC", "AB"));
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(testGS.removeUserFromGroup("ABC", "AB"));
     }
-    
+
     /**
      * Test add user to group with non existing user.
      *
@@ -414,10 +414,10 @@ public class TestGroupService {
         when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
         Assertions.assertTrue(testGS.addGroupToGroup("ABC", "ABC"));
     }
-    
+
     @Test
-    public void testIsUserAMemberOfTheGroup() throws SQLException{
-    	when(mockedRS.next()).thenReturn(true, true, false, true, true, false);
+    public void testIsUserAMemberOfTheGroup() throws SQLException {
+        when(mockedRS.next()).thenReturn(true, true, false, true, true, false);
         when(mockedRS.getString("group_name")).thenReturn("Group201", "Group202");
         when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
         when(mockedRS.getString("username")).thenReturn("AB");
@@ -430,8 +430,8 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForSearchableWhenAttributeValueIs1() throws SQLException{
-        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","1"));
+    public void testUpdateGroupForSearchableWhenAttributeValueIs1() throws SQLException {
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup", "is_searchable", "1"));
     }
 
 
@@ -441,8 +441,8 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForTrueWhenAttributeValueIsTrue() throws SQLException{
-        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","True"));
+    public void testUpdateGroupForTrueWhenAttributeValueIsTrue() throws SQLException {
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup", "is_searchable", "True"));
     }
 
     /**
@@ -451,8 +451,8 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForSearchableGroupWhenAttributeValueIsFalse() throws SQLException{
-        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","False"));
+    public void testUpdateGroupForSearchableGroupWhenAttributeValueIsFalse() throws SQLException {
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup", "is_searchable", "False"));
     }
 
     /**
@@ -461,8 +461,8 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupWhenSearchableGroupAndAttributeValueIs0() throws SQLException{
-        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","is_searchable","0"));
+    public void testUpdateGroupWhenSearchableGroupAndAttributeValueIs0() throws SQLException {
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup", "is_searchable", "0"));
     }
 
     /**
@@ -471,9 +471,9 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupWhenSearchableGroupAndAttributeValueIsIncorrect() throws SQLException{
+    public void testUpdateGroupWhenSearchableGroupAndAttributeValueIsIncorrect() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(testGS.updateGroupSettings("testGroup","is_searchable","Something"));
+        Assertions.assertFalse(testGS.updateGroupSettings("testGroup", "is_searchable", "Something"));
     }
 
     /**
@@ -482,8 +482,8 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForADifferentAttribute() throws SQLException{
-        Assertions.assertTrue(testGS.updateGroupSettings("testGroup","another_attribute","Something"));
+    public void testUpdateGroupForADifferentAttribute() throws SQLException {
+        Assertions.assertTrue(testGS.updateGroupSettings("testGroup", "another_attribute", "Something"));
     }
 
     /**
@@ -492,9 +492,9 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForFalse() throws SQLException{
+    public void testUpdateGroupForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(testGS.updateGroupSettings("testGroup","is_searchable","1"));
+        Assertions.assertFalse(testGS.updateGroupSettings("testGroup", "is_searchable", "1"));
     }
 
     /**
@@ -503,10 +503,10 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupForException() throws SQLException{
+    public void testUpdateGroupForException() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         Assertions.assertThrows(SQLException.class,
-                ()->testGS.updateGroupSettings("testGroup","is_searchable","1"));
+                () -> testGS.updateGroupSettings("testGroup", "is_searchable", "1"));
     }
 
     /**
@@ -515,10 +515,10 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchGroup() throws SQLException{
-        HashMap<String,String> testSet = new HashMap<>();
-        testSet.put("Group201","Alice");
-        Assertions.assertEquals(testSet.size(),testGS.searchGroup("Gr").size());
+    public void testSearchGroup() throws SQLException {
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("Group201", "Alice");
+        Assertions.assertEquals(testSet.size(), testGS.searchGroup("Gr").size());
     }
 
     /**
@@ -527,9 +527,9 @@ public class TestGroupService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchGroupForException() throws SQLException{
+    public void testSearchGroupForException() throws SQLException {
         when(mockedPreparedStatement.executeQuery()).thenThrow(SQLException.class);
-        Assertions.assertThrows(SQLException.class,()->testGS.searchGroup("Gr"));
+        Assertions.assertThrows(SQLException.class, () -> testGS.searchGroup("Gr"));
     }
 
 }

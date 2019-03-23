@@ -200,7 +200,7 @@ public class TestUser {
      * Test setter and getter for searchable attribute when true.
      */
     @Test
-    public void testSetterAndGetterForSearchableAttributeWhenTrue(){
+    public void testSetterAndGetterForSearchableAttributeWhenTrue() {
         ALICE.setSearchable(true);
         assertTrue(ALICE.isSearchable());
     }
@@ -209,7 +209,7 @@ public class TestUser {
      * Test setter and getter for searchable attribute when false.
      */
     @Test
-    public void testSetterAndGetterForSearchableAttributeWhenFalse(){
+    public void testSetterAndGetterForSearchableAttributeWhenFalse() {
         ALICE.setSearchable(false);
         assertFalse(ALICE.isSearchable());
     }

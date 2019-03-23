@@ -12,6 +12,7 @@ import java.util.Set;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
+import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 
@@ -22,7 +23,7 @@ import edu.northeastern.ccs.im.models.User;
  * @author - Team-201 - Ketan Kale
  */
 public class GroupService implements GroupDao {
-    private DBConnection conn;
+    private IDBConnection conn;
     private PreparedStatement pstmt = null;
     private DBUtils utils;
     private ResultSet result;
@@ -222,21 +223,20 @@ public class GroupService implements GroupDao {
      * @return true, if is moderator
      * @throws SQLException the SQL exception
      */
-	@Override
-	public boolean isModerator(String groupName, String userName) throws SQLException {
-		final String GET_MODERATOR_NAME = "SELECT moderator_name from prattle.groups where group_name = ?";
-		pstmt = conn.getPreparedStatement(GET_MODERATOR_NAME);
-		pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
-		String modName;
-    	result = pstmt.executeQuery();
-        if(!result.first()){
+    @Override
+    public boolean isModerator(String groupName, String userName) throws SQLException {
+        final String GET_MODERATOR_NAME = "SELECT moderator_name from prattle.groups where group_name = ?";
+        pstmt = conn.getPreparedStatement(GET_MODERATOR_NAME);
+        pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
+        String modName;
+        result = pstmt.executeQuery();
+        if (!result.first()) {
             return false;
         }
         modName = result.getString(MODERATOR_NAME);
-        pstmt.close(); 
-		return userName.equals(modName);
-	}
-
+        pstmt.close();
+        return userName.equals(modName);
+    }
 
 
     /**
@@ -270,8 +270,8 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
-    	final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_removed = 1 WHERE host_group_name = ? and guest_user_name = ?";
-    	pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
+        final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_removed = 1 WHERE host_group_name = ? and guest_user_name = ?";
+        pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         int qResult = pstmt.executeUpdate();
         pstmt.close();
@@ -318,34 +318,32 @@ public class GroupService implements GroupDao {
             return (qResult > 0);
         }
     }
-    
-    
-    
+
+
     /* (non-Javadoc)
      * @see edu.northeastern.ccs.im.services.GroupDao#isUserMemberOfTheGroup(java.lang.String, java.lang.String)
      */
     public boolean isUserMemberOfTheGroup(String grpName, String userName) throws SQLException {
-    	Group group = getGroup(grpName);
-    	Set<String> memberUserNames = new HashSet<>();
-    	memberUserNames = getFlatListOfUsers(group, memberUserNames);
-    	return memberUserNames.contains(userName);
+        Group group = getGroup(grpName);
+        Set<String> memberUserNames = new HashSet<>();
+        memberUserNames = getFlatListOfUsers(group, memberUserNames);
+        return memberUserNames.contains(userName);
     }
-    
-    
-    
+
+
     /**
      * Gets the flat list of member users of a group.
      *
-     * @param grp the group object of the group
+     * @param grp       the group object of the group
      * @param userNames the set of user names of member users of the group
      * @return the flat list of user names strings
      */
     private Set<String> getFlatListOfUsers(Group grp, Set<String> userNames) {
-    	for (User u : grp.getMemberUsers()) {
-    		userNames.add(u.getUserName());
-    	}
+        for (User u : grp.getMemberUsers()) {
+            userNames.add(u.getUserName());
+        }
         for (Group g : grp.getMemberGroups()) {
-        	userNames = getFlatListOfUsers(g, userNames);
+            userNames = getFlatListOfUsers(g, userNames);
         }
         return userNames;
     }
@@ -362,27 +360,25 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
-            throws SQLException{
+            throws SQLException {
         final String UPDATE_GROUP = "UPDATE prattle.groups SET " + attributeName + " = ? WHERE group_name = ?";
         String trueOrFalse;
         pstmt = conn.getPreparedStatement(UPDATE_GROUP);
-        if(attributeName.compareTo("is_searchable") == 0){
-            if(attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")){
+        if (attributeName.compareTo("is_searchable") == 0) {
+            if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {
                 trueOrFalse = "0";
-                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,groupName);
-            }
-            else if(attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")){
+                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, groupName);
+            } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
                 trueOrFalse = "1";
-                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,groupName);
-            }
-            else
+                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, groupName);
+            } else
                 ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
-        }else{
-            pstmt = utils.setPreparedStatementArgs(pstmt,attributeValue,groupName);
+        } else {
+            pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, groupName);
         }
         int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return qResult>0;
+        return qResult > 0;
     }
 
     /**
@@ -393,17 +389,17 @@ public class GroupService implements GroupDao {
      * @throws SQLException the sql exception
      */
     @Override
-    public Map<String,String> searchGroup(String searchString) throws SQLException{
-        Map<String,String> resultMap = new HashMap<>();
-        final String SEARCH_GROUP= "SELECT group_name, moderator_name FROM prattle.groups WHERE" +
+    public Map<String, String> searchGroup(String searchString) throws SQLException {
+        Map<String, String> resultMap = new HashMap<>();
+        final String SEARCH_GROUP = "SELECT group_name, moderator_name FROM prattle.groups WHERE" +
                 " is_searchable = 1 AND (group_name REGEXP concat(\"^\",?,\".*\"))";
         pstmt = conn.getPreparedStatement(SEARCH_GROUP);
-        pstmt = utils.setPreparedStatementArgs(pstmt,searchString);
+        pstmt = utils.setPreparedStatementArgs(pstmt, searchString);
         result = pstmt.executeQuery();
-        while(result.next()){
+        while (result.next()) {
             String groupName = result.getString(GROUP_NAME);
             String modName = result.getString(MODERATOR_NAME);
-            resultMap.put(groupName,modName);
+            resultMap.put(groupName, modName);
         }
         return resultMap;
     }

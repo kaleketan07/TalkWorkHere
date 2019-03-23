@@ -81,6 +81,7 @@ public class TestUserService {
         when(mockedRS.getString("username")).thenReturn("AB");
         when(mockedRS.getString("user_password")).thenReturn("QWERTY");
         when(mockedRS.getString("follower_user")).thenReturn("ABC");
+        when(mockedRS.getString("followee_user")).thenReturn("ABC");
         when(mockedRS.getBoolean("logged_in")).thenReturn(false);
         when(mockedRS.next()).thenReturn(true, false);
         Field rs = UserService.class.getDeclaredField("result");
@@ -138,7 +139,7 @@ public class TestUserService {
     public void testCreateUser() throws SQLException {
         Assertions.assertTrue(us.createUser(testUser));
     }
-    
+
     /**
      * Test follow user.
      *
@@ -148,7 +149,7 @@ public class TestUserService {
     public void testFollowUser() throws SQLException {
         Assertions.assertTrue(us.followUser(testUser, testUser));
     }
-    
+
     /**
      * Test unfollow user.
      *
@@ -223,7 +224,7 @@ public class TestUserService {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
         Assertions.assertThrows(SQLException.class, () -> us.createUser(testUser));
     }
-    
+
     /**
      * Test follow user exception.
      *
@@ -232,9 +233,9 @@ public class TestUserService {
     @Test
     public void testFollowUserException() throws SQLException {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
-        Assertions.assertThrows(SQLException.class, () -> us.followUser(testUser,testUser));
+        Assertions.assertThrows(SQLException.class, () -> us.followUser(testUser, testUser));
     }
-    
+
     /**
      * Test unfollow user exception.
      *
@@ -243,7 +244,7 @@ public class TestUserService {
     @Test
     public void testUnfollowUserException() throws SQLException {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
-        Assertions.assertThrows(SQLException.class, () -> us.unfollowUser(testUser,testUser));
+        Assertions.assertThrows(SQLException.class, () -> us.unfollowUser(testUser, testUser));
     }
 
     /**
@@ -279,7 +280,7 @@ public class TestUserService {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.createUser(testUser));
     }
-    
+
     /**
      * Test follow user false.
      *
@@ -288,9 +289,9 @@ public class TestUserService {
     @Test
     public void testFollowUserFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.followUser(testUser,testUser));
+        Assertions.assertFalse(us.followUser(testUser, testUser));
     }
-    
+
     /**
      * Test unfollow user false.
      *
@@ -299,7 +300,7 @@ public class TestUserService {
     @Test
     public void testUnfollowUserFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.unfollowUser(testUser,testUser));
+        Assertions.assertFalse(us.unfollowUser(testUser, testUser));
     }
 
     /**
@@ -309,7 +310,7 @@ public class TestUserService {
      */
     @Test
     public void testUpdateUserAttributesForTrue() throws SQLException {
-        Assertions.assertTrue(us.updateUserAttributes("ABC","first_name","XYZ"));
+        Assertions.assertTrue(us.updateUserAttributes("ABC", "first_name", "XYZ"));
     }
 
     /**
@@ -320,9 +321,9 @@ public class TestUserService {
     @Test
     public void testUpdateUserAttributesForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.updateUserAttributes("ABC","last_name","DEF"));
+        Assertions.assertFalse(us.updateUserAttributes("ABC", "last_name", "DEF"));
     }
-    
+
     /**
      * Test get followers with 1 followers.
      *
@@ -331,36 +332,61 @@ public class TestUserService {
     @Test
     public void testGetFollowersOne() throws SQLException {
     	when(mockedRS.next()).thenReturn(true,false);
-        Assertions.assertTrue(us.getFollower(testUser).contains("ABC"));
+        Assertions.assertTrue(us.getFollowers(testUser).contains("ABC"));
+    }
+
+    /**
+     * Test get followees with 1 followees.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFolloweesOne() throws SQLException {
+    	when(mockedRS.next()).thenReturn(true,false);
+        Assertions.assertTrue(us.getFollowees(testUser).contains("ABC"));
     }
     
+    
     /**
-     * Test get followers with 0 followers.
+     * Test get followees with 0 followers.
      *
      * @throws SQLException the sql exception
      */
     @Test
     public void testGetFollowersZero() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
-        Assertions.assertEquals(us.getFollower(testUser), "Number of followers 0");
+        Assertions.assertEquals(us.getFollowers(testUser), "Number of followers 0");
+    }
+    
+    /**
+     * Test get followers with 0 followees.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetFolloweesZero() throws SQLException {
+    	when(mockedRS.next()).thenReturn(false);
+        Assertions.assertEquals(us.getFollowees(testUser), "Number of followees 0");
     }
 
     /**
      * Test if a null is sent instead of user when no matching result is found
+     *
      * @throws SQLException thrown by downstream SQL calls
      */
     @Test
-    public void testNullConditionGetUserByUsernameAndPassword() throws SQLException{
+    public void testNullConditionGetUserByUsernameAndPassword() throws SQLException {
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertNull(us.getUserByUserNameAndPassword(USER, PASS));
     }
 
     /**
      * Test if a null is sent instead of user when no matching result is found
+     *
      * @throws SQLException thrown by downstream SQL calls
      */
     @Test
-    public void testNullConditionGetUserByUsername() throws SQLException{
+    public void testNullConditionGetUserByUsername() throws SQLException {
         when(mockedRS.first()).thenReturn(false);
         Assertions.assertNull(us.getUserByUserName(USER));
     }
@@ -372,8 +398,8 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenNotSearchableForTrue() throws SQLException{
-        Assertions.assertTrue(us.updateUserAttributes("ABC","first_name","NewABC"));
+    public void testUpdateUserAttributeWhenNotSearchableForTrue() throws SQLException {
+        Assertions.assertTrue(us.updateUserAttributes("ABC", "first_name", "NewABC"));
     }
 
     /**
@@ -383,9 +409,9 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenNotSearchableForFalse() throws SQLException{
+    public void testUpdateUserAttributeWhenNotSearchableForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.updateUserAttributes("ABC","first_name","NewABC"));
+        Assertions.assertFalse(us.updateUserAttributes("ABC", "first_name", "NewABC"));
     }
 
     /**
@@ -394,9 +420,9 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenException() throws SQLException{
+    public void testUpdateUserAttributeWhenException() throws SQLException {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
-        Assertions.assertThrows(SQLException.class,() -> us.updateUserAttributes("ABC","first_name","NewABC"));
+        Assertions.assertThrows(SQLException.class, () -> us.updateUserAttributes("ABC", "first_name", "NewABC"));
     }
 
     /**
@@ -406,8 +432,8 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenSearchableIsTrueForOne() throws SQLException{
-        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","1"));
+    public void testUpdateUserAttributeWhenSearchableIsTrueForOne() throws SQLException {
+        Assertions.assertTrue(us.updateUserAttributes("ABC", "user_searchable", "1"));
     }
 
     /**
@@ -417,8 +443,8 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenSearchableIsTrueForTrueValue() throws SQLException{
-        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","True"));
+    public void testUpdateUserAttributeWhenSearchableIsTrueForTrueValue() throws SQLException {
+        Assertions.assertTrue(us.updateUserAttributes("ABC", "user_searchable", "True"));
     }
 
 
@@ -429,8 +455,8 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenSearchableIsTrueForFalseValue() throws SQLException{
-        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","False"));
+    public void testUpdateUserAttributeWhenSearchableIsTrueForFalseValue() throws SQLException {
+        Assertions.assertTrue(us.updateUserAttributes("ABC", "user_searchable", "False"));
     }
 
     /**
@@ -440,8 +466,8 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenSearchableIsTrueFor0Value() throws SQLException{
-        Assertions.assertTrue(us.updateUserAttributes("ABC","user_searchable","0"));
+    public void testUpdateUserAttributeWhenSearchableIsTrueFor0Value() throws SQLException {
+        Assertions.assertTrue(us.updateUserAttributes("ABC", "user_searchable", "0"));
     }
 
     /**
@@ -451,9 +477,9 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateUserAttributeWhenSearchableButInvalidParameterPassed() throws SQLException{
+    public void testUpdateUserAttributeWhenSearchableButInvalidParameterPassed() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        Assertions.assertFalse(us.updateUserAttributes("ABC","user_searchable",
+        Assertions.assertFalse(us.updateUserAttributes("ABC", "user_searchable",
                 "SomethingElse"));
     }
 
@@ -463,10 +489,10 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchUser() throws SQLException{
-        HashMap<String,String> testSet = new HashMap<>();
-        testSet.put("AB","ABC BCD");
-        Assertions.assertEquals(testSet.size(),us.searchUser("AB").size());
+    public void testSearchUser() throws SQLException {
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("AB", "ABC BCD");
+        Assertions.assertEquals(testSet.size(), us.searchUser("AB").size());
     }
 
     /**
@@ -475,10 +501,11 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchUserForException() throws SQLException{
+    public void testSearchUserForException() throws SQLException {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeQuery();
-        Assertions.assertThrows(SQLException.class,()->us.searchUser("AB"));
+        Assertions.assertThrows(SQLException.class, () -> us.searchUser("AB"));
     }
+
     private static final String USER = "user";
     private static final String PASS = "pass";
 }

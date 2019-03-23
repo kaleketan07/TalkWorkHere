@@ -7,6 +7,7 @@ import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.server.ClientRunnable;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -127,7 +128,7 @@ public class TestUser {
         fieldCR.set(ALICE, mockedClientRunnable);
         ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
-                "Hello, Alice", false);
+                "Hello, Alice", true);
     }
 
 
@@ -212,11 +213,36 @@ public class TestUser {
         ALICE.setSearchable(false);
         assertFalse(ALICE.isSearchable());
     }
+    
+    @Test
+    public void testUserSendMessageWhenClientRunnableNotNullWithGroupMessage() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
+            IllegalAccessException {
+        ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
+        Field fieldCMS = User.class.getDeclaredField("cms");
+        fieldCMS.setAccessible(true);
+        fieldCMS.set(ALICE, mockedCMS);
+        ClientRunnable mockedClientRunnable = mock(ClientRunnable.class);
+        when(mockedClientRunnable.isInitialized()).thenReturn(true);
+        Field fieldCR = User.class.getDeclaredField("clientRunnable");
+        fieldCR.setAccessible(true);
+        fieldCR.set(ALICE, mockedClientRunnable);
+        //Set the mockedMap in ClientRunnable so the static instance will retrieve it
+        Map<String, ClientRunnable> userClients = new HashMap<>();
+        userClients.put(ALICE.getUserName(), mockedClientRunnable);
+        Field mapField = ClientRunnable.class.getDeclaredField("userClients");
+        mapField.setAccessible(true);
+        mapField.set(mockedClientRunnable, userClients);
+        ALICE.userSendMessage(GROUP_MESSAGE_FROM_ALICE);
+        verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
+                "Hello, Alice", true);
+    }
 
     private static final User TOM = new User("Tom", "Harris", "tomharris", "123", false);
     private static final User ALICE = new User("Alice", "Bob", "alicebob", "password", false);
     private static final String RUBY = "RUBY";
     private static final String ALICERUBY = "aliceruby";
+    private static final String DUMMY_GROUP_NAME = "dummy group";
     private static final Message BROADCAST_FROM_ALICERUBY = Message.makeBroadcastMessage(ALICERUBY, "Hello, Alice");
+    private static final Message GROUP_MESSAGE_FROM_ALICE = Message.makeGroupMessage(ALICERUBY, "Hello, Alice", DUMMY_GROUP_NAME);
 
 }

@@ -360,12 +360,13 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException thrown by the database queries and calls
      */
     private void handlePrivateMessage(Message msg) throws SQLException {
-        User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
-        if (destUser == null) {
-            this.enqueuePrattleResponseMessage("Destination username does not exist.");
-        } else {
-            destUser.userSendMessage(msg);
-        }
+    	 User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
+    	 if (destUser == null) {
+    		 this.enqueuePrattleResponseMessage("Destination username does not exist.");
+    	 }
+    	 else {
+    		 this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
+    	 }
     }
 
     /**
@@ -489,16 +490,20 @@ public class ClientRunnable implements Runnable {
      */
     private void handlePrivateReplyMessage(Message msg) throws SQLException {
         String destName = conversationalMessagesService.getSender(msg.getReceiverOrPassword());
-        if (destName != null) {
-            User destUser = userService.getUserByUserName(destName);
-            if (destUser == null) {
-                ChatLogger.error("msg_UniqueKey provided is wrong");
-            } else {
-                destUser.userSendMessage(msg);
-            }
-        } else
-            this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
-                    + " Please try again with the right msg_uniqueKey");
+    	if (destName != null)
+        {
+    		User destUser = userService.getUserByUserName(destName);
+            if (destUser == null) 
+            {
+       		 	this.enqueuePrattleResponseMessage("msg_UniqueKey provided is wrong");
+       	 	}
+       	 	else {
+       	 		this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
+       	 	}
+        }
+    	else
+    		this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
+    				+ " Please try again with the right msg_uniqueKey");
     }
 
     /**
@@ -658,9 +663,10 @@ public class ClientRunnable implements Runnable {
             // generate the group key to mark all individual messages sent as a result of this group message
             long time = System.currentTimeMillis();
             Timestamp sqlTimestamp = new Timestamp(time);
-            String uniqueGroupKey = currUser.getUserName() + "::" + currGroup.getGroupName() + "::" + sqlTimestamp;
-            currGroup.groupSendMessage(msg, uniqueGroupKey);
-        }
+            String uniqueGroupKey = currUser.getUserName() +"::"+ currGroup.getGroupName() +"::"+ sqlTimestamp;
+    		currGroup.groupSendMessage(msg, uniqueGroupKey);
+    		this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " + uniqueGroupKey);
+    	}
     }
 
     /**
@@ -788,6 +794,46 @@ public class ClientRunnable implements Runnable {
         String answerString = workString.toString();
         this.enqueuePrattleResponseMessage(answerString);
     }
+    
+    
+    /**
+     * Handle message of type delete group message.
+     *
+     * @param msg the message object
+     * @throws SQLException the SQL exception
+     */
+    private void handleDeleteGroupMessageMessage(Message msg) throws SQLException {
+    	// check if the sender of this message is actually the sender of the message that he wants to delete
+    	String msgSender = msg.getTextOrPassword().split("::")[0];
+    	if (msg.getName().equals(msgSender)) {
+    		if(conversationalMessagesService.deleteGroupMessage(msg.getTextOrPassword())) {
+    			this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully." );
+    		} else {
+    			this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
+    		}    		
+    	} else {
+    		this.enqueuePrattleResponseMessage("You do not have the permissions to delete this message");
+    	}
+    }
+    
+    /**
+     * Handle delete private message message.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleDeletePrivateMessageMessage(Message msg) throws SQLException {
+    	String messageSender = conversationalMessagesService.getSender(msg.getTextOrPassword());
+    	if (msg.getName().equals(messageSender)) {
+    		if(conversationalMessagesService.deleteMessage(msg.getTextOrPassword())) {
+    			this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully." );
+    		} else {
+    			this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
+    		}
+    	} else {
+    		this.enqueuePrattleResponseMessage("You do not have the permissions to delete this message");
+    	}
+    }
 
     /**
      * This method handles general messages
@@ -828,6 +874,9 @@ public class ClientRunnable implements Runnable {
         } else if (msg.isGroupMessage()){
             handleGroupMessage(msg);
             return true;
+        } else if (msg.isDeletePrivateMessageMessage()) {
+        	handleDeletePrivateMessageMessage(msg);
+        	return true;
         }
         return false;
     }
@@ -857,6 +906,9 @@ public class ClientRunnable implements Runnable {
         } else if (msg.isUpdateGroupMessage()) {
             handleUpdateGroupMessage(msg);
             return true;
+        } else if (msg.isDeleteGroupMessageMessage()) {
+        	handleDeleteGroupMessageMessage(msg);
+        	return true;
         }
         return false;
     }

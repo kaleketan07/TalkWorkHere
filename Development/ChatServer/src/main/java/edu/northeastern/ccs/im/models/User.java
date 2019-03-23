@@ -161,8 +161,14 @@ public class User {
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
         if (clientRunnable != null && clientRunnable.isInitialized()) {
             uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
-            clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
-                    System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
+            if (msg.isGroupMessage()) {
+            	clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
+                        System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator() + "this message was sent on: " + msg.getReceiverOrPassword()));
+            } else {
+            	clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
+                        System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
+            }
+            
             return uniqueKey;
         }
 

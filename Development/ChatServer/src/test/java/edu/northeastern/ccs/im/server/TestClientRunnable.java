@@ -377,7 +377,8 @@ public class TestClientRunnable {
         userService.set(clientRunnableObject, mockedUserService);
         User u = new User(SENDER_NAME, null, SENDER_NAME, null, true);
         Mockito.when(mockedUser.userSendMessage(mockedMessage)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
-        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u, mockedUser);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(u,mockedUser);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         messageList.clear();
         messageList.add(PRIVATE_MESSAGE);
         messageIter = messageList.iterator();
@@ -397,6 +398,7 @@ public class TestClientRunnable {
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -433,6 +435,7 @@ public class TestClientRunnable {
         Iterator<Message> messageIter = messageList.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
@@ -472,6 +475,7 @@ public class TestClientRunnable {
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         clientRunnableObject.run();
         UserService mockedUserService = Mockito.mock(UserService.class);
         ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
@@ -3059,6 +3063,254 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test delete group message message when sender is originator.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testDeleteGroupMessageMessageWhenSenderIsOriginator() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException{
+    	List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        UserService us = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        when(mockedcms.deleteGroupMessage(Mockito.anyString())).thenReturn(true);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(DELETE_GROUPMESSAGE_MESSAGE);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    /**
+     * Test delete group message message when sender is originator error deleting.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testDeleteGroupMessageMessageWhenSenderIsOriginatorErrorDeleting() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException{
+    	List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        UserService us = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        when(mockedcms.deleteGroupMessage(Mockito.anyString())).thenReturn(false);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(DELETE_GROUPMESSAGE_MESSAGE);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    
+    /**
+     * Test delete group message message when sender is not the originator.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testDeleteGroupMessageMessageWhenSenderIsNotTheOriginator() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException{
+    	List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        UserService us = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        when(mockedcms.deleteGroupMessage(Mockito.anyString())).thenReturn(true);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(DELETE_GROUPMSG_MSG_SENDER_NOT_IN_KEY);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    
+    
+    /**
+     * Test delete private message message when sender is originator.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testDeletePrivateMessageMessageWhenSenderIsOriginator() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException{
+    	List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        UserService us = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
+        when(mockedcms.deleteMessage(Mockito.anyString())).thenReturn(true);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(DELETE_PRIVATEMESSAGE_MESSAGE);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    
+    /**
+     * Test delete private message message when sender is originator and error deleting.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testDeletePrivateMessageMessageWhenSenderIsOriginatorAndErrorDeleting() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException{
+    	List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        UserService us = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
+        when(mockedcms.deleteMessage(Mockito.anyString())).thenReturn(false);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(DELETE_PRIVATEMESSAGE_MESSAGE);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+    
+    
+    
+    /**
+     * Test delete private message message when sender is not the originator.
+     *
+     * @throws SQLException the SQL exception
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+    @Test
+    public void testDeletePrivateMessageMessageWhenSenderIsNotTheOriginator() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException{
+    	List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        clientRunnableObject.run();
+        ConversationalMessageService mockedcms = Mockito.mock(ConversationalMessageService.class);
+        UserService us = Mockito.mock(UserService.class);
+        User mockedUser = Mockito.mock(User.class);
+        mockedUser.setLoggedIn(true);
+        when(us.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        Field cmService = ClientRunnable.class.getDeclaredField("conversationalMessagesService");
+        cmService.setAccessible(true);
+        cmService.set(clientRunnableObject, mockedcms);
+        when(mockedcms.getSender(Mockito.anyString())).thenReturn(DUMMY_USER);
+        messageList.clear();
+        mockedUser.setLoggedIn(true);
+        messageList.add(DELETE_PRIVATEMESSAGE_MESSAGE);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
 
     //Private fields to be used in tests
     private static final Message LOGIN = Message.makeLoginMessage(TestClientRunnable.SENDER_NAME, TestClientRunnable.PASS);
@@ -3089,4 +3341,9 @@ public class TestClientRunnable {
     private static final User USER_LOGGED_OFF = new User(null, null, SENDER_NAME, "QWERTY", false);
     private static final Message GROUP_MESSAGE = Message.makeGroupMessage(TestClientRunnable.SENDER_NAME, MESSAGE_TEXT, DUMMY_GROUP_NAME);
     private static final String DUMMY_MSG_UNIQUE_KEY = "dummy_key";
+    private static final String DUMMY_GROUP_MESSAGE_KEY = "Alice::Group201:testTime";
+    private static final String DUMMY_GROUP_MESSAGE_KEY2 = "Bob::Group201:testTime";
+    private static final Message DELETE_GROUPMESSAGE_MESSAGE = Message.makeDeleteGroupMessageMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_MESSAGE_KEY);
+    private static final Message DELETE_GROUPMSG_MSG_SENDER_NOT_IN_KEY = Message.makeDeleteGroupMessageMessage(TestClientRunnable.SENDER_NAME, DUMMY_GROUP_MESSAGE_KEY2);
+    private static final Message DELETE_PRIVATEMESSAGE_MESSAGE = Message.makeDeletePrivateMessageMessage(TestClientRunnable.SENDER_NAME, DUMMY_MSG_UNIQUE_KEY);
 }

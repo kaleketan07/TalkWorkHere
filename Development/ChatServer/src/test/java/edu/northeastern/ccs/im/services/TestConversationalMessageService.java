@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -256,6 +257,32 @@ public class TestConversationalMessageService {
     public void testInsertGroupConversationalMessageForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         assertFalse(cs.insertGroupConversationalMessage("ABC", "BCD"));
+    }
+    
+    /**
+     * Test delete group message.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testDeleteGroupMessage() throws SQLException{
+    	when(mockedRS.next()).thenReturn(true, true, false);
+    	when(mockedRS.getString("message_unique_key")).thenReturn("key1", "key2", "key3");
+    	cs.deleteGroupMessage("test_key");
+    	Mockito.verify(mockedPreparedStatement, times(2)).executeUpdate();
+    }
+    
+    /**
+     * Test delete group message no rows affected.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testDeleteGroupMessageNoRowsAffected() throws SQLException{
+    	when(mockedRS.next()).thenReturn(true, true, false);
+    	when(mockedRS.getString("message_unique_key")).thenReturn("key1", "key2", "key3");
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+    	assertFalse(cs.deleteGroupMessage("test_key"));
     }
 
 }

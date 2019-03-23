@@ -17,7 +17,7 @@ import edu.northeastern.ccs.im.models.ConversationalMessage;
  *
  * @author rahul
  */
-public class ConversationalMessageService implements ConversationalMessageDAO  {
+public class ConversationalMessageService implements ConversationalMessageDAO {
 
 
     private DBConnection conn;
@@ -63,7 +63,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
      * @param msgSource      Username of the source of the message
      * @param msgDestination Username of the Destination of the message
      * @param msgText        Text in the message
-     * @param setFlag 		 Marks if this message has been sent to the user or queued
+     * @param setFlag        Marks if this message has been sent to the user or queued
      * @return String        UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
      * @throws SQLException the sql exception
      */
@@ -164,7 +164,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
         pstmt.close();
         return cm;
     }
-    
+
     /**
      * gets the username of the sender of the message based on the msg_uniquekey
      *
@@ -178,28 +178,28 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
         String msgSrc = null;
         result = pstmt.executeQuery();
         if (result.first()) {
-        	msgSrc = result.getString(DB_COL_MSG_SRC);
+            msgSrc = result.getString(DB_COL_MSG_SRC);
         }
         pstmt.close();
         return msgSrc;
     }
-    
+
     /**
      * Insert an entry to the group_messages table.
      *
-     * @param uniqueGroupKey the unique group key
+     * @param uniqueGroupKey   the unique group key
      * @param uniqueMessageKey the unique message key
-     * @throws SQLException the SQL exception
      * @return true, if the message was inserted successfully else return false
+     * @throws SQLException the SQL exception
      */
     public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException {
-    	 final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
-         pstmt = conn.getPreparedStatement(ADD_MAPPING);
-         pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey,uniqueMessageKey);
-         int res = pstmt.executeUpdate();
-         pstmt.close();
-         return (res > 0);
-    }	
-    
-    
+        final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
+        pstmt = conn.getPreparedStatement(ADD_MAPPING);
+        pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey, uniqueMessageKey);
+        int res = pstmt.executeUpdate();
+        pstmt.close();
+        return (res > 0);
+    }
+
+
 }

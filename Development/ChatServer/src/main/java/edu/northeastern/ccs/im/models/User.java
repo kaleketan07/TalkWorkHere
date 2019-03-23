@@ -27,7 +27,7 @@ public class User {
         try {
             cms = ConversationalMessageService.getInstance();
         } catch (ClassNotFoundException | IOException | SQLException e) {
-            ChatLogger.error("Conversational Message Service failed to initialize.");
+            ChatLogger.error("Conversational Message Service failed to initialize: " + e);
         }
     }
 
@@ -120,7 +120,7 @@ public class User {
      *
      * @param searchableStatus - true or false status of the user's searchable preference
      */
-    public void setSearchable(boolean searchableStatus){
+    public void setSearchable(boolean searchableStatus) {
         searchable = searchableStatus;
     }
 
@@ -134,7 +134,7 @@ public class User {
     /**
      * @return the searchable status of the user
      */
-    public boolean isSearchable(){
+    public boolean isSearchable() {
         return searchable;
     }
 
@@ -165,7 +165,7 @@ public class User {
                     System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
             return uniqueKey;
         }
-        
+
         return cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
 }

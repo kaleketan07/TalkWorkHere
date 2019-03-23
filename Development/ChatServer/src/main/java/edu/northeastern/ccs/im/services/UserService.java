@@ -95,7 +95,7 @@ public class UserService implements UserDao {
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
         pstmt = utils.setPreparedStatementArgs(pstmt, username, password);
         result = pstmt.executeQuery();
-        if(result.first()) {
+        if (result.first()) {
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             boolean loggedIn = result.getBoolean(LOGGED_IN);
@@ -156,34 +156,32 @@ public class UserService implements UserDao {
      * 0/False.
      * Other attributes assume Strings are passed.
      *
-     * @param uname             the username
-     * @param attributeName     the attribute to be updated
-     * @param attributeValue    the value of the attribute that is to be set
+     * @param uname          the username
+     * @param attributeName  the attribute to be updated
+     * @param attributeValue the value of the attribute that is to be set
      * @return the boolean
      * @throws SQLException the sql exception
      */
     @Override
-    public boolean updateUserAttributes(String uname, String attributeName, String attributeValue ) throws SQLException{
+    public boolean updateUserAttributes(String uname, String attributeName, String attributeValue) throws SQLException {
         final String UPDATE_USER = "UPDATE user_profile SET " + attributeName + "  = ? WHERE username = ?";
         String trueOrFalse;
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        if(attributeName.compareTo("user_searchable") == 0){
-            if(attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")){
+        if (attributeName.compareTo("user_searchable") == 0) {
+            if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {
                 trueOrFalse = "0";
-                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,uname);
-            }
-            else if(attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")){
+                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, uname);
+            } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
                 trueOrFalse = "1";
-                pstmt = utils.setPreparedStatementArgs(pstmt,trueOrFalse,uname);
-            }
-            else
+                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, uname);
+            } else
                 ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
-        }else{
-            pstmt = utils.setPreparedStatementArgs(pstmt,attributeValue,uname);
+        } else {
+            pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, uname);
         }
         int qResult = pstmt.executeUpdate();
         pstmt.close();
-        return qResult>0;
+        return qResult > 0;
     }
 
 
@@ -205,39 +203,41 @@ public class UserService implements UserDao {
         pstmt.close();
         return qResult > 0;
     }
-    
-    
+
+
     /**
      * add a entry for a user following other user
+     *
      * @param followee user who is the followee
      * @param follower user who is the follower
      * @return true if the relation was inserted successfully
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
     @Override
-    public boolean followUser(User followee, User follower ) throws SQLException {
+    public boolean followUser(User followee, User follower) throws SQLException {
         final String FOLLOW_USER =
                 "INSERT INTO user_follows (followee_user, follower_user) VALUES (?,?)";
         pstmt = conn.getPreparedStatement(FOLLOW_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName() , follower.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return (qResult > 0);
     }
-    
+
     /**
      * delete a entry for a user following other user
+     *
      * @param followee user who is the followee
      * @param follower user who is the follower
      * @return true if the relation was deleted successfully
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
     @Override
     public boolean unfollowUser(User followee, User follower) throws SQLException {
         final String FOLLOW_USER =
                 "DELETE FROM user_follows WHERE followee_user = ? and follower_user = ?";
         pstmt = conn.getPreparedStatement(FOLLOW_USER);
-        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName() , follower.getUserName());
+        pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
         return (qResult > 0);
@@ -253,7 +253,7 @@ public class UserService implements UserDao {
      * @throws SQLException the sql exception
      */
     @Override
-    public Map<String,String> searchUser(String searchString) throws SQLException {
+    public Map<String, String> searchUser(String searchString) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
         final String SEARCH_USER =
                 "SELECT first_name, last_name, username FROM prattle.user_profile WHERE user_searchable = 1 AND (username REGEXP concat(\"^\",?,\".*\") OR first_name REGEXP concat(\"^\",?,\".*\"))";
@@ -271,9 +271,10 @@ public class UserService implements UserDao {
 
     /**
      * Returns a string which contains username of all the followers of a given user
+     *
      * @param followee user who is the followee
      * @return String which contains username of all the followers
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
     @Override
     public String getFollowers(User followee) throws SQLException {
@@ -284,10 +285,10 @@ public class UserService implements UserDao {
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName());
         result = pstmt.executeQuery();
-        while(result.next()) {
-        	followers.append(result.getString("follower_user"));
-        	followers.append(System.lineSeparator());
-        	count += 1;
+        while (result.next()) {
+            followers.append(result.getString("follower_user"));
+            followers.append(System.lineSeparator());
+            count += 1;
         }
         followers.append("Number of followers " + Integer.toString(count));
         pstmt.close();

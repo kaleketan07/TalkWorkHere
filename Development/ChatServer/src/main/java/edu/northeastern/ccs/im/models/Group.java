@@ -47,18 +47,21 @@ public class Group implements Member {
      */
     private Set<Group> memberGroups;
 
-    
-    /** The static instance of the conversational Message Service */
+
+    /**
+     * The static instance of the conversational Message Service
+     */
     private static ConversationalMessageService cms;
+
     static {
         try {
             cms = ConversationalMessageService.getInstance();
         } catch (ClassNotFoundException | IOException | SQLException e) {
-            ChatLogger.error("Conversational Message Service failed to initialize.");
+            ChatLogger.error("Conversational Message Service failed to initialize: " + e);
         }
     }
-    
-    
+
+
     /**
      * Gets the group name.
      *
@@ -130,7 +133,7 @@ public class Group implements Member {
     public void setMemberGroups(Set<Group> groups) {
         this.memberGroups = groups;
     }
-    
+
     /**
      * Send message to members of this group
      *
@@ -138,19 +141,19 @@ public class Group implements Member {
      * @throws SQLException the SQL exception
      */
     public void groupSendMessage(Message msg, String uniqueGroupKey) throws SQLException {
-    	// send message to member users
-    	for (User u : memberUsers) {
-    		// a user can also be a part of a group at a higher level in the hierarchy. Do not send the message again
-    		if (!msg.messageAlreadySent(u)) {
-    			msg.addUserToRecipients(u);
-    			String uniqueMessageKey = u.userSendMessage(msg);
-    			// add the uniqueMsgKey and the UniqueGroupKey to the new table
-    			cms.insertGroupConversationalMessage(uniqueGroupKey, uniqueMessageKey);
-    		}
-    	}
-    	// send message to member groups
-    	for (Group g: memberGroups) {
-    		g.groupSendMessage(msg, uniqueGroupKey);
-    	}
+        // send message to member users
+        for (User u : memberUsers) {
+            // a user can also be a part of a group at a higher level in the hierarchy. Do not send the message again
+            if (!msg.messageAlreadySent(u)) {
+                msg.addUserToRecipients(u);
+                String uniqueMessageKey = u.userSendMessage(msg);
+                // add the uniqueMsgKey and the UniqueGroupKey to the new table
+                cms.insertGroupConversationalMessage(uniqueGroupKey, uniqueMessageKey);
+            }
+        }
+        // send message to member groups
+        for (Group g : memberGroups) {
+            g.groupSendMessage(msg, uniqueGroupKey);
+        }
     }
 }

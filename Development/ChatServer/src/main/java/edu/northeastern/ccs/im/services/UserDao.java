@@ -123,12 +123,5 @@ public interface UserDao {
      */
   String getFollowees(User follower) throws SQLException;
 	
-  /**
-     * Returns a string which contains username of all the followers of a given user
-     * @param followee user who is the followee
-     * @return String which contains username of all the followers
-     * @throws SQLException the sql exception
-     */
-    String getFollower(User followee) throws SQLException;
 
 }

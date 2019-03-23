@@ -30,6 +30,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
     private static final String DB_COL_MSG_TEXT = "msg_text";
     private static final String DB_COL_MSG_TIMESTAMP = "msg_timestamp";
     private static final String DB_COL_MSG_UNIQUEKEY = "msg_uniquekey";
+    private static final String GRP_COL_MSG_KEY = "message_unique_key";
 
     /**
      * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will initialize
@@ -133,13 +134,14 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
         final String UPDATE_DELETE_FLAG = "UPDATE messages SET msg_deleted = 1 WHERE msg_uniquekey = ?";
         pstmt = conn.getPreparedStatement(UPDATE_DELETE_FLAG);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
+        int res = 0;
         try {
-            pstmt.executeUpdate();
+           res = pstmt.executeUpdate();
         } catch (Exception e) {
             throw new SQLException(e);
         }
         pstmt.close();
-        return true;
+        return (res>0);
     }
 
 
@@ -200,6 +202,33 @@ public class ConversationalMessageService implements ConversationalMessageDAO  {
          pstmt.close();
          return (res > 0);
     }	
+    
+    
+    /**
+     * Delete group message and the mappings from the group message table and all the messages from the .
+     *
+     * @param grpMsgUniqueKey the group message unique key
+     * @return true, if successfully deleted else return false
+     * @throws SQLException the SQL exception
+     */
+    public boolean deleteGroupMessage(String grpMsgUniqueKey) throws SQLException {
+    	// fetch all the message keys for this group key
+    	final String FETCH_MESSAGE_KEYS = "SELECT message_unique_key FROM prattle.group_messages WHERE group_unique_key = ?";
+        pstmt = conn.getPreparedStatement(FETCH_MESSAGE_KEYS);
+        pstmt = utils.setPreparedStatementArgs(pstmt, grpMsgUniqueKey);
+    	List<String> cm = new ArrayList<>();
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String msguniquekey = result.getString(GRP_COL_MSG_KEY);
+            cm.add(msguniquekey);
+        }
+        pstmt.close();
+    	// for all keys fetched above delete the message in messages table
+        for (String key : cm) {
+        	if (!deleteMessage(key)) return false;
+        }
+        return true;
+    }
     
     
 }

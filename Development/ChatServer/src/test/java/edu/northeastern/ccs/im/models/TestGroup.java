@@ -86,15 +86,15 @@ public class TestGroup {
     /**
      * Test group send message with no member group.
      *
-     * @throws SQLException the SQL exception
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
+     * @throws SQLException             the SQL exception
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    @Test 
+    @Test
     public void testGroupSendMessageWithNoMemberGroup() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-    	Group testGroup = new Group();
+        Group testGroup = new Group();
         testGroup.setGroupName(TEST_GROUP_NAME);
         testGroup.setModeratorName(TEST_MODERATOR_NAME);
         Set<User> users = new HashSet<>(Arrays.asList(CAROL, DAN));
@@ -108,22 +108,22 @@ public class TestGroup {
         Mockito.when(CAROL.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         testGroup.groupSendMessage(msg, DUMMY_MSG_UNIQUE_KEY);
         Mockito.verify(mockedCMS, Mockito.atLeastOnce()).insertGroupConversationalMessage(DUMMY_MSG_UNIQUE_KEY, DUMMY_MSG_UNIQUE_KEY);
-        
-        
+
+
     }
-    
+
     /**
      * Test group send message with user present in sub groups.
      *
-     * @throws SQLException the SQL exception
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
+     * @throws SQLException             the SQL exception
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    @Test 
+    @Test
     public void testGroupSendMessageWithUserPresentInSubGroups() throws SQLException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-    	Group testGroup = new Group();
+        Group testGroup = new Group();
         testGroup.setGroupName(TEST_GROUP_NAME);
         testGroup.setModeratorName(TEST_MODERATOR_NAME);
         Set<User> users = new HashSet<>(Arrays.asList(DAN, CAROL));
@@ -135,7 +135,7 @@ public class TestGroup {
         Group testGroup2 = new Group();
         testGroup2.setGroupName(TEST_GROUP_NAME_1);
         testGroup2.setModeratorName(TEST_MODERATOR_NAME);
-        Set<User> users2 = new HashSet<>(Arrays.asList(DAN, GARY,BOB));
+        Set<User> users2 = new HashSet<>(Arrays.asList(DAN, GARY, BOB));
         testGroup2.setMemberUsers(users2);
         Set<Group> groups = new HashSet<>(Arrays.asList(testGroup2));
         testGroup.setMemberGroups(groups);
@@ -145,10 +145,10 @@ public class TestGroup {
         Mockito.when(GARY.userSendMessage(msg)).thenReturn(DUMMY_MSG_UNIQUE_KEY);
         testGroup.groupSendMessage(msg, DUMMY_MSG_UNIQUE_KEY);
         Mockito.verify(mockedCMS, Mockito.atLeastOnce()).insertGroupConversationalMessage(DUMMY_MSG_UNIQUE_KEY, DUMMY_MSG_UNIQUE_KEY);
-        
+
     }
-    
-   
+
+
     private static final User CAROL = Mockito.mock(User.class);
     private static final User DAN = Mockito.mock(User.class);
     private static final User BOB = Mockito.mock(User.class);

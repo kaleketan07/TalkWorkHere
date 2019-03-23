@@ -88,10 +88,10 @@ public class ClientRunnable implements Runnable {
     private GroupService groupService;
 
     /**
-     * Store instance of ConversationalMessage to be used to retrive messages 
+     * Store instance of ConversationalMessage to be used to retrive messages
      */
     private ConversationalMessageService conversationalMessagesService;
-    
+
     /**
      * This static data structure stores the client runnable instances
      * associated with their usernames for easy lookup during messaging.
@@ -176,12 +176,12 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
-     * Sending response message from prattle to client  
+     * Sending response message from prattle to client
      */
     public void enqueuePrattleResponseMessage(String responseMessage) {
-    	this.enqueueMessage(Message.makePrattleMessage(responseMessage));
+        this.enqueueMessage(Message.makePrattleMessage(responseMessage));
     }
-    
+
     /**
      * Immediately send this message to the client. This returns if we were
      * successful or not in our attempt to send the message.
@@ -276,7 +276,7 @@ public class ClientRunnable implements Runnable {
      *
      * @see java.lang.Thread#run()
      */
-    public void run() {  
+    public void run() {
         try {
             // The client must be initialized before we can do anything else
             if (!initialized) {
@@ -321,7 +321,7 @@ public class ClientRunnable implements Runnable {
                     terminate = true;
                     // Reply with a quit message.
                     enqueueMessage(Message.makeQuitMessage(name));
-                } else if (msg.isLoginMessage() || msg.isRegisterMessage() || ( user!=null && user.isLoggedIn())) {
+                } else if (msg.isLoginMessage() || msg.isRegisterMessage() || (user != null && user.isLoggedIn())) {
                     processMessage(msg);
                 } else {
                     ChatLogger.error("User not logged in.");
@@ -340,34 +340,32 @@ public class ClientRunnable implements Runnable {
         // Register the user after checking whether the user already exists or no
         User currentUser = userService.getUserByUserName(msg.getName());
         if (currentUser != null) {
-        	this.enqueuePrattleResponseMessage("Username already exists.");
+            this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
             // since the user was not found, a new user with this name may be created
             if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                this.enqueuePrattleResponseMessage("User" + msg.getName() +"registed");
+                this.enqueuePrattleResponseMessage("User" + msg.getName() + "registed");
+            } else {
+                this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
             }
-            else {
-            	this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
-            }
-            
+
         }
     }
-    
+
     /**
      * Handles private message
-     * 
+     *
      * @param msg the incoming message_user type of message
      * @throws SQLException thrown by the database queries and calls
      */
     private void handlePrivateMessage(Message msg) throws SQLException {
-    	 User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
-    	 if (destUser == null) {
-    		 this.enqueuePrattleResponseMessage("Destination username does not exist.");
-    	 }
-    	 else {
-    		 destUser.userSendMessage(msg);
-    	 }
+        User destUser = userService.getUserByUserName(msg.getReceiverOrPassword());
+        if (destUser == null) {
+            this.enqueuePrattleResponseMessage("Destination username does not exist.");
+        } else {
+            destUser.userSendMessage(msg);
+        }
     }
 
     /**
@@ -380,12 +378,12 @@ public class ClientRunnable implements Runnable {
         // Login the user after checking in the user with this username-password combo exists
         User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
         if (currentUser == null) {
-        	this.enqueuePrattleResponseMessage("Incorrect username and password");
+            this.enqueuePrattleResponseMessage("Incorrect username and password");
         } else {
             // since the user was found, set the loggedIn attribute to true in the database
-            boolean updated = userService.updateUserAttributes(currentUser.getUserName(),"logged_in","1");
+            boolean updated = userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1");
             if (!updated) {
-            	this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
+                this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
             }
         }
     }
@@ -400,12 +398,12 @@ public class ClientRunnable implements Runnable {
         // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup != null) {
-        	this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
+            this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
         } else {
             groupService.createGroup(msg.getTextOrPassword(), msg.getName());
         }
     }
-    
+
     /**
      * Handles the GetGroupMessage
      *
@@ -416,9 +414,9 @@ public class ClientRunnable implements Runnable {
         // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup == null) {
-        	this.enqueuePrattleResponseMessage("Groupname does not exist. So no details can be provided");
+            this.enqueuePrattleResponseMessage("Groupname does not exist. So no details can be provided");
         } else {
-        	this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
+            this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
         }
     }
 
@@ -434,17 +432,17 @@ public class ClientRunnable implements Runnable {
         Group currentGroup = groupService.getGroup(msg.getTextOrPassword());
         // if group does not exist
         if (currentGroup == null) {
-        	this.enqueuePrattleResponseMessage("Group does not exist.");
+            this.enqueuePrattleResponseMessage("Group does not exist.");
         } else {
             // if the user is in fact the moderator of the group only then delete the group
             if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
                 groupService.deleteGroup(currentGroup.getGroupName());
             } else {
-            	this.enqueuePrattleResponseMessage("CurrentUser is not the moderator of the group.");
+                this.enqueuePrattleResponseMessage("CurrentUser is not the moderator of the group.");
             }
         }
     }
-    
+
     /**
      * Handles the handleDeleteUserMessage
      *
@@ -453,36 +451,36 @@ public class ClientRunnable implements Runnable {
      */
     private void handleDeleteUserMessage(Message msg) throws SQLException {
         // Delete the user after getting the user
-    	User currentUser = userService.getUserByUserName(msg.getName());
-    	boolean result = userService.deleteUser(currentUser);
-    	if (!result) {
-    		this.enqueuePrattleResponseMessage("User could not deteled");
-    	}
-    	else {
-    		this.terminate = true;
-    	}
+        User currentUser = userService.getUserByUserName(msg.getName());
+        boolean result = userService.deleteUser(currentUser);
+        if (!result) {
+            this.enqueuePrattleResponseMessage("User could not deteled");
+        } else {
+            this.terminate = true;
+        }
     }
 
     /**
      * Helper for checking the validity of input before calling the handlers
-     * @param currentUser - the current user requesting the service
+     *
+     * @param currentUser  - the current user requesting the service
      * @param currentGroup - the group from which the user needs to be removed or added to.
-     * @param guestUser - the user to be added or removed.
+     * @param guestUser    - the user to be added or removed.
      * @return - true or false value based on the required checks passed or failed respectively.
      */
     private boolean helperAddRemoveUserToGroupMessage(User currentUser, Group currentGroup, User guestUser) {
         if (currentGroup == null)
-        	this.enqueuePrattleResponseMessage("The group you are trying to add to does not exist!");
+            this.enqueuePrattleResponseMessage("The group you are trying to add to does not exist!");
         else if (!currentGroup.getModeratorName().equals(currentUser.getUserName()))
-        	this.enqueuePrattleResponseMessage("You do not have the permissions to perform this operation");
+            this.enqueuePrattleResponseMessage("You do not have the permissions to perform this operation");
         else if (guestUser == null)
-        	this.enqueuePrattleResponseMessage("The user you are trying to add does not exist");
+            this.enqueuePrattleResponseMessage("The user you are trying to add does not exist");
         else
             return true;
         return false;
     }
-    
-    
+
+
     /**
      * Handle PrivateReplyMessage to group message.
      *
@@ -491,20 +489,16 @@ public class ClientRunnable implements Runnable {
      */
     private void handlePrivateReplyMessage(Message msg) throws SQLException {
         String destName = conversationalMessagesService.getSender(msg.getReceiverOrPassword());
-    	if (destName != null)
-        {
-    		User destUser = userService.getUserByUserName(destName);
-            if (destUser == null) 
-            {
-       		 ChatLogger.error("msg_UniqueKey provided is wrong");
-       	 	}
-       	 	else {
-       	 		destUser.userSendMessage(msg);
-       	 	}
-        }
-    	else
-    		this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
-    				+ " Please try again with the right msg_uniqueKey");
+        if (destName != null) {
+            User destUser = userService.getUserByUserName(destName);
+            if (destUser == null) {
+                ChatLogger.error("msg_UniqueKey provided is wrong");
+            } else {
+                destUser.userSendMessage(msg);
+            }
+        } else
+            this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
+                    + " Please try again with the right msg_uniqueKey");
     }
 
     /**
@@ -514,21 +508,20 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the SQL exception
      */
     private void handleAddUserToGroupMessage(Message msg) throws SQLException {
-    	
-    	User currentUser = userService.getUserByUserName(msg.getName());
+
+        User currentUser = userService.getUserByUserName(msg.getName());
         Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
         User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
-        if(helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
-            if(groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName())) {
-            	this.enqueuePrattleResponseMessage("User was added successfully");
-            }
-            else {  
+        if (helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
+            if (groupService.addUserToGroup(currentGroup.getGroupName(), guestUser.getUserName())) {
+                this.enqueuePrattleResponseMessage("User was added successfully");
+            } else {
                 this.enqueuePrattleResponseMessage("User was not added as the user was already there");
             }
         }
     }
 
-    
+
     /**
      * Handle remove user from group message.
      *
@@ -536,17 +529,17 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the SQL exception
      */
     private void handleRemoveUserFromGroupMessage(Message msg) throws SQLException {
-    	User currentUser = userService.getUserByUserName(msg.getName());
-    	Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
-    	User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
-        if(helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
-    		if(groupService.removeUserFromGroup(currentGroup.getGroupName(), guestUser.getUserName())) 
-    			this.enqueuePrattleResponseMessage("User was removed successfully");
-    		else
-    			this.enqueuePrattleResponseMessage("user was not removed as the user was not in the group");
-    	}
+        User currentUser = userService.getUserByUserName(msg.getName());
+        Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+        User guestUser = userService.getUserByUserName(msg.getTextOrPassword());
+        if (helperAddRemoveUserToGroupMessage(currentUser, currentGroup, guestUser)) {
+            if (groupService.removeUserFromGroup(currentGroup.getGroupName(), guestUser.getUserName()))
+                this.enqueuePrattleResponseMessage("User was removed successfully");
+            else
+                this.enqueuePrattleResponseMessage("user was not removed as the user was not in the group");
+        }
     }
-    
+
     /**
      * Handle the update message sent by the user. Check which number value was sent,
      * 1 is first name, 2 is second name, 3 is password, 4 is searchability and call updateUserAttributes accordingly
@@ -556,75 +549,76 @@ public class ClientRunnable implements Runnable {
      * @param msg The incoming user profile update message
      * @throws SQLException thrown by wrong database queries
      */
-    private void handleUserProfileUpdateMessage(Message msg){
-        try{
+    private void handleUserProfileUpdateMessage(Message msg) {
+        try {
             String mappedAttributeName = helperUserProfileUpdateMessage(msg.getTextOrPassword());
-            if(userService.updateUserAttributes(msg.getName(), mappedAttributeName, msg.getReceiverOrPassword()))
+            if (userService.updateUserAttributes(msg.getName(), mappedAttributeName, msg.getReceiverOrPassword()))
                 this.enqueuePrattleResponseMessage("Updated the value: " + mappedAttributeName + " successfully.");
             else
                 this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages " +
                     "using HELP UPU");
         }
     }
-    
+
     /**
      * Handle a user following other user of the other user exists in the database
      *
      * @param msg The incoming follow user message
      * @throws SQLException thrown by wrong database queries
      */
-    private void handleFollowUserMessage(Message msg) throws SQLException{
-       User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
-       User followerUser = userService.getUserByUserName(msg.getName());
-       
-       if (followeeUser == null) {
-    	   this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
-    	   return;
-       }
-       userService.followUser(followeeUser, followerUser);
+    private void handleFollowUserMessage(Message msg) throws SQLException {
+        User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
+        User followerUser = userService.getUserByUserName(msg.getName());
+
+        if (followeeUser == null) {
+            this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
+            return;
+        }
+        userService.followUser(followeeUser, followerUser);
     }
-    
+
     /**
      * Handle a user unfollowing other user if the other user exists in the database
      *
      * @param msg The incoming follow user message
      * @throws SQLException thrown by wrong database queries
      */
-    private void handleUnfollowUserMessage(Message msg) throws SQLException{
-       User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
-       User followerUser = userService.getUserByUserName(msg.getName());
-       
-       if (followeeUser == null) {
-    	   this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
-    	   return;
-       }
-       userService.unfollowUser(followeeUser, followerUser);
+    private void handleUnfollowUserMessage(Message msg) throws SQLException {
+        User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
+        User followerUser = userService.getUserByUserName(msg.getName());
+
+        if (followeeUser == null) {
+            this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
+            return;
+        }
+        userService.unfollowUser(followeeUser, followerUser);
     }
 
     /**
-     * Helper function to help map the attribute name 
+     * Helper function to help map the attribute name
      * to the number value sent by the user
+     *
      * @param attributeNumber The number of the attribute to be mapped
      * @return the mapped attribute name to be updated
      */
-    private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException{
+    private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException {
         String mappedAttribute = null;
-        if(attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.compareTo("1") == 0)
             mappedAttribute = "first_name";
-        else if(attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.compareTo("2") == 0)
             mappedAttribute = "last_name";
-        else if(attributeNumber.compareTo("3") == 0)
+        else if (attributeNumber.compareTo("3") == 0)
             mappedAttribute = "user_password";
-        else if(attributeNumber.compareTo("4") == 0)
+        else if (attributeNumber.compareTo("4") == 0)
             mappedAttribute = "user_searchable";
         else
             throw new SQLException("Number not in bounds");
         return mappedAttribute;
     }
 
-    
+
     /**
      * Handles the messages get followers.
      *
@@ -632,10 +626,10 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the SQL exception
      */
     private void handleGetFollowersMessage(Message msg) throws SQLException {
-    	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage("Followers are " + userService.getFollower(currUser));
+        User currUser = userService.getUserByUserName(msg.getName());
+        this.enqueuePrattleResponseMessage("Followers are " + userService.getFollower(currUser));
     }
-    
+
     /**
      * Handles the messages sent on Groups.
      *
@@ -643,20 +637,20 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the SQL exception
      */
     private void handleGroupMessage(Message msg) throws SQLException {
-    	User currUser = userService.getUserByUserName(msg.getName());
-    	Group currGroup = groupService.getGroup(msg.getReceiverOrPassword());
-    	if (currGroup == null) {
-    		this.enqueuePrattleResponseMessage("The destination group does not exist");
-    	} else if (!groupService.isUserMemberOfTheGroup(currGroup.getGroupName(), currUser.getUserName())) {
-    		this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() +" to send a message on it");
-    	} else {
-    		this.enqueuePrattleResponseMessage("message sent successfully");
-    		// generate the group key to mark all individual messages sent as a result of this group message
-    		long time = System.currentTimeMillis();
+        User currUser = userService.getUserByUserName(msg.getName());
+        Group currGroup = groupService.getGroup(msg.getReceiverOrPassword());
+        if (currGroup == null) {
+            this.enqueuePrattleResponseMessage("The destination group does not exist");
+        } else if (!groupService.isUserMemberOfTheGroup(currGroup.getGroupName(), currUser.getUserName())) {
+            this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() + " to send a message on it");
+        } else {
+            this.enqueuePrattleResponseMessage("message sent successfully");
+            // generate the group key to mark all individual messages sent as a result of this group message
+            long time = System.currentTimeMillis();
             Timestamp sqlTimestamp = new Timestamp(time);
-            String uniqueGroupKey = currUser.getUserName() +"::"+ currGroup.getGroupName() +"::"+ sqlTimestamp;
-    		currGroup.groupSendMessage(msg, uniqueGroupKey);
-    	}
+            String uniqueGroupKey = currUser.getUserName() + "::" + currGroup.getGroupName() + "::" + sqlTimestamp;
+            currGroup.groupSendMessage(msg, uniqueGroupKey);
+        }
     }
 
     /**
@@ -665,7 +659,7 @@ public class ClientRunnable implements Runnable {
      * @param msg the message sent by the client
      * @throws SQLException
      */
-    private void handleUpdateGroupMessage(Message msg){
+    private void handleUpdateGroupMessage(Message msg) {
         try {
             User user = userService.getUserByUserName(msg.getName());
             Group group = groupService.getGroup(msg.getTextOrPassword());
@@ -676,14 +670,14 @@ public class ClientRunnable implements Runnable {
                 //Split the string into key and value pair
                 String[] keyValuePair = msg.getReceiverOrPassword().split(":");
                 String attributeName = getGroupAttributeName(keyValuePair[0]);
-                if(groupService.updateGroupSettings(msg.getTextOrPassword(),attributeName,keyValuePair[1]))
+                if (groupService.updateGroupSettings(msg.getTextOrPassword(), attributeName, keyValuePair[1]))
                     this.enqueuePrattleResponseMessage("Group setting updated successfully");
                 else
                     this.enqueuePrattleResponseMessage("Failed updating the group setting.");
             } else {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong with the update. Please refer to the correct " +
                     "group update syntax using HELP UPG");
         }
@@ -698,9 +692,9 @@ public class ClientRunnable implements Runnable {
      * @return a String which is the name of the attribute as defined in the database
      * @throws SQLException the SQL exception.
      */
-    private String getGroupAttributeName(String attributeNumber) throws SQLException{
+    private String getGroupAttributeName(String attributeNumber) throws SQLException {
         String attributeName;
-        if(attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.compareTo("1") == 0)
             attributeName = "is_searchable";
         else
             throw new SQLException("Group setting number out of bounds");
@@ -714,10 +708,10 @@ public class ClientRunnable implements Runnable {
      *
      * @param msg The message sent by the user
      */
-    private void handleSearchMessage(Message msg){
-        if(msg.getTextOrPassword().equalsIgnoreCase("user"))
+    private void handleSearchMessage(Message msg) {
+        if (msg.getTextOrPassword().equalsIgnoreCase("user"))
             handleUserSearchMessage(msg.getReceiverOrPassword());
-        else if( msg.getTextOrPassword().equalsIgnoreCase("group"))
+        else if (msg.getTextOrPassword().equalsIgnoreCase("group"))
             handleGroupSearchMessage(msg.getReceiverOrPassword());
         else
             this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check the syntax" +
@@ -730,16 +724,16 @@ public class ClientRunnable implements Runnable {
      *
      * @param searchString The string that is used for the regex to retrieve all similar users
      */
-    private void handleUserSearchMessage(String searchString){
-        Map<String,String> resultantSet;
+    private void handleUserSearchMessage(String searchString) {
+        Map<String, String> resultantSet;
         try {
             resultantSet = userService.searchUser(searchString);
-            if(resultantSet.isEmpty()){
+            if (resultantSet.isEmpty()) {
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
             helperForBuildingAndSendingSearchMessage(resultantSet);
-        }catch(Exception e){
+        } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
         }
@@ -750,16 +744,16 @@ public class ClientRunnable implements Runnable {
      *
      * @param searchString the string that is used by the regex to retrieve all the similar groups
      */
-    private void handleGroupSearchMessage(String searchString){
-        Map<String,String> resultantSet;
+    private void handleGroupSearchMessage(String searchString) {
+        Map<String, String> resultantSet;
         try {
             resultantSet = groupService.searchGroup(searchString);
-            if(resultantSet.isEmpty()){
+            if (resultantSet.isEmpty()) {
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
             helperForBuildingAndSendingSearchMessage(resultantSet);
-        }catch(Exception e){
+        } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
         }
@@ -772,10 +766,10 @@ public class ClientRunnable implements Runnable {
      *
      * @param resultantSet the set containing the mapped values that is retrieved from the database
      */
-    private void helperForBuildingAndSendingSearchMessage(Map<String,String> resultantSet){
+    private void helperForBuildingAndSendingSearchMessage(Map<String, String> resultantSet) {
         StringBuilder workString = new StringBuilder();
         workString.append("\nResults: \n");
-        for(Map.Entry<String,String> pair : resultantSet.entrySet()){
+        for (Map.Entry<String, String> pair : resultantSet.entrySet()) {
             workString.append(pair.getKey());
             workString.append(" ");
             workString.append(pair.getValue());
@@ -964,7 +958,7 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserName(this.getName());
         userClients.remove(this.getName());
         if (currentUser.isLoggedIn()) {
-            boolean updated = userService.updateUserAttributes(currentUser.getUserName(),"logged_in","0");
+            boolean updated = userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "0");
             if (!updated) {
                 ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
             }

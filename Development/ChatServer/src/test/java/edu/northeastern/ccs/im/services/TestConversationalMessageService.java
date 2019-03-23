@@ -108,29 +108,30 @@ public class TestConversationalMessageService {
     }
 
     /**
-     * Test getSender() method 
-     * @throws SQLException 
+     * Test getSender() method
+     *
+     * @throws SQLException
      */
     @Test
     public void testGetSender() throws SQLException {
-    	String ret = cs.getSender("ABC");
+        String ret = cs.getSender("ABC");
         assertTrue(ret.equals("ABC"));
     }
-    
+
 
     /**
      * Test getSender() method  with invalid user
-     * @throws SQLException 
+     *
+     * @throws SQLException
      */
     @Test
     public void testGetSenderInvalid() throws SQLException {
-    	when(mockedRS.first()).thenReturn(false);
+        when(mockedRS.first()).thenReturn(false);
         String ret = cs.getSender("ABC");
-    	assertNull(ret);
+        assertNull(ret);
     }
-    
-    
-    
+
+
     /**
      * Test for inserConversationalMessage using src_name, dest_name, msg_text
      *
@@ -234,27 +235,27 @@ public class TestConversationalMessageService {
         doThrow(SQLException.class).when(mockedPreparedStatement).executeUpdate();
         Assertions.assertThrows(SQLException.class, () -> cs.deleteMessage("ABCBCD2018:05:05"));
     }
-    
+
     /**
      * Test insert group conversational message for true.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testInsertGroupConversationalMessageForTrue() throws SQLException{
-    	when(mockedPreparedStatement.executeUpdate()).thenReturn(1);
-        assertTrue(cs.insertGroupConversationalMessage("ABC","BCD"));
+    public void testInsertGroupConversationalMessageForTrue() throws SQLException {
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(1);
+        assertTrue(cs.insertGroupConversationalMessage("ABC", "BCD"));
     }
-    
+
     /**
      * Test insert group conversational message for false.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testInsertGroupConversationalMessageForFalse() throws SQLException{
-    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-        assertFalse(cs.insertGroupConversationalMessage("ABC","BCD"));
+    public void testInsertGroupConversationalMessageForFalse() throws SQLException {
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        assertFalse(cs.insertGroupConversationalMessage("ABC", "BCD"));
     }
 
 }

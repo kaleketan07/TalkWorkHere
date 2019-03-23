@@ -10,6 +10,7 @@ import java.util.List;
 
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
+import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.ConversationalMessage;
 
 /**
@@ -20,7 +21,7 @@ import edu.northeastern.ccs.im.models.ConversationalMessage;
 public class ConversationalMessageService implements ConversationalMessageDAO {
 
 
-    private DBConnection conn;
+    private IDBConnection conn;
     private PreparedStatement pstmt = null;
     private DBUtils utils = null;
     private ResultSet result;

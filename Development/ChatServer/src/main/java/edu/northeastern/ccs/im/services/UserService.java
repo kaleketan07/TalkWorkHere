@@ -3,6 +3,7 @@ package edu.northeastern.ccs.im.services;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
+import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.User;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.Set;
 public class UserService implements UserDao {
 
     private Set<User> userSet = new HashSet<>();
-    private DBConnection conn;
+    private IDBConnection conn;
     private PreparedStatement pstmt = null;
     private DBUtils utils;
     private ResultSet result;

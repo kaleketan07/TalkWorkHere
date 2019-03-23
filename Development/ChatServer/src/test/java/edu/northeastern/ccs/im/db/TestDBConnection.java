@@ -22,7 +22,7 @@ public class TestDBConnection {
      */
     @Test
     public void testConstructor() throws ClassNotFoundException, SQLException, IOException {
-        DBConnection dbConn = new DBConnection();
+        IDBConnection dbConn = new DBConnection();
         Assertions.assertTrue(dbConn instanceof DBConnection);
     }
 
@@ -36,7 +36,7 @@ public class TestDBConnection {
      */
     @Test
     public void testClose() throws ClassNotFoundException, SQLException, IOException {
-        DBConnection dbConn = new DBConnection();
+        IDBConnection dbConn = new DBConnection();
         dbConn.close();
         String sql = "select * from test";
         Assertions.assertThrows(SQLNonTransientConnectionException.class, () -> dbConn.getPreparedStatement(sql));
@@ -54,7 +54,7 @@ public class TestDBConnection {
     @Test
     public void testGetPreparedStatement() throws NoSuchFieldException, ClassNotFoundException, SQLException, IllegalAccessException, IOException {
         Connection mockedConn = Mockito.mock(Connection.class);
-        DBConnection dbConn = new DBConnection();
+        IDBConnection dbConn = new DBConnection();
         Field conn = DBConnection.class.getDeclaredField("connection");
         conn.setAccessible(true);
         conn.set(dbConn, mockedConn);

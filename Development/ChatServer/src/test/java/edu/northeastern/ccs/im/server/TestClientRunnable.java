@@ -100,7 +100,7 @@ public class TestClientRunnable {
      *
      * @throws IllegalAccessException the illegal access exception
      * @throws NoSuchFieldException   the no such field exception
-     * @throws SQLException           the sql exception
+     * @throws SQLException           the sql exception that is thrown when a query doesn't work correctly
      */
     @BeforeEach
     public void setUp() throws IllegalAccessException,NoSuchFieldException,SQLException{

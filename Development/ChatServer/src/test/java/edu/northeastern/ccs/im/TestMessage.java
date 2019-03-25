@@ -383,17 +383,6 @@ public class TestMessage {
     }
 
 
-    /**
-     * Test addUniqueKey with DeleteUser as the handle
-     */
-    @Test
-    public void testAddUniqueKeyWithInvalidHandle() {
-        Message message = Message.makeMessage(DLU, SENDER_NAME, PASS, NULL_OUTPUT);
-        String msgText = message.getTextOrPassword();
-        message = Message.addUniqueKeyToMsg(message, "ABC");
-        assertEquals(message.getTextOrPassword(), msgText);
-    }
-
 
     /**
      * Test makeMessage with Remove_user as the handle

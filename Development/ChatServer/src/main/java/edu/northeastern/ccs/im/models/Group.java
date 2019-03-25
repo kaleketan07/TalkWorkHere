@@ -142,7 +142,7 @@ public class Group implements Member {
      */
     public void groupSendMessage(Message msg, String uniqueGroupKey) throws SQLException {
         // send message to member users
-        for (User u : memberUsers) {
+        for (User u : this.memberUsers) {
             // a user can also be a part of a group at a higher level in the hierarchy. Do not send the message again
             if (!msg.messageAlreadySent(u)) {
                 msg.addUserToRecipients(u);
@@ -152,8 +152,19 @@ public class Group implements Member {
             }
         }
         // send message to member groups
-        for (Group g : memberGroups) {
+        for (Group g : this.memberGroups) {
             g.groupSendMessage(msg, uniqueGroupKey);
         }
     }
+    
+    @Override
+	public boolean equals(Object obj) {
+		if(obj instanceof User) {
+			return this.groupName.equals(((Group) obj).getGroupName());
+		}
+		return false;
+	}
+   
+    @Override
+	public int hashCode() {	return (this.groupName != null) ? 31 * groupName.hashCode(): 0; }
 }

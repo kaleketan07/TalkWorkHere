@@ -10,7 +10,6 @@ import java.util.concurrent.ScheduledFuture;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
-import edu.northeastern.ccs.im.models.ConversationalMessage;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
@@ -345,7 +344,7 @@ public class ClientRunnable implements Runnable {
             // since the user was not found, a new user with this name may be created
             if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                this.enqueuePrattleResponseMessage("User" + msg.getName() + "registed");
+                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
             } else {
                 this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
             }
@@ -455,7 +454,7 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserName(msg.getName());
         boolean result = userService.deleteUser(currentUser);
         if (!result) {
-            this.enqueuePrattleResponseMessage("User could not deteled");
+            this.enqueuePrattleResponseMessage("User could not be deleted");
         } else {
             this.terminate = true;
         }

@@ -402,6 +402,8 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
         } else {
             groupService.createGroup(msg.getTextOrPassword(), msg.getName());
+            groupService.addUserToGroup(msg.getTextOrPassword(), msg.getName());
+            this.enqueuePrattleResponseMessage("Successfully created group: "+ msg.getTextOrPassword());
         }
     }
 

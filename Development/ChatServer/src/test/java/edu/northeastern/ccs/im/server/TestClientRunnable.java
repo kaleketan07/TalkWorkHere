@@ -1181,6 +1181,7 @@ public class TestClientRunnable {
         Iterator<Message> messageIter = ml.iterator();
         NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
         when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
         privateGroupService.set(clientRunnableObject, mgs);
         UserService us = Mockito.mock(UserService.class);

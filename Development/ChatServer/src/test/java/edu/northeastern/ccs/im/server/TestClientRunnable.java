@@ -197,8 +197,8 @@ public class TestClientRunnable {
     @Test
     public void testSetNameandGetName() throws IOException{
         SocketChannel client = SocketChannel.open();
-        NetworkConnection networkConnectionMock = new NetworkConnection(client);
-        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        NetworkConnection networkConnection = new NetworkConnection(client);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnection);
         clientRunnableObject.setName(SENDER_NAME);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
     }
@@ -228,91 +228,10 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
-    /**
-     * Test to check handleIncomingMessage() with makeHelloMessage in Message iterator
-     * Thus enqueue the message in the waitlist, Also tests method sendMessage
-     * Test can be done by asserting initialized data variable which is set after first run()
-     *
-     * @throws IllegalAccessException    the illegal access exception to be used while using java Reflection
-     * @throws IllegalArgumentException  the illegal Argument exception to be used while using java Reflection
-     * @throws InvocationTargetException the the underlying reflection method call throws an exception .
-     * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
-     */
-    @Test
-    public void testHandleIncomingMessageAndEnqueueMessage() throws IllegalAccessException,
-            InvocationTargetException, NoSuchMethodException {
-        Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
-        retrieveItems.setAccessible(true);
-        Message.class.getDeclaredMethods();
-        Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
-        Message loginMessage = Message.makeSimpleLoginMessage(SENDER_NAME);
-        messageList.add(loginMessage);
-        messageList.add(helloMessage);
-        messageIter = messageList.iterator();
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
-        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
-                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
-        clientRunnableObject.setFuture(future);
-        clientRunnableObject.run();
-        clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized());
-    }
-
-    /**
-     * Testing setFuture() using ScheduledFuture Object and also testing the
-     * case of a quit(terminate Message as a part of handleIncomingMessages
-     * method
-     */
-    @Test
-    public void testHandleIncomingMessageTerminateCondition(){
-        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
-        messageList.add(BROADCAST);
-        messageList.add(quitMessage);
-        messageIter = messageList.iterator();
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
-        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
-                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
-        clientRunnableObject.setFuture(future);
-        clientRunnableObject.run();
-        clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized());
-    }
 
 
     /**
-     * Testing setFuture() using ScheduledFuture
-     *
-     * @throws IllegalAccessException    the illegal access exception to be used while using java Reflection
-     * @throws InvocationTargetException the underlying reflection method call throws an exception
-     * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
-     */
-    @Test
-    public void testSetFutureMethod() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Message login = Message.makeSimpleLoginMessage(SENDER_NAME);
-        Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
-        retrieveItems.setAccessible(true);
-        Message.class.getDeclaredMethods();
-        Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
-        messageList.add(login);
-        messageList.add(helloMessage);
-        messageList.add(BROADCAST);
-        messageIter = messageList.iterator();
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
-        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
-                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
-        clientRunnableObject.setFuture(future);
-        clientRunnableObject.enqueueMessage(BROADCAST);
-        clientRunnableObject.enqueueMessage(BROADCAST);
-        clientRunnableObject.run();
-        clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized());
-    }
-
-    /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Empty waitList
      */
     @Test
@@ -325,7 +244,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Login waitList
      *
      * @throws SQLException the sql exception
@@ -340,7 +259,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
     @Test
@@ -351,7 +270,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
     @Test
@@ -363,8 +282,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Private_User message in waitList and Message sent successfully
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Private User message in waitList and Message sent successfully
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress(){
@@ -377,7 +296,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
      *
      * @throws SQLException the sql exception
@@ -393,7 +312,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
      */
     @Test
@@ -407,7 +326,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
      */
     @Test
@@ -420,8 +339,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Private_User message in waitList and Message not sent
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Private User message in waitList and Message not sent
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithPrivateWithInvalidDestAddress() throws SQLException{
@@ -432,7 +351,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Register Message as the message type
      */
     @Test
@@ -445,7 +364,7 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Register Message as the message type
      */
     @Test
@@ -458,8 +377,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Delete_Group Message as the message type
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Delete Group Message as the message type
      * With invalid group name
      */
     @Test
@@ -472,8 +391,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Delete_Group Message as the message type
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Delete Group Message as the message type
      * where user is not the moderator of the group
      */
     @Test
@@ -487,8 +406,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Delete_Group Message as the message type
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Delete Group Message as the message type
      * With Valid User and Group and User being Moderator of the group
      */
     @Test
@@ -500,8 +419,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Get_Group Message as the message type
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Get Group Message as the message type
      * With Valid Group
      */
     @Test
@@ -514,8 +433,8 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Get_Group Message as the message type
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Get Group Message as the message type
      * With Invalid Group
      */
     @Test
@@ -528,9 +447,9 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Login in waitList and login unsuccessful - this test
-     * is for the time when the user's attributes in the database don't get updated after loggin in.
+     * is for the time when the user's attributes in the database don't get updated after logging in.
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserUnsuccessfulLogin() throws SQLException{
@@ -540,39 +459,9 @@ public class TestClientRunnable {
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
         clientRunnableObject.run();
     }
-    /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
-     * which also tests the handleOutgoingMessage() with Delete User Message with valid user
-     */
-    @Test
-    public void testHandleIncomingMessageWithIteratorWithDeleteUserMessage() throws SQLException,
-            IllegalAccessException,NoSuchFieldException{
-        List<Message> messageList = new ArrayList<>();
-        messageList.add(BROADCAST);
-        Iterator<Message> messageIter = messageList.iterator();
-        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
-        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
-                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
-        clientRunnableObject.setFuture(future);
-        clientRunnableObject.run();
-        UserService mockedUserService = Mockito.mock(UserService.class);
-        Field userService = ClientRunnable.class.getDeclaredField("userService");
-        userService.setAccessible(true);
-        userService.set(clientRunnableObject, mockedUserService);
-        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(true);
-        messageList.clear();
-        messageList.add(DELETE_USER);
-        messageIter = messageList.iterator();
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        clientRunnableObject.run();
-    }
 
     /**
-     * Test handleIncomingMessage() empty message Iterator form network connection
+     * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Delete User Message with invalid user
      */
     @Test
@@ -646,45 +535,6 @@ public class TestClientRunnable {
         assertFalse(clientRunnableObject.isInitialized());
     }
 
-
-    /**
-     * Testing isBehind() condition in run() by setting it to True
-     *
-     * @throws InvocationTargetException the underlying reflection method call throws an exception
-     * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
-     * @throws NoSuchFieldException      the no such field exception to be used while using java Reflection
-     */
-    @Test
-    public void testTimerIsBehind() throws IllegalAccessException, SQLException, InvocationTargetException,
-            NoSuchMethodException, NoSuchFieldException {
-        Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
-        retrieveItems.setAccessible(true);
-        Message.class.getDeclaredMethods();
-        Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
-        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
-        messageList.clear();
-        messageList.add(helloMessage);
-        messageList.add(quitMessage);
-        messageIter = messageList.iterator();
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ClientTimer ct = Mockito.mock(ClientTimer.class);
-        Field privateStringField = ClientRunnable.class.getDeclaredField("timer");
-        privateStringField.setAccessible(true);
-        privateStringField.set(clientRunnableObject, ct);
-        when(ct.isBehind()).thenReturn(true);
-        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
-        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
-                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
-        UserService us = Mockito.mock(UserService.class);
-        when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        Field privateUserService = ClientRunnable.class.
-                getDeclaredField("userService");
-        privateUserService.setAccessible(true);
-        privateUserService.set(clientRunnableObject, us);
-        clientRunnableObject.setFuture(future);
-        clientRunnableObject.run();
-        assertFalse(clientRunnableObject.isInitialized());
-    }
 
     /**
      * Testing setUserName using a valid string Input Which sets the user name
@@ -1062,35 +912,6 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         when(mockedUserService.updateUserAttributes(USER_LOGGED_ON.getUserName(),
                 "logged_in", "0")).thenReturn(true);
-        clientRunnableObject.run();
-        clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized());
-    }
-
-    /**
-     * Verify logout for loggedIn user but DB update unsuccessful.
-     */
-    @Test
-    public void testTerminateClientLogoutLoggedInUserUpdateFailed() throws NoSuchFieldException, IllegalAccessException, SQLException {
-
-        messageList = new ArrayList<>();
-        messageList.add(BROADCAST);
-        messageList.add(QUIT_MESSAGE);
-        messageIter = messageList.iterator();
-        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
-        when(networkConnectionMock.iterator()).thenReturn(messageIter);
-        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
-        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
-        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
-        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
-                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
-        clientRunnableObject.setFuture(future);
-        UserService mockedService = Mockito.mock(UserService.class);
-        Field f = ClientRunnable.class.getDeclaredField("userService");
-        f.setAccessible(true);
-        f.set(clientRunnableObject, mockedService);
-        when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        when(mockedService.updateUserAttributes(USER_LOGGED_ON.getUserName(), "logged_in", "0")).thenReturn(false);
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1650,6 +1471,11 @@ public class TestClientRunnable {
     }
 
 
+    /**
+     * Test for handle incoming messages when user is null and reg and login.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testForHandleIncomingMessagesWhenUserIsNullAndRegAndLogin() throws SQLException{
         clientRunnableObject.run();
@@ -1657,6 +1483,189 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(null);
         clientRunnableObject.run();
         clientRunnableObject.run();
+    }
+
+    /**
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Delete User Message with valid user
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithDeleteUserMessage() throws SQLException,
+            IllegalAccessException,NoSuchFieldException{
+        List<Message> messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        Iterator<Message> messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        clientRunnableObject.run();
+        UserService mockedUserService = Mockito.mock(UserService.class);
+        Field userService = ClientRunnable.class.getDeclaredField("userService");
+        userService.setAccessible(true);
+        userService.set(clientRunnableObject, mockedUserService);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(true);
+        messageList.clear();
+        messageList.add(DELETE_USER);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test to check handleIncomingMessage() with makeHelloMessage in Message iterator
+     * Thus enqueue the message in the waitlist, Also tests method sendMessage
+     * Test can be done by asserting initialized data variable which is set after first run()
+     *
+     * @throws IllegalAccessException    the illegal access exception to be used while using java Reflection
+     * @throws IllegalArgumentException  the illegal Argument exception to be used while using java Reflection
+     * @throws InvocationTargetException the the underlying reflection method call throws an exception .
+     * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
+     */
+    @Test
+    public void testHandleIncomingMessageAndEnqueueMessage() throws IllegalAccessException,
+            InvocationTargetException, NoSuchMethodException {
+        Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
+        retrieveItems.setAccessible(true);
+        Message.class.getDeclaredMethods();
+        Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
+        Message loginMessage = Message.makeSimpleLoginMessage(SENDER_NAME);
+        messageList.add(loginMessage);
+        messageList.add(helloMessage);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Testing setFuture() using ScheduledFuture Object and also testing the
+     * case of a quit(terminate Message as a part of handleIncomingMessages
+     * method
+     */
+    @Test
+    public void testHandleIncomingMessageTerminateCondition(){
+        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
+        messageList.add(BROADCAST);
+        messageList.add(quitMessage);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+
+    /**
+     * Testing setFuture() using ScheduledFuture
+     *
+     * @throws IllegalAccessException    the illegal access exception to be used while using java Reflection
+     * @throws InvocationTargetException the underlying reflection method call throws an exception
+     * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
+     */
+    @Test
+    public void testSetFutureMethod() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Message login = Message.makeSimpleLoginMessage(SENDER_NAME);
+        Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
+        retrieveItems.setAccessible(true);
+        Message.class.getDeclaredMethods();
+        Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
+        messageList.add(login);
+        messageList.add(helloMessage);
+        messageList.add(BROADCAST);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        clientRunnableObject.enqueueMessage(BROADCAST);
+        clientRunnableObject.enqueueMessage(BROADCAST);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Testing isBehind() condition in run() by setting it to True
+     *
+     * @throws InvocationTargetException the underlying reflection method call throws an exception
+     * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
+     * @throws NoSuchFieldException      the no such field exception to be used while using java Reflection
+     */
+    @Test
+    public void testTimerIsBehind() throws IllegalAccessException, SQLException, InvocationTargetException,
+            NoSuchMethodException, NoSuchFieldException {
+        Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
+        retrieveItems.setAccessible(true);
+        Message.class.getDeclaredMethods();
+        Message helloMessage = (Message) retrieveItems.invoke(Message.class, MESSAGE_TEXT);
+        Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
+        messageList.clear();
+        messageList.add(helloMessage);
+        messageList.add(quitMessage);
+        messageIter = messageList.iterator();
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientTimer ct = Mockito.mock(ClientTimer.class);
+        Field privateStringField = ClientRunnable.class.getDeclaredField("timer");
+        privateStringField.setAccessible(true);
+        privateStringField.set(clientRunnableObject, ct);
+        when(ct.isBehind()).thenReturn(true);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        UserService us = Mockito.mock(UserService.class);
+        when(us.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        Field privateUserService = ClientRunnable.class.
+                getDeclaredField("userService");
+        privateUserService.setAccessible(true);
+        privateUserService.set(clientRunnableObject, us);
+        clientRunnableObject.setFuture(future);
+        clientRunnableObject.run();
+        assertFalse(clientRunnableObject.isInitialized());
+    }
+
+
+    /**
+     * Verify logout for loggedIn user but DB update unsuccessful.
+     */
+    @Test
+    public void testTerminateClientLogoutLoggedInUserUpdateFailed() throws NoSuchFieldException, IllegalAccessException, SQLException {
+
+        messageList = new ArrayList<>();
+        messageList.add(BROADCAST);
+        messageList.add(QUIT_MESSAGE);
+        messageIter = messageList.iterator();
+        NetworkConnection networkConnectionMock = Mockito.mock(NetworkConnection.class);
+        when(networkConnectionMock.iterator()).thenReturn(messageIter);
+        ClientRunnable clientRunnableObject = new ClientRunnable(networkConnectionMock);
+        when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
+        ScheduledExecutorService threadpool = Executors.newScheduledThreadPool(ServerConstants.THREAD_POOL_SIZE);
+        ScheduledFuture<?> future = threadpool.scheduleAtFixedRate(clientRunnableObject, ServerConstants.CLIENT_CHECK_DELAY,
+                ServerConstants.CLIENT_CHECK_DELAY, TimeUnit.MILLISECONDS);
+        clientRunnableObject.setFuture(future);
+        UserService mockedService = Mockito.mock(UserService.class);
+        Field f = ClientRunnable.class.getDeclaredField("userService");
+        f.setAccessible(true);
+        f.set(clientRunnableObject, mockedService);
+        when(mockedService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedService.updateUserAttributes(USER_LOGGED_ON.getUserName(), "logged_in", "0")).thenReturn(false);
+        clientRunnableObject.run();
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     //Private fields to be used in tests

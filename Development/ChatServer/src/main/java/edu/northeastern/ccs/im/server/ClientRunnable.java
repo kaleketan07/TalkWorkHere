@@ -683,13 +683,19 @@ public class ClientRunnable implements Runnable {
         String groupName = msg.getReceiverOrPassword();
         User userInviter = userService.getUserByUserName(inviter);
         User userInvitee = userService.getUserByUserName(invitee);
-        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+        Group group = groupService.getGroup(groupName);
 
-        if(userInviter == null || userInvitee == null || groupUsers.isEmpty() ) {
-            this.enqueuePrattleResponseMessage("Cannot create invitation: Invalid user name or group name provided.");
+        if(group == null) {
+            this.enqueuePrattleResponseMessage("Cannot create invitation: Invalid group name provided.");
             return;
         }
 
+        if(userInvitee == null) {
+            this.enqueuePrattleResponseMessage("Cannot create invitation: Invalid user name.");
+            return;
+        }
+
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
         if(groupUsers.contains(userInvitee)) {
             this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName);
             return;
@@ -710,7 +716,8 @@ public class ClientRunnable implements Runnable {
         else
             this.enqueuePrattleResponseMessage("Unable to send invitation.");
     }
-/*
+
+    /*
     private void handleDeleteInvitationUserMessage(Message msg) throws SQLException {
         String inviter = msg.getName();
         String invitee = msg.getTextOrPassword();

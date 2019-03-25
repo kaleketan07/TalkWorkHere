@@ -42,7 +42,7 @@ public class InvitationService implements InvitationDao {
      * Instantiates a new invitation service.
      *
      * @throws ClassNotFoundException the class not found exception
-     * @throws SQLException           the SQL exception
+     * @throws SQLException           the SQL exception is thrown due to some query or database interaction
      * @throws IOException            Signals that an I/O exception has occurred.
      */
     private InvitationService() throws ClassNotFoundException, SQLException, IOException {
@@ -55,7 +55,7 @@ public class InvitationService implements InvitationDao {
      *
      * @return the invitation service instance
      * @throws ClassNotFoundException the class not found exception
-     * @throws SQLException           the SQL exception
+     * @throws SQLException           the SQL exception is thrown due to some query or database interaction
      * @throws IOException            Signals that an I/O exception has occurred.
      */
     public static InvitationService getInstance() throws ClassNotFoundException, SQLException, IOException {
@@ -72,7 +72,7 @@ public class InvitationService implements InvitationDao {
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return the message retrieved or null if not record is found
-     * @throws SQLException
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
      */
     @Override
     public Message getInvitation(String inviter, String invitee, String groupName) throws SQLException {
@@ -104,7 +104,7 @@ public class InvitationService implements InvitationDao {
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return the message retrieved or null if not record is found
-     * @throws SQLException
+     * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
     @Override
     public Message getInvitation(String invitee, String groupName) throws SQLException {
@@ -138,7 +138,7 @@ public class InvitationService implements InvitationDao {
      * @param groupName - The group for which the invite is sent
      * @param approved - The flag denoting true for approval and false for rejection
      * @return true if the update was successful, false if not
-     * @throws SQLException
+     * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
     @Override
     public boolean approveRejectInvitation(String invitee, String groupName, boolean approved) throws SQLException {
@@ -157,7 +157,7 @@ public class InvitationService implements InvitationDao {
      * @param groupName - The group for which the invite is sent
      * @param accepted - The flag denoting true for acceptance and false for denial
      * @return true if the update was successful, false if not
-     * @throws SQLException
+     * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
     @Override
     public boolean acceptDenyInvitation(String invitee, String groupName, boolean accepted) throws SQLException {
@@ -176,7 +176,7 @@ public class InvitationService implements InvitationDao {
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return true if the update was successful, false if not
-     * @throws SQLException
+     * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
     @Override
     public boolean createInvitation(String inviter, String invitee, String groupName) throws SQLException {
@@ -195,7 +195,7 @@ public class InvitationService implements InvitationDao {
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return true if the update was successful, false if not
-     * @throws SQLException
+     * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
     @Override
     public boolean deleteInvitation(String inviter, String invitee, String groupName) throws SQLException {

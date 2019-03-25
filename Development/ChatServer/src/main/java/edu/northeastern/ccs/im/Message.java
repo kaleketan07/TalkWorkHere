@@ -43,10 +43,25 @@ public class Message {
      */
     private String msgReceiverOrPassword;
 
+    /**
+     * The flag used when invitation is accepted by a invitee
+     */
     private boolean isInvitationAccepted;
+    /**
+     * The flag used when invitation is declined by a invitee
+     */
     private boolean isInvitationDenied;
+    /**
+     * The flag used when invitation is approved by a moderator
+     */
     private boolean isInvitationApproved;
+    /**
+     * The flag used when invitation is rejected by a moderator
+     */
     private boolean isInvitationRejected;
+    /**
+     * The flag used when invitation is deleted by a inviter
+     */
     private boolean isInvitationDeleted;
 
     /**
@@ -73,7 +88,7 @@ public class Message {
         // initialize an empty set of recipients
         messageRecipients = new HashSet<>();
 
-        // set isInvitationApproved and isInvitationAccepted to false
+        // initialize all flags to false
         isInvitationAccepted = false;
         isInvitationApproved = false;
         isInvitationRejected = false;
@@ -102,7 +117,7 @@ public class Message {
         msgReceiverOrPassword = receiverorPassword;
         // initialize an empty set of recipients
         messageRecipients = new HashSet<>();
-        // set isInvitationApproved and isInvitationAccepted to false
+        // initialize all flags to false
         isInvitationAccepted = false;
         isInvitationApproved = false;
         isInvitationRejected = false;
@@ -365,7 +380,9 @@ public class Message {
      * @param password - password of the user used to validate the login
      * @return a Message object of type login
      */
-    public static Message makeLoginMessage(String myName, String password) { return new Message(MessageType.LOGIN, myName, password); }
+    public static Message makeLoginMessage(String myName, String password) {
+        return new Message(MessageType.LOGIN, myName, password);
+    }
 
     /**
      * This method creates a register message based on the given name and password
@@ -374,7 +391,9 @@ public class Message {
      * @param password - password of the user requesting a register
      * @return a Message object of type register
      */
-    public static Message makeRegisterMessage(String myName, String password, String confirmPassword) { return new Message(MessageType.REGISTER, myName, password, confirmPassword); }
+    public static Message makeRegisterMessage(String myName, String password, String confirmPassword) {
+        return new Message(MessageType.REGISTER, myName, password, confirmPassword);
+    }
 
     /**
      * This message creates a Private User message type of a message
@@ -463,7 +482,9 @@ public class Message {
      * @param groupName - groupName of the group to be deleted
      * @return a Message object of type delete_group
      */
-    public static Message makeDeleteGroupMessage(String userName, String groupName) { return new Message(MessageType.DELETE_GROUP, userName, groupName); }
+    public static Message makeDeleteGroupMessage(String userName, String groupName) {
+        return new Message(MessageType.DELETE_GROUP, userName, groupName);
+    }
 
     /**
      * This method creates a message to be sent for creating a group.

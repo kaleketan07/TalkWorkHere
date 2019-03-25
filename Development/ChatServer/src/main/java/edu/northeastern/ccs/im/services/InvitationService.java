@@ -78,7 +78,7 @@ public class InvitationService implements InvitationDao {
     public Message getInvitation(String inviter, String invitee, String groupName) throws SQLException {
         final String QUERY = "SELECT * from group_invitation where inviter = ? and invitee = ? and group_name = ?";
         preparedStatement = connection.getPreparedStatement(QUERY);
-        preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
+        preparedStatement = utils.setPreparedStatementArgs(preparedStatement, inviter, invitee, groupName);
         result = preparedStatement.executeQuery();
         Message message = null;
         if(result.first()) {

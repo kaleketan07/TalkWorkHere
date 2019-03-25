@@ -750,7 +750,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
-            helperForBuildingAndSendingSearchMessage(resultantSet);
+            helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
@@ -770,7 +770,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
-            helperForBuildingAndSendingSearchMessage(resultantSet);
+            helperForBuildingAndSendingSearchMessage(resultantSet,"Group");
         } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
@@ -784,16 +784,16 @@ public class ClientRunnable implements Runnable {
      *
      * @param resultantSet the set containing the mapped values that is retrieved from the database
      */
-    private void helperForBuildingAndSendingSearchMessage(Map<String, String> resultantSet) {
+    private void helperForBuildingAndSendingSearchMessage(Map<String, String> resultantSet, String userOrGroup) {
         StringBuilder workString = new StringBuilder();
-        workString.append("\nResults: \n");
-        for (Map.Entry<String, String> pair : resultantSet.entrySet()) {
-            workString.append(pair.getKey());
-            workString.append(" ");
-            workString.append(pair.getValue());
-            workString.append("\n");
-        }
+        if(userOrGroup.equalsIgnoreCase("User"))
+            workString.append(String.format("%n%-15s | %-15s %n","Username::","Full Name::"));
+        else
+            workString.append(String.format("%n%-15s | %-15s %n","Group Name::","Moderator Name::"));
+        for (Map.Entry<String, String> pair : resultantSet.entrySet())
+            workString.append(String.format("%-15s | %-15s %n",pair.getKey(),pair.getValue()));
         String answerString = workString.toString();
+
         this.enqueuePrattleResponseMessage(answerString);
     }
     

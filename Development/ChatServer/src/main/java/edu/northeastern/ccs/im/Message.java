@@ -210,6 +210,8 @@ public class Message {
             return makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_GROUP_MESSAGE.toString()) == 0) {
         	return makeDeleteGroupMessageMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.ADD_GROUP_TO_GROUP.toString()) == 0) {
+        	return makeAddGroupToGroupMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return null;
     }
@@ -552,6 +554,18 @@ public class Message {
     	return new Message(MessageType.DELETE_GROUP_MESSAGE, srcName, text);
     }
     
+    /**
+     * Make a message for adding a group to group.
+     *
+     * @param srcName the name of the sender
+     * @param guestGrpName the guest group name
+     * @param hostGrpName the host group name
+     * @return the message object
+     */
+    public static Message makeAddGroupToGroupMessage(String srcName, String guestGrpName, String hostGrpName) {
+    	return new Message(MessageType.ADD_GROUP_TO_GROUP, srcName, guestGrpName, hostGrpName);
+    }
+    
 
     /**
      * Return the name of the sender of this message.
@@ -774,6 +788,13 @@ public class Message {
      * @return true, if message is for deleting a group message
      */
     public boolean isDeleteGroupMessageMessage() {return (msgType == MessageType.DELETE_GROUP_MESSAGE);}
+    
+    /**
+     * Verify if the message is a message for adding a group to group
+     *
+     * @return true, if message is for deleting a group message
+     */
+    public boolean isAddGroupToGroupMessage() { return (msgType == MessageType.ADD_GROUP_TO_GROUP);}
     
     /**
      * Determine if this message is a message signing off from the IM server.

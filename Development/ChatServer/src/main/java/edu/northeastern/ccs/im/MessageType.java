@@ -114,7 +114,12 @@ public enum MessageType {
 	/** 
 	 * Handle to delete a group message. 
 	 */
-	DELETE_GROUP_MESSAGE("DGM");
+	DELETE_GROUP_MESSAGE("DGM"),
+	
+	/** 
+	 * Handle to add a group to group. 
+	 */
+	ADD_GROUP_TO_GROUP("AGG");
 	
 	/**
      * Store the short name of this message type.

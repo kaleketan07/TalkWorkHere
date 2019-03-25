@@ -1668,6 +1668,68 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test add group to group.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroup() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
+        when(mockedGroupService.addGroupToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test add group to group when host group does not exist.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupWhenHostGroupDoesNotExist() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test add group to group when sender not the moderator of the host group.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupWhenSenderNotTheModeratorOfTheHostGroup() throws SQLException{
+        clientRunnableObject.run();
+        when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    @Test
+    public void testAddGroupToGroupWhenGuestGroupDoesNotExist() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp,(Group) null);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
@@ -1689,6 +1751,7 @@ public class TestClientRunnable {
     private static final Message GET_FOLLOWERS = Message.makeGetFollowersMessage(SENDER_NAME);
     private static final Message GET_FOLLOWEES = Message.makeGetFolloweesMessage(SENDER_NAME);
     private static final String DUMMY_GROUP_NAME = "dummy";
+    private static final String ANOTHER_DUMMY_GROUP_NAME = "dummy2";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";
     private static final Message ADD_USER_TO_GROUP = Message.makeAddUserToGroupMessage(SENDER_NAME, SENDER_NAME, DUMMY_GROUP_NAME);
@@ -1706,4 +1769,7 @@ public class TestClientRunnable {
     private static final Message DELETE_GROUPMESSAGE_MESSAGE = Message.makeDeleteGroupMessageMessage(SENDER_NAME, DUMMY_GROUP_MESSAGE_KEY);
     private static final Message DELETE_GROUPMSG_MSG_SENDER_NOT_IN_KEY = Message.makeDeleteGroupMessageMessage(SENDER_NAME, DUMMY_GROUP_MESSAGE_KEY2);
     private static final Message DELETE_PRIVATEMESSAGE_MESSAGE = Message.makeDeletePrivateMessageMessage(SENDER_NAME, DUMMY_MSG_UNIQUE_KEY);
+    private static final Message ADD_GROUP_TO_GROUP = Message.makeAddGroupToGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
+    private static final Message ADD_GROUP_TO_GROUP2 = Message.makeAddGroupToGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
+    private static final String ANOTHER_USER = "another_user";
 }

@@ -479,6 +479,18 @@ public class ClientRunnable implements Runnable {
             return true;
         return false;
     }
+    
+    private boolean helperAddRemoveGroupToGroupMessage(User currentUser, Group currentGroup, Group guestGroup) {
+        if (currentGroup == null)
+            this.enqueuePrattleResponseMessage("The group you are trying to add to does not exist!");
+        else if (!currentGroup.getModeratorName().equals(currentUser.getUserName()))
+            this.enqueuePrattleResponseMessage("You do not have the permissions to perform this operation");
+        else if (guestGroup == null)
+            this.enqueuePrattleResponseMessage("The user you are trying to add does not exist");
+        else
+            return true;
+        return false;
+    }
 
 
     /**
@@ -833,6 +845,20 @@ public class ClientRunnable implements Runnable {
     		this.enqueuePrattleResponseMessage("You do not have the permissions to delete this message");
     	}
     }
+    
+    
+    private void handleAddGroupToGroupMessage(Message msg) throws SQLException {
+        User currentUser = userService.getUserByUserName(msg.getName());
+        Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+        Group guestUser = groupService.getGroup(msg.getTextOrPassword());
+        if (helperAddRemoveGroupToGroupMessage(currentUser, currentGroup, guestUser)) {
+            if (groupService.addGroupToGroup(currentGroup.getGroupName(), guestUser.getGroupName())) {
+                this.enqueuePrattleResponseMessage("Group was added successfully");
+            } else {
+                this.enqueuePrattleResponseMessage("Group was not added as the group was already there");
+            }
+        }
+    }
 
     /**
      * This method handles general messages
@@ -908,6 +934,9 @@ public class ClientRunnable implements Runnable {
         } else if (msg.isDeleteGroupMessageMessage()) {
         	handleDeleteGroupMessageMessage(msg);
         	return true;
+        } else if (msg.isAddGroupToGroupMessage()) {
+            handleAddGroupToGroupMessage(msg);
+            return true;
         }
         return false;
     }

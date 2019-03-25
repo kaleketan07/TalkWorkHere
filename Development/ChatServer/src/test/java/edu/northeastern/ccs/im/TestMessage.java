@@ -485,6 +485,18 @@ public class TestMessage {
         Assertions.assertEquals("attributes", message.getReceiverOrPassword());
         Assertions.assertTrue(message.isUpdateGroupMessage());
     }
+    
+    /**
+     * Test is add group to group message true.
+     */
+    @Test
+    public void testIsAddGroupToGroupMessageTrue() {
+        Message message = Message.makeAddGroupToGroupMessage(SENDER_NAME, "testGroup", "testGroup2");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("testGroup", message.getTextOrPassword());
+        Assertions.assertEquals("testGroup2", message.getReceiverOrPassword());
+        Assertions.assertTrue(message.isAddGroupToGroupMessage());
+    }
 
     /**
      * Test is update group message for false.
@@ -502,6 +514,15 @@ public class TestMessage {
     public void testMakeMessageAddUserGroupMessageCondition() {
         Message message = Message.makeMessage(AUG, SENDER_NAME, GROUP_NAME, ANOTHER_USER);
         Assertions.assertTrue(message.isAddUserToGroupMessage());
+    }
+    
+    /**
+     * Test make message add group group message condition.
+     */
+    @Test
+    public void testMakeMessageAddGroupGroupMessageCondition() {
+        Message message = Message.makeMessage(AGG, SENDER_NAME, GROUP_NAME, ANOTHER_GROUP_NAME);
+        Assertions.assertTrue(message.isAddGroupToGroupMessage());
     }
 
     /**
@@ -644,11 +665,13 @@ public class TestMessage {
     private static final String SRH = "SRH";
     private static final String MSG = "MSG";
     private static final String UPG = "UPG";
+    private static final String AGG = "AGG";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final String PASS = "some_p@$$worD";
     private static final String GROUP_NAME = "group";
+    private static final String ANOTHER_GROUP_NAME = "group2";
     private static final String ANOTHER_USER = "another-user";
 }

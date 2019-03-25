@@ -680,42 +680,82 @@ public class Message {
         return msgReceiverOrPassword;
     }
 
+    /**
+     * Set the invitation approved flag
+     * @param invitationApproved - true or false value to be set
+     */
     public void setInvitationApproved(boolean invitationApproved) {
         isInvitationApproved = invitationApproved;
     }
 
+    /**
+     *  Set the invitation accepted flag
+     * @param invitationAccepted - true or false value to be set
+     */
     public void setInvitationAccepted(boolean invitationAccepted) {
         isInvitationAccepted = invitationAccepted;
     }
 
+    /**
+     * Get the value of Invitation Approved flag
+     * @return true or false based on the flag's value
+     */
     public boolean isInvitationApproved() {
         return isInvitationApproved;
     }
 
+    /**
+     * Get the value of Invitation Accepted flag
+     * @return true or false based on the flag's value
+     */
     public boolean isInvitationAccepted() {
         return isInvitationAccepted;
     }
 
+    /**
+     * Set the invitation rejected flag
+     * @param invitationRejected - true or false value to be set
+     */
     public void setInvitationRejected(boolean invitationRejected) {
         isInvitationRejected = invitationRejected;
     }
 
+    /**
+     * Get the value of Invitation Rejected flag
+     * @return true or false based on the flag's value
+     */
     public boolean isInvitationRejected() {
         return isInvitationRejected;
     }
 
+    /**
+     * Set the invitation denied flag
+     * @param invitationDenied - true or false value to be set
+     */
     public void setInvitationDenied(boolean invitationDenied) {
         isInvitationDenied = invitationDenied;
     }
 
+    /**
+     * Get the value of Invitation Denied flag
+     * @return true or false based on the flag's value
+     */
     public boolean isInvitationDenied() {
         return isInvitationDenied;
     }
 
+    /**
+     * Set the invitation deleted flag
+     * @param invitationDeleted - true or false value to be set
+     */
     public void setInvitationDeleted(boolean invitationDeleted) {
         isInvitationDeleted = invitationDeleted;
     }
 
+    /**
+     * Get the value of Invitation Deleted flag
+     * @return true or false based on the flag's value
+     */
     public boolean isInvitationDeleted() {
         return isInvitationDeleted;
     }

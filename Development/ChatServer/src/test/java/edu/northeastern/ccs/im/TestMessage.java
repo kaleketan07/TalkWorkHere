@@ -20,6 +20,7 @@ import edu.northeastern.ccs.im.models.User;
  * @version 1.0
  */
 public class TestMessage {
+
     /**
      * Test to check if makeQuitMessage creates the necessary object
      * when the desired values are given as input.
@@ -343,7 +344,6 @@ public class TestMessage {
         strBuild.append(toStringHelper(PASS));
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
-
     }
 
     /**
@@ -607,6 +607,196 @@ public class TestMessage {
         Assertions.assertFalse(message.isSearchMessage());
     }
 
+    /**
+     * Test the isCreateInvitationMessage method
+     * for true output
+     */
+    @Test
+    public void testIsCreateInvitationMessageForTrue() {
+        Message message = Message.makeCreateInvitationMessage(INVITER, INVITEE, GROUP_NAME);
+        Assertions.assertTrue(message.isCreateInvitationMessage());
+    }
+
+    /**
+     * Test the isCreateInvitationMessage method
+     * for false output
+     */
+    @Test
+    public void testIsCreateInvitationUserMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isCreateInvitationMessage());
+    }
+
+    /**
+     * Test the isDeleteInvitationMessage method
+     * for true output
+     */
+    @Test
+    public void testIsDeleteInvitationMessageForTrue() {
+        Message message = Message.makeDeleteInvitationMessage(INVITER, INVITEE, GROUP_NAME);
+        Assertions.assertTrue(message.isDeleteInvitationMessage());
+    }
+
+    /**
+     * Test the isDeleteInvitationMessage method
+     * for false output
+     */
+    @Test
+    public void testIsDeleteInvitationUserMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isDeleteInvitationMessage());
+    }
+
+    /**
+     * Test the isAcceptInviteUserMessage method
+     * for true output
+     */
+    @Test
+    public void testIsAcceptInviteUserMessageForTrue() {
+        Message message = Message.makeAcceptInviteUserMessage(INVITEE, GROUP_NAME);
+        Assertions.assertTrue(message.isAcceptInviteUserMessage());
+    }
+
+    /**
+     * Test the isAcceptInviteUserMessage method
+     * for false output
+     */
+    @Test
+    public void testIsAcceptInviteUserMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isAcceptInviteUserMessage());
+    }
+
+    /**
+     * Test the isDenyInviteUserMessage method
+     * for true output
+     */
+    @Test
+    public void testIsDenyInviteUserMessageForTrue() {
+        Message message = Message.makeDenyInviteUserMessage(INVITEE, GROUP_NAME);
+        Assertions.assertTrue(message.isDenyInviteUserMessage());
+    }
+
+    /**
+     * Test the isDenyInviteUserMessage method
+     * for false output
+     */
+    @Test
+    public void testIsDenyInviteUserMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isDenyInviteUserMessage());
+    }
+
+
+    /**
+     * Test the isApproveInviteModeratorMessage method
+     * for true output
+     */
+    @Test
+    public void testIsApproveInviteModeratorMessageForTrue() {
+        Message message = Message.makeApproveInviteModeratorMessage(MODERATOR, INVITEE, GROUP_NAME);
+        Assertions.assertTrue(message.isApproveInviteModeratorMessage());
+    }
+
+    /**
+     * Test the isApproveInviteModeratorMessage method
+     * for false output
+     */
+    @Test
+    public void testIsApproveInviteModeratorMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isApproveInviteModeratorMessage());
+    }
+
+    /**
+     * Test the isRejectInviteModeratorMessage method
+     * for true output
+     */
+    @Test
+    public void testIsRejectInviteModeratorMessageForTrue() {
+        Message message = Message.makeRejectInviteModeratorMessage(MODERATOR, INVITEE, GROUP_NAME);
+        Assertions.assertTrue(message.isRejectInviteModeratorMessage());
+    }
+
+    /**
+     * Test the isRejectInviteModeratorMessage method
+     * for false output
+     */
+    @Test
+    public void testIsRejectInviteModeratorMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isRejectInviteModeratorMessage());
+    }
+
+    /**
+     * Test makeMessage for Create Invitation Message handle and
+     * toString method to return the expected output.
+     */
+    @Test
+    public void testMakeMessageForCreateInvitationMessage() {
+        assertTrue(invitationTestHelper(IUG, INVITER, INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test makeMessage for Delete Invitation Message handle and
+     * toString method to return the expected output.
+     */
+    @Test
+    public void testMakeMessageForDeleteUserInvitationMessage() {
+        assertTrue(invitationTestHelper(DUI, INVITER, INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test makeMessage for Approve Invitation Message handle and
+     * toString method to return the expected output.
+     */
+    @Test
+    public void testMakeMessageForApproveInvitationModeratorMessage() {
+        assertTrue(invitationTestHelper(AIM, MODERATOR, INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test makeMessage for Reject Invitation Message handle and
+     * toString method to return the expected output.
+     */
+    @Test
+    public void testMakeMessageForRejectInvitationModeratorMessage() {
+        assertTrue(invitationTestHelper(RIM,INVITEE, GROUP_NAME, GROUP_NAME));
+    }
+
+    /**
+     * Test makeMessage for Accept Invitation Message handle and
+     * toString method to return the expected output.
+     */
+    @Test
+    public void testMakeMessageForAcceptInvitationUserMessage() {
+        assertTrue(invitationTestHelper(AIU, INVITEE, GROUP_NAME, NULL_OUTPUT));
+    }
+
+    /**
+     * Test makeMessage for Deny Invitation Message handle and
+     * toString method to return the expected output.
+     */
+    @Test
+    public void testMakeMessageForDenyInvitationUserMessage() {
+        assertTrue(invitationTestHelper(DIU, MODERATOR, INVITEE, NULL_OUTPUT));
+    }
+
+    /**
+     * Helper for testing all make invitation messages
+     *
+     * @param handle - the handle for a particular invitation message to be tested
+     * @return - boolean values based on
+     */
+    private boolean invitationTestHelper(String handle, String firstArg, String secondArg, String thirdArg) {
+        Message message = Message.makeMessage(handle, firstArg, secondArg, thirdArg);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(handle);
+        strBuild.append(toStringHelper(firstArg));
+        strBuild.append(toStringHelper(secondArg));
+        strBuild.append(toStringHelper(thirdArg));
+        return strBuild.toString().equals(message.toString());
+    }
 
     /**
      * A private helper method to generate toString output for the given
@@ -644,6 +834,12 @@ public class TestMessage {
     private static final String SRH = "SRH";
     private static final String MSG = "MSG";
     private static final String UPG = "UPG";
+    private static final String IUG = "IUG";
+    private static final String DUI = "DUI";
+    private static final String AIU = "AIU";
+    private static final String DIU = "DIU";
+    private static final String AIM = "AIM";
+    private static final String RIM = "RIM";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";
@@ -651,4 +847,8 @@ public class TestMessage {
     private static final String PASS = "some_p@$$worD";
     private static final String GROUP_NAME = "group";
     private static final String ANOTHER_USER = "another-user";
+    private static final String MODERATOR = "moderator";
+    private static final String INVITEE = "invitee";
+    private static final String INVITER = "inviter";
+
 }

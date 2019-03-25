@@ -146,7 +146,7 @@ public class Message {
      * @return true, if the user is already in the recipients else returns false
      */
     public boolean messageAlreadySent(User u) {
-        return messageRecipients.contains(u);
+        return this.messageRecipients.contains(u);
     }
 
     /**
@@ -156,7 +156,7 @@ public class Message {
      * @return true, if the user is added to the messageRecipients successfully else returns false
      */
     public boolean addUserToRecipients(User u) {
-        return messageRecipients.add(u);
+        return this.messageRecipients.add(u);
     }
 
     /**
@@ -632,10 +632,7 @@ public class Message {
      * @return msg
      */
     public static Message addUniqueKeyToMsg(Message msg, String text) {
-        if (msg.isPrivateUserMessage() || msg.isPrivateReplyMessage()) {
-            return new Message(msg.msgType, msg.msgSender, text, msg.msgReceiverOrPassword);
-        }
-        return msg;
+    	return new Message(msg.msgType, msg.msgSender, text, msg.msgReceiverOrPassword);
     }
 
     /**

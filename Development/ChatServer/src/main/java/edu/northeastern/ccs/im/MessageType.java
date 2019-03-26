@@ -77,7 +77,7 @@ public enum MessageType {
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 
-    REMOVE_USER_GROUP("RUG"),  
+    REMOVE_USER_GROUP("RUG"),
 
     /**
      * Message whose contents are to follow a user
@@ -114,8 +114,38 @@ public enum MessageType {
 	/** 
 	 * Handle to delete a group message. 
 	 */
-	DELETE_GROUP_MESSAGE("DGM");
-	
+	DELETE_GROUP_MESSAGE("DGM"),
+
+    /**
+     * Message handle for Inviting user to a group
+     */
+    INVITE_USER_GROUP("IUG"),
+
+    /**
+     * Message handle for deleting an invitation
+     */
+    DELETE_USER_INVITATION("DUI"),
+
+    /**
+     * Message handle for a user to accept an invite
+     */
+    ACCEPT_INVITE_USER("AIU"),
+
+    /**
+     * Message handle for a user to deny an invite
+     */
+    DENY_INVITE_USER("DIU"),
+
+    /**
+     * Message handle for a moderator to approve an invite.
+     */
+    APPROVE_INVITE_MODERATOR("AIM"),
+
+    /**
+     * Message handle for a moderator to approve an invite.
+     */
+    REJECT_INVITE_MODERATOR("RIM");
+
 	/**
      * Store the short name of this message type.
      */

@@ -1680,6 +1680,22 @@ public class TestClientRunnable {
     }
 
     /**
+     * This test verifies delete Invitation handle when the invitation is already deleted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDeleteInvitationInviterNotTheInvitationSender() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE_INVITER);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
      * This test verifies delete Invitation handle when the invitation is deleted successfully.
      *
      * @throws SQLException - thrown when a downstream database calls fails.
@@ -1928,12 +1944,14 @@ public class TestClientRunnable {
     private static final String PASS = "some_p@$$worD";
     private static final String MODERATOR = "moderator";
     private static final String INVITEE = "invitee";
+    private static final String INVITER = "inviter";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
     private static final Message BROADCAST = Message.makeBroadcastMessage(SENDER_NAME, MESSAGE_TEXT);
     private static final Message CREATE_INVITATION_MESSAGE = Message.makeCreateInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message DELETE_INVITATION_MESSAGE = Message.makeDeleteInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
+    private static final Message DELETE_INVITATION_MESSAGE_INVITER = Message.makeDeleteInvitationMessage(INVITER, INVITEE, GROUP_NAME);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(SENDER_NAME, GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, "hello", "rb");
     private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, "hello", "rb");

@@ -652,7 +652,7 @@ public class ClientRunnable implements Runnable {
                     " using HELP GFR.");
         }
     }
-    
+
     /**
      * Handles the messages get followees.
      *
@@ -753,7 +753,10 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
-     * The handle for messages of type Delete Invitation
+     * The handle for messages of type Delete Invitation where an inviter
+     * who has sent an invitation to an invitee wants to delete the invitation
+     * so that it is unavailable for acceptance by the user
+     * or approval by the moderator after deletion.
      *
      * @param msg - The message to be handled
      * @throws SQLException - the exception thrown when a downstream database error occurs
@@ -769,6 +772,8 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("No invitaton exists for the given user and group.");
             else if(invitation.isInvitationDeleted())
                 this.enqueuePrattleResponseMessage("Invitation is already deleted.");
+            else if(!invitation.getName().equals(inviter))
+                this.enqueuePrattleResponseMessage("Since you did not initiate this invitation you cannot delete it");
             else if(invitationService.deleteInvitation(inviter, invitee, groupName))
                 this.enqueuePrattleResponseMessage("The invitation was successfully deleted.");
             else

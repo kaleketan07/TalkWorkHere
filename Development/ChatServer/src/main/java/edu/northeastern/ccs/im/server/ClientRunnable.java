@@ -14,6 +14,7 @@ import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
 import edu.northeastern.ccs.im.services.GroupService;
+import edu.northeastern.ccs.im.services.InvitationService;
 import edu.northeastern.ccs.im.services.UserService;
 
 /**
@@ -92,6 +93,11 @@ public class ClientRunnable implements Runnable {
     private ConversationalMessageService conversationalMessagesService;
 
     /**
+     * Stores the invitationService instance.
+     */
+    private InvitationService invitationService;
+
+    /**
      * This static data structure stores the client runnable instances
      * associated with their usernames for easy lookup during messaging.
      */
@@ -137,6 +143,7 @@ public class ClientRunnable implements Runnable {
             userService = UserService.getInstance();
             groupService = GroupService.getGroupServiceInstance();
             conversationalMessagesService = ConversationalMessageService.getInstance();
+            invitationService = InvitationService.getInstance();
         } catch (ClassNotFoundException | SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
         }
@@ -698,12 +705,267 @@ public class ClientRunnable implements Runnable {
             // generate the group key to mark all individual messages sent as a result of this group message
             long time = System.currentTimeMillis();
             Timestamp sqlTimestamp = new Timestamp(time);
-            String uniqueGroupKey = currUser.getUserName() +"::"+ currGroup.getGroupName() +"::"+ sqlTimestamp;
-    		currGroup.groupSendMessage(msg, uniqueGroupKey);
-    		this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " + uniqueGroupKey);
-    	}
+            String uniqueGroupKey = currUser.getUserName() + "::" + currGroup.getGroupName() + "::" + sqlTimestamp;
+            currGroup.groupSendMessage(msg, uniqueGroupKey);
+            this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " + uniqueGroupKey);
+        }
     }
 
+    /**
+     * The handle for messages of type Create Invitation
+     *
+     * @param msg - The message to be handled
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
+    private void handleCreateInvitationMessage(Message msg) throws SQLException {
+        String inviter = msg.getName();
+        String invitee = msg.getTextOrPassword();
+        String groupName = msg.getReceiverOrPassword();
+        User userInviter = userService.getUserByUserName(inviter);
+        User userInvitee = userService.getUserByUserName(invitee);
+        Group group = groupService.getGroup(groupName);
+
+        if(group == null) {
+            this.enqueuePrattleResponseMessage("Cannot create invitation: Invalid group name provided.");
+            return;
+        }
+
+        if(userInvitee == null) {
+            this.enqueuePrattleResponseMessage("Cannot create invitation: Invalid user name.");
+            return;
+        }
+
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+        if(groupUsers.contains(userInvitee)) {
+            this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName);
+            return;
+        }
+
+        if(!groupUsers.contains(userInviter)) {
+            this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName + "; you cannot send an invite.");
+            return;
+        }
+
+        if(invitationService.getInvitation(invitee, groupName) != null) {
+            this.enqueuePrattleResponseMessage("An invitation has already been sent to user " + invitee + " for the group " + groupName);
+            return;
+        }
+
+        if (invitationService.createInvitation(inviter, invitee, groupName))
+            this.enqueuePrattleResponseMessage("The invitation was successfully sent.");
+        else
+            this.enqueuePrattleResponseMessage("Unable to send invitation.");
+    }
+
+    /*
+    private void handleDeleteInvitationUserMessage(Message msg) throws SQLException {
+        String inviter = msg.getName();
+        String invitee = msg.getTextOrPassword();
+        String groupName = msg.getReceiverOrPassword();
+        User userInviter = userService.getUserByUserName(inviter);
+        User userInvitee = userService.getUserByUserName(invitee);
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+
+        if(userInviter == null || userInvitee == null || groupUsers.isEmpty() ) {
+            this.enqueuePrattleResponseMessage("Cannot delete invitation: Invalid user name or group name provided.");
+            return;
+        }
+
+        if(groupUsers.contains(userInvitee)) {
+            this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName + ", cannot delete the invitation at this time.");
+            return;
+        }
+
+        if(!groupUsers.contains(userInviter)) {
+            this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName + "anymore; you cannot delete the invite.");
+            return;
+        }
+
+        Message invitation = invitationService.getInvitation(invitee, groupName);
+        if(invitation == null) {
+            this.enqueuePrattleResponseMessage("No invitaton exists for the given user and group.");
+            return;
+        }
+
+        if(invitation.isInvitationDeleted()) {
+            this.enqueuePrattleResponseMessage("Invitation is already deleted.");
+            return;
+        }
+
+        if(invitationService.deleteInvitation(inviter, invitee, groupName))
+            this.enqueuePrattleResponseMessage("The invitation was successfully deleted.");
+        else
+            this.enqueuePrattleResponseMessage("Unable to delete invitation.");
+    }
+
+    private void handleAcceptInvitationUserMessage(Message msg) throws SQLException {
+        String invitee = msg.getName();
+        String groupName = msg.getTextOrPassword();
+        User userInvitee = userService.getUserByUserName(invitee);
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+        if(groupUsers.contains(userInvitee)) {
+            this.enqueuePrattleResponseMessage("You are already a member of the group " + groupName);
+            return;
+        }
+
+        Message invitation = invitationService.getInvitation(invitee, groupName);
+        if(invitation == null) {
+            this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
+            return;
+        }
+
+        if(invitation.isInvitationAccepted()) {
+            this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been removed from the group");
+            return;
+        }
+
+        if(invitation.isInvitationRejected()) {
+            this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you will have to wait for an invite from another user");
+            return;
+        }
+
+        if(invitation.isInvitationDeleted()) {
+            this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have to wait for another invite.");
+            return;
+        }
+
+        if(invitationService.acceptDenyInvitation(invitee, groupName, true)) {
+            this.enqueuePrattleResponseMessage("The invitation was successfully accepted.");
+            Group group = groupService.getGroup(groupName);
+            if(invitation.isInvitationApproved() && group != null) {
+                boolean result = groupService.addUserToGroup(groupName, invitee);
+                if(result)
+                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
+            }
+        }
+        else
+            this.enqueuePrattleResponseMessage("Unable to accept invitation.");
+
+    }
+
+    private void handleDenyInvitationUserMessage(Message msg) throws SQLException {
+        String invitee = msg.getName();
+        String groupName = msg.getTextOrPassword();
+        User userInvitee = userService.getUserByUserName(invitee);
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+        if(groupUsers.contains(userInvitee)) {
+            this.enqueuePrattleResponseMessage("You are already a member of the group " + groupName);
+            return;
+        }
+
+        Message invitation = invitationService.getInvitation(invitee, groupName);
+        if(invitation == null) {
+            this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
+            return;
+        }
+
+        if(invitation.isInvitationRejected()) {
+            this.enqueuePrattleResponseMessage("This invitation is already rejected by moderator; you do not need to deny it anymore");
+            return;
+        }
+
+        if(invitation.isInvitationAccepted()) {
+            this.enqueuePrattleResponseMessage("You have already accepted this invitation; you cannot deny it now");
+            return;
+        }
+
+        if(invitation.isInvitationDeleted()) {
+            this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, hence cannot be denied");
+            return;
+        }
+
+        if(invitationService.acceptDenyInvitation(invitee, groupName, false))
+            this.enqueuePrattleResponseMessage("The invitation was denied successfully.");
+        else
+            this.enqueuePrattleResponseMessage("Unable to deny invitation.");
+    }
+
+    private void handleApproveInvitationModeratorMessage(Message msg) throws SQLException {
+
+        String moderator = msg.getName();
+        String invitee = msg.getTextOrPassword();
+        String groupName = msg.getReceiverOrPassword();
+
+        if(!groupService.isModerator(groupName, moderator)) {
+            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are not a moderator of this group");
+            return;
+        }
+
+        User userInvitee = userService.getUserByUserName(invitee);
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+        if(groupUsers.contains(userInvitee)) {
+            this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
+            return;
+        }
+
+        Message invitation = invitationService.getInvitation(invitee, groupName);
+        if(invitation == null) {
+            this.enqueuePrattleResponseMessage("This invitation does not exist" + groupName);
+            return;
+        }
+
+        if(invitation.isInvitationRejected()) {
+            this.enqueuePrattleResponseMessage("You have already rejected this invitation, you cannot approve it now.");
+            return;
+        }
+
+        if(invitation.isInvitationDeleted()) {
+            this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, hence cannot be approved");
+            return;
+        }
+
+        if(invitationService.approveRejectInvitation(invitee, groupName, true)) {
+            this.enqueuePrattleResponseMessage("The invitation was successfully approved.");
+            Group group = groupService.getGroup(groupName);
+            if(invitation.isInvitationAccepted() && group != null) {
+                boolean result = groupService.addUserToGroup(groupName, invitee);
+                if(result)
+                    this.enqueuePrattleResponseMessage("Since this invitation is already accepted, the user " + invitee + " was added to "+ groupName);
+            }
+        }
+        else
+            this.enqueuePrattleResponseMessage("Unable to approve invitation.");
+    }
+
+    private void handleRejectInvitationModeratorMessage(Message msg) throws SQLException {
+        String moderator = msg.getName();
+        String invitee = msg.getTextOrPassword();
+        String groupName = msg.getReceiverOrPassword();
+
+        if(!groupService.isModerator(groupName, moderator)) {
+            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are not a moderator of this group");
+            return;
+        }
+
+        User userInvitee = userService.getUserByUserName(invitee);
+        Set<User> groupUsers = groupService.getMemberUsers(groupName);
+        if(groupUsers.contains(userInvitee)) {
+            this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
+            return;
+        }
+
+        Message invitation = invitationService.getInvitation(invitee, groupName);
+        if(invitation == null) {
+            this.enqueuePrattleResponseMessage("This invitation does not exist" + groupName);
+            return;
+        }
+
+        if(invitation.isInvitationApproved()) {
+            this.enqueuePrattleResponseMessage("You have already approved this invitation, you cannot reject it now.");
+            return;
+        }
+
+        if(invitation.isInvitationDeleted()) {
+            this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, hence cannot be rejected");
+            return;
+        }
+
+        if(invitationService.approveRejectInvitation(invitee, groupName, false))
+            this.enqueuePrattleResponseMessage("The invitation was successfully rejected.");
+        else
+            this.enqueuePrattleResponseMessage("Unable to reject invitation.");
+    }
+*/
     /**
      * Handle the update group message method
      *
@@ -1025,6 +1287,35 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
+     * This method handles Invitation messages
+     *
+     * @param msg - The incoming message
+     * @throws SQLException - thrown by Database related queries and calls
+     */
+    private boolean handleInvitationMessages(Message msg) throws  SQLException {
+        if(msg.isCreateInvitationMessage()) {
+            handleCreateInvitationMessage(msg);
+            return true;
+//        } else if(msg.isDeleteInvitationMessage()) {
+//            handleDeleteInvitationUserMessage(msg);
+//            return true;
+//        } else if(msg.isAcceptInviteUserMessage()) {
+//            handleAcceptInvitationUserMessage(msg);
+//            return true;
+//        } else if (msg.isDenyInviteUserMessage()) {
+//            handleDenyInvitationUserMessage(msg);
+//            return true;
+//        } else if(msg.isApproveInviteModeratorMessage()) {
+//            handleApproveInvitationModeratorMessage(msg);
+//            return true;
+//        } else if(msg.isRejectInviteModeratorMessage()) {
+//            handleRejectInvitationModeratorMessage(msg);
+//            return true;
+        }
+        return false;
+    }
+
+    /**
      * This method handles different types of messages and delegates works to its respective methods
      *
      * @param msg - The incoming message
@@ -1037,6 +1328,7 @@ public class ClientRunnable implements Runnable {
         result = result? result: handleGroupMessages(msg);
         result = result? result: handleUserMessages(msg);
         result = result? result: handleCommunicationMessages(msg);
+        result = result? result: handleInvitationMessages(msg);
 
         if(!result) {
             ChatLogger.warning("Message not one of the required types " + msg);

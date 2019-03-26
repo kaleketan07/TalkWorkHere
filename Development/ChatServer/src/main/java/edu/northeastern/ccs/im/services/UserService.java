@@ -317,6 +317,31 @@ public class UserService implements UserDao {
         return resultUsers;
     }
 
-
+    
+    /**
+     * Returns a Map<String, String> which contains username of all the user who are
+     * online from the list of followees of the given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
+    @Override
+    public Map<String, String> getOnlineUsers(User follower) throws SQLException {
+    	Map<String, String> resultUsers = new HashMap<>();
+        final String GET_FOLLOWERS =
+        		"select username from user_profile where username in" +  
+        		" (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?) and logged_in = 1";
+        pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
+        pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String username = result.getString(USER_NAME);
+            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
+            resultUsers.put(username, fullName);
+        }
+        pstmt.close();
+        return resultUsers;
+    }
+    
 }
 

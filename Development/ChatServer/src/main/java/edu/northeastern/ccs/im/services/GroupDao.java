@@ -117,8 +117,8 @@ public interface GroupDao {
     /**
      * Checks if is user member of the group.
      *
-     * @param grpName  the name of the group in which the user name is to be searched
-     * @param userName the user name to be searched
+     * @param grpName  the name of the group in which the user name is to be checked
+     * @param userName the user name to be checked
      * @return true, if is user is a member of the group
      * @throws SQLException the SQL exception
      */
@@ -145,4 +145,14 @@ public interface GroupDao {
      * @throws SQLException the sql exception
      */
     Map<String, String> searchGroup(String searchString) throws SQLException;
+    
+    /**
+     * Removes the group from the given group
+     *
+     * @param hostGroupName
+     * @param guestGroupName
+     * @return true, if successfully removes the group else returns false
+     * @throws SQLException
+     */
+    boolean removeGroupFromGroup(String hostGroupName, String guestGroupName) throws SQLException;
 }

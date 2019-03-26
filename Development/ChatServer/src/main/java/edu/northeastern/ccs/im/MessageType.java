@@ -119,7 +119,12 @@ public enum MessageType {
 	/** 
 	 * Handle to add a group to group. 
 	 */
-	ADD_GROUP_TO_GROUP("AGG");
+	ADD_GROUP_TO_GROUP("AGG"),
+	
+	/** 
+	 * Handle to remove a group from group. 
+	 */
+	REMOVE_GROUP_FROM_GROUP("RGG");
 	
 	/**
      * Store the short name of this message type.

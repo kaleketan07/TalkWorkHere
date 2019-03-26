@@ -847,18 +847,38 @@ public class ClientRunnable implements Runnable {
     }
     
     
+    /**
+     * Handle add group to group message.
+     *
+     * @param msg the msg object of type Add Group to Group
+     * @throws SQLException the SQL exception
+     */
     private void handleAddGroupToGroupMessage(Message msg) throws SQLException {
         User currentUser = userService.getUserByUserName(msg.getName());
         Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
-        Group guestUser = groupService.getGroup(msg.getTextOrPassword());
-        if (helperAddRemoveGroupToGroupMessage(currentUser, currentGroup, guestUser)) {
-            if (groupService.addGroupToGroup(currentGroup.getGroupName(), guestUser.getGroupName())) {
+        Group guestGroup = groupService.getGroup(msg.getTextOrPassword());
+        if (helperAddRemoveGroupToGroupMessage(currentUser, currentGroup, guestGroup)) {
+            if (groupService.addGroupToGroup(currentGroup.getGroupName(), guestGroup.getGroupName())) {
                 this.enqueuePrattleResponseMessage("Group was added successfully");
             } else {
                 this.enqueuePrattleResponseMessage("Group was not added as the group was already there");
             }
         }
     }
+    
+    private void handleRemoveGroupFromGroupMessage(Message msg) throws SQLException {
+        User currentUser = userService.getUserByUserName(msg.getName());
+        Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());
+        Group guestGroup = groupService.getGroup(msg.getTextOrPassword());
+        if (helperAddRemoveGroupToGroupMessage(currentUser, currentGroup, guestGroup)) {
+            if (groupService.removeGroupFromGroup(currentGroup.getGroupName(), guestGroup.getGroupName())) {
+                this.enqueuePrattleResponseMessage("Group was removed successfully");
+            } else {
+                this.enqueuePrattleResponseMessage("Internal error occurred while removing the group. Group could not be removed");
+            }
+        }
+    }
+    
 
     /**
      * This method handles general messages
@@ -936,6 +956,9 @@ public class ClientRunnable implements Runnable {
         	return true;
         } else if (msg.isAddGroupToGroupMessage()) {
             handleAddGroupToGroupMessage(msg);
+            return true;
+        } else if (msg.isRemoveGroupFromGroupMessage()) {
+            handleRemoveGroupFromGroupMessage(msg);
             return true;
         }
         return false;

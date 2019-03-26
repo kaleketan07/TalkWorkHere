@@ -699,6 +699,12 @@ public class ClientRunnable implements Runnable {
         }
     }
 
+    /**
+     * The handle for messages of type Create Invitation
+     *
+     * @param msg - The message to be handled
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
     private void handleCreateInvitationMessage(Message msg) throws SQLException {
         String inviter = msg.getName();
         String invitee = msg.getTextOrPassword();

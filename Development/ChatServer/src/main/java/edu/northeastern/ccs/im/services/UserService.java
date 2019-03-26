@@ -279,9 +279,9 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String, String> getFollowers(User followee) throws SQLException {
-    	Map<String, String> resultUsers = new HashMap<>();
-    	final String GET_FOLLOWERS =
-    			"select * from user_profile where username in (SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?)";
+        Map<String, String> resultUsers = new HashMap<>();
+        final String GET_FOLLOWERS =
+                "select * from user_profile where username in (SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?)";
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName());
         result = pstmt.executeQuery();
@@ -293,19 +293,19 @@ public class UserService implements UserDao {
         pstmt.close();
         return resultUsers;
     }
-    
+
     /**
      * Returns a Map<String, String> which contains username and fullname of all the followee of a given user
-     * 
+     *
      * @param follower user who is the follower
      * @return a Map<String, String> which contains username and fullname
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
     @Override
     public Map<String, String> getFollowees(User follower) throws SQLException {
-    	Map<String, String> resultUsers = new HashMap<>();
+        Map<String, String> resultUsers = new HashMap<>();
         final String GET_FOLLOWERS =
-        		"SELECT * from user_profile WHERE username in (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?)";
+                "SELECT * from user_profile WHERE username in (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?)";
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
@@ -318,21 +318,21 @@ public class UserService implements UserDao {
         return resultUsers;
     }
 
-    
+
     /**
      * Returns a Map<String, String> which contains username and fullname of all the user who are
      * online from the list of followees of the given user
-     * 
+     *
      * @param follower user who is the follower
      * @return a Map<String, String> which contains username and fullname
-     * @throws SQLException  the sql exception
+     * @throws SQLException the sql exception
      */
     @Override
     public Map<String, String> getOnlineUsers(User follower) throws SQLException {
-    	Map<String, String> resultUsers = new HashMap<>();
+        Map<String, String> resultUsers = new HashMap<>();
         final String GET_FOLLOWERS =
-        		"select username from user_profile where username in" +  
-        		" (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?) and logged_in = 1";
+                "select username from user_profile where username in" +
+                        " (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?) and logged_in = 1";
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
@@ -344,6 +344,6 @@ public class UserService implements UserDao {
         pstmt.close();
         return resultUsers;
     }
-    
+
 }
 

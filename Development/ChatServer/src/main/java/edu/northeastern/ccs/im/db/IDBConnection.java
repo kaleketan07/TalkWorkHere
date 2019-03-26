@@ -7,6 +7,7 @@ public interface IDBConnection {
 
     /**
      * Closes the IDBConnection object
+     *
      * @throws SQLException - when an error occurs during database interaction
      */
     public void close() throws SQLException;

@@ -145,7 +145,7 @@ public interface GroupDao {
      * @throws SQLException the sql exception
      */
     Map<String, String> searchGroup(String searchString) throws SQLException;
-    
+
     /**
      * Removes the group from the given group
      *

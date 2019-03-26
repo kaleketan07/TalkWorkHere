@@ -137,12 +137,12 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
         int res = 0;
         try {
-           res = pstmt.executeUpdate();
+            res = pstmt.executeUpdate();
         } catch (Exception e) {
             throw new SQLException(e);
         }
         pstmt.close();
-        return (res>0);
+        return (res > 0);
     }
 
 
@@ -196,15 +196,15 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the SQL exception
      */
     public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException {
-    	 final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
-         pstmt = conn.getPreparedStatement(ADD_MAPPING);
-         pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey,uniqueMessageKey);
-         int res = pstmt.executeUpdate();
-         pstmt.close();
-         return (res > 0);
-    }	
-    
-    
+        final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
+        pstmt = conn.getPreparedStatement(ADD_MAPPING);
+        pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey, uniqueMessageKey);
+        int res = pstmt.executeUpdate();
+        pstmt.close();
+        return (res > 0);
+    }
+
+
     /**
      * Delete group message and the mappings from the group message table and all the messages from the .
      *
@@ -213,24 +213,23 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the SQL exception
      */
     public boolean deleteGroupMessage(String grpMsgUniqueKey) throws SQLException {
-    	// fetch all the message keys for this group key
-    	final String FETCH_MESSAGE_KEYS = "SELECT message_unique_key FROM prattle.group_messages WHERE group_unique_key = ?";
+        // fetch all the message keys for this group key
+        final String FETCH_MESSAGE_KEYS = "SELECT message_unique_key FROM prattle.group_messages WHERE group_unique_key = ?";
         pstmt = conn.getPreparedStatement(FETCH_MESSAGE_KEYS);
         pstmt = utils.setPreparedStatementArgs(pstmt, grpMsgUniqueKey);
-    	List<String> cm = new ArrayList<>();
+        List<String> cm = new ArrayList<>();
         result = pstmt.executeQuery();
         while (result.next()) {
             String msguniquekey = result.getString(GRP_COL_MSG_KEY);
             cm.add(msguniquekey);
         }
         pstmt.close();
-    	// for all keys fetched above delete the message in messages table
+        // for all keys fetched above delete the message in messages table
         for (String key : cm) {
-        	if (!deleteMessage(key)) return false;
+            if (!deleteMessage(key)) return false;
         }
         return true;
     }
-    
-    
+
 
 }

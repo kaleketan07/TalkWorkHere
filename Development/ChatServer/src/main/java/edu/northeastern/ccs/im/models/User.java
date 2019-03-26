@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class User {
 
-	private String firstName;
+    private String firstName;
     private String lastName;
     private String userName;
     private String userPassword;
@@ -162,28 +162,30 @@ public class User {
         if (clientRunnable != null && clientRunnable.isInitialized()) {
             uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
             if (msg.isGroupMessage()) {
-            	clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
+                clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
                         System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator()));
             } else {
-            	clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
+                clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
                         System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
             }
-            
+
             return uniqueKey;
         }
 
         return cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
-    
+
     @Override
-	public boolean equals(Object obj) {
-		if(obj instanceof User) {
-			return this.userName.equals(((User) obj).getUserName());
-		}
-		return false;
-	}
-   
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            return this.userName.equals(((User) obj).getUserName());
+        }
+        return false;
+    }
+
     @Override
-	public int hashCode() {	return (this.userName != null) ? 31 * userName.hashCode(): 0; }
+    public int hashCode() {
+        return (this.userName != null) ? 31 * userName.hashCode() : 0;
+    }
 }
 

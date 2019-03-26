@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -90,16 +92,17 @@ public class TestClientRunnable {
 
     /**
      * Helper method to reset and set the messageList to be used during tests
+     *
      * @param messageList - the message list to be passed that contains all the messages
      * @param msg         - the message object that needs to be added to the above mentioned list
      * @return message iterator - an iterator over the message list that will be used by the ClientRunnable mocked object
      */
-    private Iterator<Message> resetAndAddMessages(List<Message> messageList, Message... msg){
+    private Iterator<Message> resetAndAddMessages(List<Message> messageList, Message... msg) {
         messageList.clear();
-        for(Message m : msg)
+        for (Message m : msg)
             messageList.add(m);
         Iterator<Message> messageIter2 = messageList.iterator();
-        return  messageIter2;
+        return messageIter2;
     }
 
     /**
@@ -110,7 +113,7 @@ public class TestClientRunnable {
      * @throws SQLException           the sql exception that is thrown when a query doesn't work correctly
      */
     @BeforeEach
-    public void setUp() throws IllegalAccessException,NoSuchFieldException,SQLException{
+    public void setUp() throws IllegalAccessException, NoSuchFieldException, SQLException {
         MockitoAnnotations.initMocks(this);
         //Define behavior for networkConnectionMock
         clientRunnableObject = new ClientRunnable(networkConnectionMock);
@@ -122,10 +125,10 @@ public class TestClientRunnable {
 
         //Define behavior for mocked User Service
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(USER_LOGGED_ON);
-        when(mockedUserService.updateUserAttributes(Mockito.anyString(),Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         when(mockedUserService.deleteUser(Mockito.any())).thenReturn(true);
-        when(mockedUserService.updateUserAttributes(Mockito.anyString(),Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
         //Define behavior for mocked Conversational Message Service
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
@@ -139,16 +142,16 @@ public class TestClientRunnable {
         //Define behavior for Group Service:
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
         when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        when(mockedGroupService.createGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.createGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         when(mockedGroupService.removeUserFromGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        when(mockedGroupService.addUserToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.addUserToGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         when(mockedGroupService.isUserMemberOfTheGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        when(mockedGroupService.updateGroupSettings(Mockito.anyString(),Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.updateGroupSettings(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
         //Set fields in clientRunnable
         Field ncField = ClientRunnable.class.getDeclaredField("connection");
         ncField.setAccessible(true);
-        ncField.set(clientRunnableObject,networkConnectionMock);
+        ncField.set(clientRunnableObject, networkConnectionMock);
         Field userServiceField = ClientRunnable.class.getDeclaredField("userService");
         userServiceField.setAccessible(true);
         userServiceField.set(clientRunnableObject, mockedUserService);
@@ -180,7 +183,7 @@ public class TestClientRunnable {
      * to true in the first run with using a message iterator with one message
      */
     @Test
-    public void testRun(){
+    public void testRun() {
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -192,7 +195,7 @@ public class TestClientRunnable {
      * to true in the first run with using a message iterator with one message
      */
     @Test
-    public void testRunSameClient(){
+    public void testRunSameClient() {
         clientRunnableObject.run();
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -206,7 +209,7 @@ public class TestClientRunnable {
      * @throws IOException the io exception that can be encountered when opening a SocketChannel
      */
     @Test
-    public void testSetNameandGetName() throws IOException{
+    public void testSetNameandGetName() throws IOException {
         SocketChannel client = SocketChannel.open();
         NetworkConnection networkConnection = new NetworkConnection(client);
         ClientRunnable clientRunnableObject = new ClientRunnable(networkConnection);
@@ -220,7 +223,7 @@ public class TestClientRunnable {
      */
     @Test
     public void testHandleIncomingMessageandHandleOutGoingMessage() {
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,BROADCAST,BROADCAST));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, BROADCAST, BROADCAST));
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -231,14 +234,13 @@ public class TestClientRunnable {
      * not have broadcast message
      */
     @Test
-    public void testHandleIncomingMessageWithoutBroadcastMessage(){
+    public void testHandleIncomingMessageWithoutBroadcastMessage() {
         Message login = Message.makeSimpleLoginMessage(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,BROADCAST,login));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, BROADCAST, login));
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-
 
 
     /**
@@ -263,8 +265,8 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageWithIteratorWithLoginMessageForInvalidUser() throws SQLException {
         clientRunnableObject.run();
-        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(),Mockito.anyString())).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -274,9 +276,9 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin(){
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
         clientRunnableObject.run();
     }
 
@@ -285,9 +287,9 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserUnsuccessfulRegister(){
+    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserUnsuccessfulRegister() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REGISTER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REGISTER));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -297,11 +299,11 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Private User message in waitList and Message sent successfully
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress(){
+    public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress() {
         clientRunnableObject.run();
         User mockedUser = mock(User.class);
         mockedUser.setLoggedIn(true);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, PRIVATE_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -313,11 +315,11 @@ public class TestClientRunnable {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithValidDestAddress() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithValidDestAddress() throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, mockedUser);
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_REPLY));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, PRIVATE_REPLY));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -327,12 +329,12 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithInvalidDestAddress() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithInvalidDestAddress() throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(null);
         mockedUser.setLoggedIn(true);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_REPLY));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, PRIVATE_REPLY));
         clientRunnableObject.run();
     }
 
@@ -341,11 +343,11 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with PrivateReply message in waitList and Message sent successfully
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithInvalidDestAddress2() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithPrivateReplyWithInvalidDestAddress2() throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, (User) null);
         mockedUser.setLoggedIn(true);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_REPLY));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, PRIVATE_REPLY));
         clientRunnableObject.run();
     }
 
@@ -354,10 +356,10 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Private User message in waitList and Message not sent
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithPrivateWithInvalidDestAddress() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithPrivateWithInvalidDestAddress() throws SQLException {
         clientRunnableObject.run();
-        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON,(User) null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_MESSAGE));
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, (User) null);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, PRIVATE_MESSAGE));
         clientRunnableObject.run();
     }
 
@@ -367,10 +369,10 @@ public class TestClientRunnable {
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserSuccessFulRegister()
-            throws SQLException{
+            throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REGISTER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REGISTER));
         clientRunnableObject.run();
     }
 
@@ -380,10 +382,10 @@ public class TestClientRunnable {
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserRegisterPasswordFail()
-            throws SQLException{
+            throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REGISTER2));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REGISTER2));
         clientRunnableObject.run();
     }
 
@@ -393,10 +395,10 @@ public class TestClientRunnable {
      * With invalid group name
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithDeleteGroupMessageWithInvalidGroupName() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithDeleteGroupMessageWithInvalidGroupName() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -407,11 +409,11 @@ public class TestClientRunnable {
      * where user is not the moderator of the group
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithDeleteGroupMessageWithInvalidModerator() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithDeleteGroupMessageWithInvalidModerator() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
-        when(mockedGroupService.isModerator(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_GROUP));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -422,9 +424,9 @@ public class TestClientRunnable {
      * With Valid User and Group and User being Moderator of the group
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithDeleteGroupMessageWithValidUserNameAndGroupName(){
+    public void testHandleIncomingMessageWithIteratorWithDeleteGroupMessageWithValidUserNameAndGroupName() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -435,9 +437,9 @@ public class TestClientRunnable {
      * With Valid Group
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithGetGroupMessageWithValidGroup(){
+    public void testHandleIncomingMessageWithIteratorWithGetGroupMessageWithValidGroup() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_GROUP));
         when(networkConnectionMock.sendMessage(Mockito.any())).thenReturn(true);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -449,10 +451,10 @@ public class TestClientRunnable {
      * With Invalid Group
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithGetGroupMessageWithInvalidGroup() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithGetGroupMessageWithInvalidGroup() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -463,11 +465,11 @@ public class TestClientRunnable {
      * is for the time when the user's attributes in the database don't get updated after logging in.
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserUnsuccessfulLogin() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserUnsuccessfulLogin() throws SQLException {
         clientRunnableObject.run();
-        when(mockedUserService.updateUserAttributes(Mockito.anyString(),Mockito.anyString(),Mockito.anyString()))
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(false);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
         clientRunnableObject.run();
     }
 
@@ -476,10 +478,10 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Delete User Message with invalid user
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithDeleteUserMessageInvalid() throws SQLException{
+    public void testHandleIncomingMessageWithIteratorWithDeleteUserMessageInvalid() throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.deleteUser(USER_LOGGED_ON)).thenReturn(false);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_USER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_USER));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -489,7 +491,7 @@ public class TestClientRunnable {
      * message Iterator from network connection
      */
     @Test
-    public void testCheckInitialization(){
+    public void testCheckInitialization() {
         clientRunnableObject.run();
         messageList.clear();
         messageIter = messageList.iterator();
@@ -507,7 +509,7 @@ public class TestClientRunnable {
      * @throws NoSuchMethodException     the no such method exception to be used while using java Reflection
      */
     @Test
-    public void testSetUserName() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException{
+    public void testSetUserName() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Method retrieveItems = Message.class.getDeclaredMethod("makeHelloMessage", String.class);
         retrieveItems.setAccessible(true);
         Message.class.getDeclaredMethods();
@@ -551,7 +553,7 @@ public class TestClientRunnable {
      * Testing setUserName using a valid string Input Which sets the user name
      */
     @Test
-    public void testSetUserNameWithValidString(){
+    public void testSetUserNameWithValidString() {
         clientRunnableObject.run();
         assertNotEquals(clientRunnableObject.getUserId(), -1);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
@@ -642,7 +644,7 @@ public class TestClientRunnable {
         assertNotEquals(clientRunnableObject.getUserId(), -1);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
         ClientRunnable senderClient = ClientRunnable.getClientByUsername(SENDER_NAME);
-        assertEquals(clientRunnableObject.getName(),senderClient.getName());
+        assertEquals(clientRunnableObject.getName(), senderClient.getName());
     }
 
     /**
@@ -660,7 +662,7 @@ public class TestClientRunnable {
      * and checks whether the duplicate user name is set to invalid-USERNAME-counter format
      */
     @Test
-    public void testSetUserNameForAlreadyExistingUsers(){
+    public void testSetUserNameForAlreadyExistingUsers() {
         clientRunnableObject.run();
         assertNotEquals(clientRunnableObject.getUserId(), -1);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
@@ -679,13 +681,13 @@ public class TestClientRunnable {
     /**
      * Test create group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testCreateGroup() throws SQLException{
+    public void testCreateGroup() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroupService.getGroup(DUMMY_GROUP_NAME)).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_GROUP));
         clientRunnableObject.run();
         assertNotEquals(clientRunnableObject.getUserId(), -1);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
@@ -694,13 +696,13 @@ public class TestClientRunnable {
     /**
      * Test cannot create existing group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testCannotCreateExistingGroup() throws SQLException{
+    public void testCannotCreateExistingGroup() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroupService.getGroup(DUMMY_GROUP_NAME)).thenReturn(mockedGroup);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -708,16 +710,16 @@ public class TestClientRunnable {
     /**
      * Test add user to group when user is already a part of the group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddUserToGroup() throws SQLException{
+    public void testAddUserToGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_USER_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
-        when(mockedGroupService.addUserToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(mockedGroupService.addUserToGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -725,15 +727,15 @@ public class TestClientRunnable {
     /**
      * Test remove user from group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveUserFromGroupWithUserInGroup() throws SQLException{
+    public void testRemoveUserFromGroupWithUserInGroup() throws SQLException {
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_USER_TO_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -741,14 +743,14 @@ public class TestClientRunnable {
     /**
      * Test add user to group when user is not a part of the group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddUserToGroupWithUserNotGroup() throws SQLException{
+    public void testAddUserToGroupWithUserNotGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_USER_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -757,16 +759,16 @@ public class TestClientRunnable {
     /**
      * Test remove user from group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveUserFromGroupWithUserNotInGroup() throws SQLException{
+    public void testRemoveUserFromGroupWithUserNotInGroup() throws SQLException {
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_USER_TO_GROUP));
-        when(mockedGroupService.removeUserFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_USER_TO_GROUP));
+        when(mockedGroupService.removeUserFromGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -774,12 +776,12 @@ public class TestClientRunnable {
     /**
      * Test remove user from group when the group is not present.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveUserFromGroupWithNoGroup() throws SQLException{
+    public void testRemoveUserFromGroupWithNoGroup() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_USER_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -788,14 +790,14 @@ public class TestClientRunnable {
     /**
      * Test remove user from group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveUserFromGroupByNonModerator() throws SQLException{
+    public void testRemoveUserFromGroupByNonModerator() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(DUMMY_USER);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_USER_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -804,17 +806,17 @@ public class TestClientRunnable {
     /**
      * Test remove non existing user from group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveNonExisitingUserToGroup() throws SQLException{
+    public void testRemoveNonExisitingUserToGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         when(mockedUserService.getUserByUserName(DUMMY_USER)).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_USER_TO_GROUP));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -822,14 +824,14 @@ public class TestClientRunnable {
     /**
      * Test add user to group by non moderator
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddUserToGroupByNonModerator() throws SQLException{
+    public void testAddUserToGroupByNonModerator() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(DUMMY_USER);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_USER_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_USER_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -838,17 +840,17 @@ public class TestClientRunnable {
     /**
      * Test add non existing user to group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddNonExisitingUserToGroup() throws SQLException{
+    public void testAddNonExisitingUserToGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
         when(mockedUserService.getUserByUserName(DUMMY_USER)).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_USER_TO_GROUP2));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_USER_TO_GROUP2));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -856,10 +858,10 @@ public class TestClientRunnable {
     /**
      * Test add non existing user to group and when the moderator is invalid
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddNonExisitingUserInvalidModerator() throws SQLException{
+    public void testAddNonExisitingUserInvalidModerator() throws SQLException {
         USER_LOGGED_OFF.setLoggedIn(true);
         clientRunnableObject.run();
         Group temp = new Group();
@@ -867,7 +869,7 @@ public class TestClientRunnable {
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
         when(mockedUserService.getUserByUserName(DUMMY_USER)).thenReturn(null);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_USER_TO_GROUP2));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_USER_TO_GROUP2));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
         USER_LOGGED_OFF.setLoggedIn(false);
@@ -876,28 +878,27 @@ public class TestClientRunnable {
     /**
      * Test add user to non existing group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddUserToNonExistingGroup() throws SQLException{
+    public void testAddUserToNonExistingGroup() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_ON);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_USER_TO_GROUP2));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_USER_TO_GROUP2));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test invalid message handle
-     *
      */
     @Test
-    public void testInvalidHandle(){
+    public void testInvalidHandle() {
         clientRunnableObject.run();
         Message mockMsg = Mockito.mock(Message.class);
         when(mockMsg.getName()).thenReturn(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,mockMsg));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, mockMsg));
         clientRunnableObject.run();
         assertNotEquals(clientRunnableObject.getUserId(), -1);
         assertEquals(clientRunnableObject.getName(), SENDER_NAME);
@@ -906,10 +907,10 @@ public class TestClientRunnable {
     /**
      * Verify logout for loggedIn user
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testTerminateClientLogoutLoggedInUser() throws SQLException{
+    public void testTerminateClientLogoutLoggedInUser() throws SQLException {
         messageList = new ArrayList<>();
         messageList.add(BROADCAST);
         messageList.add(QUIT_MESSAGE);
@@ -932,9 +933,9 @@ public class TestClientRunnable {
      * Verify follow user is handled properly for valid followee
      */
     @Test
-    public void testUserFollowMessageValid(){
+    public void testUserFollowMessageValid() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,FOLLOW_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, FOLLOW_USER_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -943,9 +944,9 @@ public class TestClientRunnable {
      * Verify unfollow user is handled properly for valid followee
      */
     @Test
-    public void testUserUnfollowMessageValid(){
+    public void testUserUnfollowMessageValid() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,UNFOLLOW_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, UNFOLLOW_USER_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -956,9 +957,9 @@ public class TestClientRunnable {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUserFollowMessageInvalid() throws SQLException{
+    public void testUserFollowMessageInvalid() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,FOLLOW_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, FOLLOW_USER_MESSAGE));
         when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, (User) null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -970,9 +971,9 @@ public class TestClientRunnable {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testUserUnfollowMessageInvalid() throws SQLException{
+    public void testUserUnfollowMessageInvalid() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,UNFOLLOW_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, UNFOLLOW_USER_MESSAGE));
         when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -984,10 +985,10 @@ public class TestClientRunnable {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testHandleIncomingMessageWhenUserIsNotLoggedInAndUserSendsBroadcastMessage() throws SQLException{
+    public void testHandleIncomingMessageWhenUserIsNotLoggedInAndUserSendsBroadcastMessage() throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,BROADCAST));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, BROADCAST));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -995,12 +996,11 @@ public class TestClientRunnable {
 
     /**
      * Test handle incoming message when user is logged in.
-     *
      */
     @Test
-    public void testHandleIncomingMessageWhenUserIsLoggedIn(){
+    public void testHandleIncomingMessageWhenUserIsLoggedIn() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,BROADCAST));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, BROADCAST));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1011,10 +1011,10 @@ public class TestClientRunnable {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testHandleIncomingMessageWhenUserIsNotLoggedInAndUserSendsLOGINMessage() throws SQLException{
+    public void testHandleIncomingMessageWhenUserIsNotLoggedInAndUserSendsLOGINMessage() throws SQLException {
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN,LOGIN));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN, LOGIN));
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1022,12 +1022,11 @@ public class TestClientRunnable {
 
     /**
      * Test handle incoming message when user is not logged in and user sends register message.
-     *
      */
     @Test
-    public void testHandleIncomingMessageWhenUserIsNotLoggedInAndUserSendsREGISTERMessage() throws SQLException{
+    public void testHandleIncomingMessageWhenUserIsNotLoggedInAndUserSendsREGISTERMessage() throws SQLException {
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(USER_LOGGED_OFF);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REGISTER,REGISTER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REGISTER, REGISTER));
         clientRunnableObject.run();
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1035,26 +1034,24 @@ public class TestClientRunnable {
 
     /**
      * Test handle user profile update message for first name.
-     *
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForFirstName(){
+    public void testHandleUserProfileUpdateMessageForFirstName() {
         clientRunnableObject.run();
         Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME, "1", "Predna");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,someMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, someMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test handle user profile update message for last name.
-     *
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForLastName(){
+    public void testHandleUserProfileUpdateMessageForLastName() {
         clientRunnableObject.run();
         Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME, "2", "Predna");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,someMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, someMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1062,26 +1059,25 @@ public class TestClientRunnable {
     /**
      * Test handle user profile update message for user password.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForUserPassword(){
+    public void testHandleUserProfileUpdateMessageForUserPassword() {
         clientRunnableObject.run();
         Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME, "3", "Predna");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,someMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, someMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test handle user profile update message for user searchability attribute.
-     *
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForUserSearchability(){
+    public void testHandleUserProfileUpdateMessageForUserSearchability() {
         clientRunnableObject.run();
         Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME, "4", "True");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,someMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, someMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1094,10 +1090,10 @@ public class TestClientRunnable {
      * @throws SQLException           the sql exception
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForIncorrectNumber() throws SQLException{
+    public void testHandleUserProfileUpdateMessageForIncorrectNumber() throws SQLException {
         clientRunnableObject.run();
         Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME, "5", "Random");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,someMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, someMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1105,14 +1101,14 @@ public class TestClientRunnable {
     /**
      * Test handle user profile update message for last name when database operations don't get executed
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testHandleUserProfileUpdateMessageForLastNameFalse() throws SQLException{
+    public void testHandleUserProfileUpdateMessageForLastNameFalse() throws SQLException {
         clientRunnableObject.run();
         Message someMessage = Message.makeUserProfileUpdateMessage(SENDER_NAME, "2", "Predna");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,someMessage));
-        when(mockedUserService.updateUserAttributes(Mockito.anyString(),Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, someMessage));
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1120,12 +1116,12 @@ public class TestClientRunnable {
     /**
      * Test handle message with null output for msg.getName() (Invalid sender specified).
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testNullSenderInMessage(){
+    public void testNullSenderInMessage() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,NULL_PRIVATE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, NULL_PRIVATE_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1133,12 +1129,12 @@ public class TestClientRunnable {
     /**
      * Test group message when group does not exist.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testGroupMessageWhenGroupDoesNotExist() throws SQLException{
+    public void testGroupMessageWhenGroupDoesNotExist() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GROUP_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GROUP_MESSAGE));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1147,13 +1143,13 @@ public class TestClientRunnable {
     /**
      * Test update group message when group is not present.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsNotPresent() throws SQLException{
+    public void testUpdateGroupMessageWhenGroupIsNotPresent() throws SQLException {
         clientRunnableObject.run();
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "NoSuchGroup", "1:0");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,updateGroupMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1162,15 +1158,15 @@ public class TestClientRunnable {
     /**
      * Test group message when user not A member of group.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testGroupMessageWhenUserNotAMemberOfGroup() throws SQLException{
+    public void testGroupMessageWhenUserNotAMemberOfGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GROUP_MESSAGE));
-        when(mockedGroupService.isUserMemberOfTheGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GROUP_MESSAGE));
+        when(mockedGroupService.isUserMemberOfTheGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1178,50 +1174,47 @@ public class TestClientRunnable {
     /**
      * Test group message.
      *
-     * @throws SQLException             the SQL exception
+     * @throws SQLException the SQL exception
      */
     @Test
-    public void testGroupMessage(){
+    public void testGroupMessage() {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GROUP_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GROUP_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test Get Followers
-     *
      */
     @Test
-    public void testGetFollowers(){
+    public void testGetFollowers() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWERS));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_FOLLOWERS));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test Get Online Users
-     *
      */
     @Test
-    public void testGetOnlineUsers(){
+    public void testGetOnlineUsers() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_ONLINE_USER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_ONLINE_USER));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test Get Followees .
-     *
      */
     @Test
-    public void testGetFollowees(){
+    public void testGetFollowees() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWEES));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_FOLLOWEES));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1229,26 +1222,26 @@ public class TestClientRunnable {
     /**
      * Test update group message when group is present but user is not moderator.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsNotModerator() throws SQLException{
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsNotModerator() throws SQLException {
         clientRunnableObject.run();
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:0");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,updateGroupMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
         when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
+
     /**
      * Test update group message when group is present but user is moderator for true.
-     *
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForTrue(){
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForTrue() {
         clientRunnableObject.run();
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:0");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,updateGroupMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1256,14 +1249,14 @@ public class TestClientRunnable {
     /**
      * Test update group message when group is present but user is moderator for false.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForFalse() throws SQLException{
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForFalse() throws SQLException {
         clientRunnableObject.run();
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:0");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,updateGroupMessage));
-        when(mockedGroupService.updateGroupSettings(Mockito.anyString(),Mockito.anyString(),Mockito.anyString()))
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        when(mockedGroupService.updateGroupSettings(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1272,14 +1265,14 @@ public class TestClientRunnable {
     /**
      * Test update group message when group is present but user is moderator for exception.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForException() throws SQLException{
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForException() throws SQLException {
         clientRunnableObject.run();
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:0");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,updateGroupMessage));
-        when(mockedGroupService.updateGroupSettings(Mockito.anyString(),Mockito.anyString(),Mockito.anyString())).
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        when(mockedGroupService.updateGroupSettings(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).
                 thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1287,25 +1280,23 @@ public class TestClientRunnable {
 
     /**
      * Test update group message when group is present but user is moderator when attribute number is out of bounds.
-     *
      */
     @Test
-    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorWhenAttributeNumberIsOutOfBounds(){
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorWhenAttributeNumberIsOutOfBounds() {
         clientRunnableObject.run();
         Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "2:0");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,updateGroupMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test search message for user.
-     *
      */
     @Test
-    public void testSearchMessageForUser() throws SQLException{
+    public void testSearchMessageForUser() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,SEARCH_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, SEARCH_USER_MESSAGE));
         HashMap<String, String> testSet = new HashMap<>();
         testSet.put("kp", "some name");
         testSet.put("kp2", "some otherName");
@@ -1317,12 +1308,12 @@ public class TestClientRunnable {
     /**
      * Test search message for user when no such user is found.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchMessageForUserWhenNoSuchUserIsFound() throws SQLException{
+    public void testSearchMessageForUserWhenNoSuchUserIsFound() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,SEARCH_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, SEARCH_USER_MESSAGE));
         HashMap<String, String> testSet = new HashMap<>();
         when(mockedUserService.searchUser("kp")).thenReturn(testSet);
         clientRunnableObject.run();
@@ -1332,12 +1323,12 @@ public class TestClientRunnable {
     /**
      * Test search message when sql exception is thrown due to some error.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchMessageWhenSQLExceptionIsThrownDueToSomeError() throws SQLException{
+    public void testSearchMessageWhenSQLExceptionIsThrownDueToSomeError() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,SEARCH_USER_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, SEARCH_USER_MESSAGE));
         when(mockedUserService.searchUser("kp")).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1346,13 +1337,13 @@ public class TestClientRunnable {
     /**
      * Test search message for neither group or user.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchMessageForNeitherGroupOrUser() throws SQLException{
+    public void testSearchMessageForNeitherGroupOrUser() throws SQLException {
         clientRunnableObject.run();
         Message searchMessage = Message.makeSearchMessage(SENDER_NAME, "WrongInput", "kp");
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,searchMessage));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, searchMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1360,12 +1351,12 @@ public class TestClientRunnable {
     /**
      * Test search message for group.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchMessageForGroup() throws SQLException{
+    public void testSearchMessageForGroup() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,SEARCH_GROUP_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, SEARCH_GROUP_MESSAGE));
         HashMap<String, String> testSet = new HashMap<>();
         testSet.put("kkg", "kk");
         testSet.put("kkGroup", "kk");
@@ -1377,12 +1368,12 @@ public class TestClientRunnable {
     /**
      * Test get follower message for user.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testGetFollowerOneMessage() throws SQLException{
+    public void testGetFollowerOneMessage() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWERS));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_FOLLOWERS));
         HashMap<String, String> testSet = new HashMap<>();
         testSet.put("kkg", "kk");
         testSet.put("kkGroup", "kk");
@@ -1394,12 +1385,12 @@ public class TestClientRunnable {
     /**
      * Test get online user message.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testGetTwoOnlineUserMessage() throws SQLException{
+    public void testGetTwoOnlineUserMessage() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_ONLINE_USER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_ONLINE_USER));
         HashMap<String, String> testSet = new HashMap<>();
         testSet.put("kkg", "kk");
         testSet.put("kkGroup", "kk");
@@ -1407,44 +1398,44 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test get follower message for user.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testGetFollowerMessageForException() throws SQLException{
+    public void testGetFollowerMessageForException() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWERS));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_FOLLOWERS));
         when(mockedUserService.getFollowers(Mockito.any())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test get online user for user.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testGetOnlineUserForException() throws SQLException{
+    public void testGetOnlineUserForException() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_ONLINE_USER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_ONLINE_USER));
         when(mockedUserService.getOnlineUsers(Mockito.any())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test get follower message for user.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testGetFolloweeOneMessage() throws SQLException{
+    public void testGetFolloweeOneMessage() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWEES));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_FOLLOWEES));
         HashMap<String, String> testSet = new HashMap<>();
         testSet.put("kkg", "kk");
         testSet.put("kkGroup", "kk");
@@ -1456,26 +1447,26 @@ public class TestClientRunnable {
     /**
      * Test get follower message for user.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testGetFolloweeMessageForException() throws SQLException{
+    public void testGetFolloweeMessageForException() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWEES));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_FOLLOWEES));
         when(mockedUserService.getFollowees(Mockito.any())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test search message for group when no such group is found.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchMessageForGroupWhenNoSuchGroupIsFound() throws SQLException{
+    public void testSearchMessageForGroupWhenNoSuchGroupIsFound() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,SEARCH_GROUP_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, SEARCH_GROUP_MESSAGE));
         HashMap<String, String> testSet = new HashMap<>();
         when(mockedGroupService.searchGroup(Mockito.anyString())).thenReturn(testSet);
         clientRunnableObject.run();
@@ -1485,12 +1476,12 @@ public class TestClientRunnable {
     /**
      * Test search message when sql exception is thrown due to some error for groups.
      *
-     * @throws SQLException           the sql exception
+     * @throws SQLException the sql exception
      */
     @Test
-    public void testSearchMessageWhenSQLExceptionIsThrownDueToSomeErrorForGroups() throws SQLException{
+    public void testSearchMessageWhenSQLExceptionIsThrownDueToSomeErrorForGroups() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,SEARCH_GROUP_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, SEARCH_GROUP_MESSAGE));
         when(mockedGroupService.searchGroup(Mockito.anyString())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1498,12 +1489,11 @@ public class TestClientRunnable {
 
     /**
      * Test delete group message message when sender is originator.
-     *
      */
     @Test
-    public void testDeleteGroupMessageMessageWhenSenderIsOriginator(){
+    public void testDeleteGroupMessageMessageWhenSenderIsOriginator() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_GROUPMESSAGE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_GROUPMESSAGE_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1514,34 +1504,32 @@ public class TestClientRunnable {
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testDeleteGroupMessageMessageWhenSenderIsOriginatorErrorDeleting() throws SQLException{
+    public void testDeleteGroupMessageMessageWhenSenderIsOriginatorErrorDeleting() throws SQLException {
         clientRunnableObject.run();
         when(mockedcms.deleteGroupMessage(Mockito.anyString())).thenReturn(false);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_GROUPMESSAGE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_GROUPMESSAGE_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test delete group message message when sender is not the originator.
-     *
      */
     @Test
-    public void testDeleteGroupMessageMessageWhenSenderIsNotTheOriginator(){
+    public void testDeleteGroupMessageMessageWhenSenderIsNotTheOriginator() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_GROUPMSG_MSG_SENDER_NOT_IN_KEY));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_GROUPMSG_MSG_SENDER_NOT_IN_KEY));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
      * Test delete private message message when sender is originator.
-     *
      */
     @Test
-    public void testDeletePrivateMessageMessageWhenSenderIsOriginator(){
+    public void testDeletePrivateMessageMessageWhenSenderIsOriginator() {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_PRIVATEMESSAGE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_PRIVATEMESSAGE_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1552,9 +1540,9 @@ public class TestClientRunnable {
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testDeletePrivateMessageMessageWhenSenderIsOriginatorAndErrorDeleting() throws SQLException{
+    public void testDeletePrivateMessageMessageWhenSenderIsOriginatorAndErrorDeleting() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_PRIVATEMESSAGE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_PRIVATEMESSAGE_MESSAGE));
         when(mockedcms.deleteMessage(Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1566,9 +1554,9 @@ public class TestClientRunnable {
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testDeletePrivateMessageMessageWhenSenderIsNotTheOriginator() throws SQLException{
+    public void testDeletePrivateMessageMessageWhenSenderIsNotTheOriginator() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,DELETE_PRIVATEMESSAGE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_PRIVATEMESSAGE_MESSAGE));
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(DUMMY_USER);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1585,7 +1573,7 @@ public class TestClientRunnable {
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1600,7 +1588,7 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getGroup(GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1615,7 +1603,7 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>());
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1630,7 +1618,7 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(INVITEE_USER)));
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1646,7 +1634,7 @@ public class TestClientRunnable {
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(CREATE_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1663,7 +1651,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
         when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1680,7 +1668,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
         when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(false);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1696,7 +1684,7 @@ public class TestClientRunnable {
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1713,7 +1701,7 @@ public class TestClientRunnable {
         DELETE_INVITATION_MESSAGE.setInvitationDeleted(true);
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         DELETE_INVITATION_MESSAGE.setInvitationDeleted(false);
     }
 
@@ -1747,7 +1735,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
         when(mockedInvitationService.deleteInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1764,7 +1752,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
         when(mockedInvitationService.deleteInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(false);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1779,7 +1767,7 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1795,7 +1783,7 @@ public class TestClientRunnable {
         ACCEPT_INVITATION_MESSAGE.setInvitationAccepted(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         ACCEPT_INVITATION_MESSAGE.setInvitationAccepted(false);
     }
 
@@ -1812,7 +1800,7 @@ public class TestClientRunnable {
         ACCEPT_INVITATION_MESSAGE.setInvitationDenied(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         ACCEPT_INVITATION_MESSAGE.setInvitationDenied(false);
     }
 
@@ -1829,7 +1817,7 @@ public class TestClientRunnable {
         ACCEPT_INVITATION_MESSAGE.setInvitationRejected(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         ACCEPT_INVITATION_MESSAGE.setInvitationRejected(false);
     }
 
@@ -1846,7 +1834,7 @@ public class TestClientRunnable {
         ACCEPT_INVITATION_MESSAGE.setInvitationDeleted(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         ACCEPT_INVITATION_MESSAGE.setInvitationDeleted(false);
     }
 
@@ -1863,7 +1851,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1880,7 +1868,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         ACCEPT_INVITATION_MESSAGE.setInvitationApproved(false);
     }
 
@@ -1900,7 +1888,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(true);
         when(mockedGroupService.addUserToGroup(GROUP_NAME, INVITEE)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         ACCEPT_INVITATION_MESSAGE.setInvitationApproved(false);
     }
 
@@ -1917,7 +1905,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
         when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(false);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1932,7 +1920,7 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -1948,7 +1936,7 @@ public class TestClientRunnable {
         DENY_INVITATION_MESSAGE.setInvitationAccepted(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         DENY_INVITATION_MESSAGE.setInvitationAccepted(false);
     }
 
@@ -1965,7 +1953,7 @@ public class TestClientRunnable {
         DENY_INVITATION_MESSAGE.setInvitationDenied(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         DENY_INVITATION_MESSAGE.setInvitationDenied(false);
     }
 
@@ -1982,7 +1970,7 @@ public class TestClientRunnable {
         DENY_INVITATION_MESSAGE.setInvitationRejected(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         DENY_INVITATION_MESSAGE.setInvitationRejected(false);
     }
 
@@ -1999,7 +1987,7 @@ public class TestClientRunnable {
         DENY_INVITATION_MESSAGE.setInvitationDeleted(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         DENY_INVITATION_MESSAGE.setInvitationDeleted(false);
     }
 
@@ -2016,7 +2004,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
         when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, false)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2032,7 +2020,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
         when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, false)).thenReturn(false);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2046,7 +2034,7 @@ public class TestClientRunnable {
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, APPROVE_INVITATION_MESSAGE));
         when(mockedGroupService.getGroup(GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2061,7 +2049,7 @@ public class TestClientRunnable {
         when(mockedGroupService.getGroup(GROUP_NAME)).thenReturn(GROUP);
         when(mockedGroupService.isModerator(GROUP_NAME, SENDER_NAME)).thenReturn(false);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2078,7 +2066,7 @@ public class TestClientRunnable {
         when(mockedGroupService.isModerator(GROUP_NAME, SENDER_NAME)).thenReturn(true);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(INVITEE_USER)));
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2095,7 +2083,7 @@ public class TestClientRunnable {
         when(mockedGroupService.isModerator(GROUP_NAME, SENDER_NAME)).thenReturn(true);
         when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2113,7 +2101,7 @@ public class TestClientRunnable {
         APPROVE_INVITATION_MESSAGE.setInvitationRejected(true);
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(APPROVE_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         APPROVE_INVITATION_MESSAGE.setInvitationRejected(false);
     }
 
@@ -2132,7 +2120,7 @@ public class TestClientRunnable {
         APPROVE_INVITATION_MESSAGE.setInvitationDeleted(true);
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(APPROVE_INVITATION_MESSAGE);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         APPROVE_INVITATION_MESSAGE.setInvitationDeleted(false);
     }
 
@@ -2151,7 +2139,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(APPROVE_INVITATION_MESSAGE);
         when(mockedInvitationService.approveRejectInvitation(INVITEE, GROUP_NAME, true)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2169,7 +2157,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(APPROVE_INVITATION_MESSAGE);
         when(mockedInvitationService.approveRejectInvitation(INVITEE, GROUP_NAME, true)).thenReturn(false);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
     }
 
     /**
@@ -2188,7 +2176,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(APPROVE_INVITATION_MESSAGE);
         when(mockedInvitationService.approveRejectInvitation(INVITEE, GROUP_NAME, true)).thenReturn(true);
         clientRunnableObject.run();
-        assertTrue(clientRunnableObject.isInitialized ());
+        assertTrue(clientRunnableObject.isInitialized());
         APPROVE_INVITATION_MESSAGE.setInvitationAccepted(false);
     }
 
@@ -2196,9 +2184,9 @@ public class TestClientRunnable {
      * Test for user does not exist, that is, user is null and msg is not a login message neither a register message
      */
     @Test
-    public void testForUserDoesNotExist() throws SQLException{
+    public void testForUserDoesNotExist() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, PRIVATE_MESSAGE));
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(null);
         clientRunnableObject.run();
     }
@@ -2209,9 +2197,9 @@ public class TestClientRunnable {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testForHandleIncomingMessagesWhenUserIsNullAndRegAndLogin() throws SQLException{
+    public void testForHandleIncomingMessagesWhenUserIsNullAndRegAndLogin() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN,REGISTER));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN, REGISTER));
         when(mockedUserService.getUserByUserName(SENDER_NAME)).thenReturn(null);
         clientRunnableObject.run();
         clientRunnableObject.run();
@@ -2223,7 +2211,7 @@ public class TestClientRunnable {
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithDeleteUserMessage() throws SQLException,
-            IllegalAccessException,NoSuchFieldException{
+            IllegalAccessException, NoSuchFieldException {
         List<Message> messageList = new ArrayList<>();
         messageList.add(BROADCAST);
         Iterator<Message> messageIter = messageList.iterator();
@@ -2285,7 +2273,7 @@ public class TestClientRunnable {
      * method
      */
     @Test
-    public void testHandleIncomingMessageTerminateCondition(){
+    public void testHandleIncomingMessageTerminateCondition() {
         Message quitMessage = Message.makeQuitMessage(SENDER_NAME);
         messageList.add(BROADCAST);
         messageList.add(quitMessage);
@@ -2405,168 +2393,168 @@ public class TestClientRunnable {
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddGroupToGroup() throws SQLException{
+    public void testAddGroupToGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_GROUP_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
-        when(mockedGroupService.addGroupToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.addGroupToGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test add group to group could not add.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddGroupToGroupCouldNotAdd() throws SQLException{
+    public void testAddGroupToGroupCouldNotAdd() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_GROUP_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
-        when(mockedGroupService.addGroupToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(mockedGroupService.addGroupToGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test add group to group when host group does not exist.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddGroupToGroupWhenHostGroupDoesNotExist() throws SQLException{
+    public void testAddGroupToGroupWhenHostGroupDoesNotExist() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_GROUP_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp, (Group) null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test add group to group when sender not the moderator of the host group.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddGroupToGroupWhenSenderNotTheModeratorOfTheHostGroup() throws SQLException{
+    public void testAddGroupToGroupWhenSenderNotTheModeratorOfTheHostGroup() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_GROUP_TO_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test add group to group when guest group does not exist.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testAddGroupToGroupWhenGuestGroupDoesNotExist() throws SQLException{
+    public void testAddGroupToGroupWhenGuestGroupDoesNotExist() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
-        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null,temp);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ADD_GROUP_TO_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null, temp);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test remove group from group.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveGroupFromGroup() throws SQLException{
+    public void testRemoveGroupFromGroup() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_GROUP_FROM_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
-        when(mockedGroupService.removeGroupFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.removeGroupFromGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
-    
+
+
     /**
      * Test remove group from group could not remove.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveGroupFromGroupCouldNotRemove() throws SQLException{
+    public void testRemoveGroupFromGroupCouldNotRemove() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_GROUP_FROM_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
-        when(mockedGroupService.removeGroupFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        when(mockedGroupService.removeGroupFromGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
-    
+
+
     /**
      * Test remove group from group when host group does not exist.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveGroupFromGroupWhenHostGroupDoesNotExist() throws SQLException{
+    public void testRemoveGroupFromGroupWhenHostGroupDoesNotExist() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_GROUP_FROM_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp, (Group) null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
+
     /**
      * Test remove group from group when sender not the moderator of the host group.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveGroupFromGroupWhenSenderNotTheModeratorOfTheHostGroup() throws SQLException{
+    public void testRemoveGroupFromGroupWhenSenderNotTheModeratorOfTheHostGroup() throws SQLException {
         clientRunnableObject.run();
         when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_GROUP_FROM_GROUP));
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
         when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
-    
+
+
     /**
      * Test remove group from group when guest group does not exist.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testRemoveGroupFromGroupWhenGuestGroupDoesNotExist() throws SQLException{
+    public void testRemoveGroupFromGroupWhenGuestGroupDoesNotExist() throws SQLException {
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
-        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null,temp);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REMOVE_GROUP_FROM_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null, temp);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-    
-    
+
+
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
@@ -2590,9 +2578,9 @@ public class TestClientRunnable {
     private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, "hello", "rb");
     private static final Message DELETE_USER = Message.makeDeleteUserMessage(SENDER_NAME);
     private static final Message GET_GROUP = Message.makeGetGroupMessage(SENDER_NAME, GROUP_NAME);
-    private static final Message PRIVATE_REPLY = Message.makePrivateReplyMessage(SENDER_NAME,"Alex","MESSAGEKEY");
-    private static final Message FOLLOW_USER_MESSAGE = Message.makeFollowUserMessage(SENDER_NAME,"Alex");
-    private static final Message UNFOLLOW_USER_MESSAGE = Message.makeUnfollowUserMessage(SENDER_NAME,"Alex");
+    private static final Message PRIVATE_REPLY = Message.makePrivateReplyMessage(SENDER_NAME, "Alex", "MESSAGEKEY");
+    private static final Message FOLLOW_USER_MESSAGE = Message.makeFollowUserMessage(SENDER_NAME, "Alex");
+    private static final Message UNFOLLOW_USER_MESSAGE = Message.makeUnfollowUserMessage(SENDER_NAME, "Alex");
     private static final Message GET_FOLLOWERS = Message.makeGetFollowersMessage(SENDER_NAME);
     private static final Message GET_FOLLOWEES = Message.makeGetFolloweesMessage(SENDER_NAME);
     private static final Message GET_ONLINE_USER = Message.makeGetOnlineUserMessage(SENDER_NAME);
@@ -2603,9 +2591,9 @@ public class TestClientRunnable {
     private static final Message ADD_USER_TO_GROUP = Message.makeAddUserToGroupMessage(SENDER_NAME, SENDER_NAME, DUMMY_GROUP_NAME);
     private static final Message ADD_USER_TO_GROUP2 = Message.makeAddUserToGroupMessage(SENDER_NAME, DUMMY_USER, DUMMY_GROUP_NAME);
     private static final Message REMOVE_USER_TO_GROUP = Message.makeRemoveUserFromGroupMessage(SENDER_NAME, DUMMY_USER, DUMMY_GROUP_NAME);
-    private static final User USER_LOGGED_ON = new User(null,null,SENDER_NAME,"QWERTY",true);
-    private static final User INVITEE_USER = new User(null,null,INVITEE,"test",true);
-    private static final User USER_LOGGED_OFF = new User(null,null,SENDER_NAME,"QWERTY",false);
+    private static final User USER_LOGGED_ON = new User(null, null, SENDER_NAME, "QWERTY", true);
+    private static final User INVITEE_USER = new User(null, null, INVITEE, "test", true);
+    private static final User USER_LOGGED_OFF = new User(null, null, SENDER_NAME, "QWERTY", false);
     private static final Group GROUP = new Group();
     private static final Message GROUP_MESSAGE = Message.makeGroupMessage(SENDER_NAME, MESSAGE_TEXT, DUMMY_GROUP_NAME);
     private static final String DUMMY_MSG_UNIQUE_KEY = "dummy_key";

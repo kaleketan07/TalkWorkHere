@@ -258,31 +258,31 @@ public class TestConversationalMessageService {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         assertFalse(cs.insertGroupConversationalMessage("ABC", "BCD"));
     }
-    
+
     /**
      * Test delete group message.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testDeleteGroupMessage() throws SQLException{
-    	when(mockedRS.next()).thenReturn(true, true, false);
-    	when(mockedRS.getString("message_unique_key")).thenReturn("key1", "key2", "key3");
-    	cs.deleteGroupMessage("test_key");
-    	Mockito.verify(mockedPreparedStatement, times(2)).executeUpdate();
+    public void testDeleteGroupMessage() throws SQLException {
+        when(mockedRS.next()).thenReturn(true, true, false);
+        when(mockedRS.getString("message_unique_key")).thenReturn("key1", "key2", "key3");
+        cs.deleteGroupMessage("test_key");
+        Mockito.verify(mockedPreparedStatement, times(2)).executeUpdate();
     }
-    
+
     /**
      * Test delete group message no rows affected.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testDeleteGroupMessageNoRowsAffected() throws SQLException{
-    	when(mockedRS.next()).thenReturn(true, true, false);
-    	when(mockedRS.getString("message_unique_key")).thenReturn("key1", "key2", "key3");
-    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
-    	assertFalse(cs.deleteGroupMessage("test_key"));
+    public void testDeleteGroupMessageNoRowsAffected() throws SQLException {
+        when(mockedRS.next()).thenReturn(true, true, false);
+        when(mockedRS.getString("message_unique_key")).thenReturn("key1", "key2", "key3");
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        assertFalse(cs.deleteGroupMessage("test_key"));
     }
 
 }

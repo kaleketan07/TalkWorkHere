@@ -196,9 +196,9 @@ public class Message {
      * Given a handle, name and textOrPassword, return the appropriate General message instance or an
      * instance from a subclass of message.
      *
-     * @param handle         Handle of the message to be generated.
-     * @param srcName        Name of the originator of the message (may be null)
-     * @param textOrPassword Text sent in this message (may be null)
+     * @param handle             Handle of the message to be generated.
+     * @param srcName            Name of the originator of the message (may be null)
+     * @param textOrPassword     Text sent in this message (may be null)
      * @param receiverOrPassword The third parameter which can have different values based on the type of the message
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
@@ -222,9 +222,9 @@ public class Message {
      * Given a handle, name and textOrPassword, return the appropriate Group message instance or an
      * instance from a subclass of message.
      *
-     * @param handle         Handle of the message to be generated.
-     * @param srcName        Name of the originator of the message (may be null)
-     * @param textOrPassword Text sent in this message (may be null)
+     * @param handle             Handle of the message to be generated.
+     * @param srcName            Name of the originator of the message (may be null)
+     * @param textOrPassword     Text sent in this message (may be null)
      * @param receiverOrPassword The third parameter which can have different values based on the type of the message
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
@@ -243,12 +243,12 @@ public class Message {
         } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
             return makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_GROUP_MESSAGE.toString()) == 0) {
-        	return makeDeleteGroupMessageMessage(srcName, textOrPassword);
+            return makeDeleteGroupMessageMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.ADD_GROUP_TO_GROUP.toString()) == 0) {
-        	return makeAddGroupToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+            return makeAddGroupToGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.REMOVE_GROUP_FROM_GROUP.toString()) == 0) {
-        	return makeRemoveGroupFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        }	
+            return makeRemoveGroupFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        }
         return null;
     }
 
@@ -256,16 +256,16 @@ public class Message {
      * Given a handle, name and textOrPassword, return the appropriate User message instance or an
      * instance from a subclass of message.
      *
-     * @param handle         Handle of the message to be generated.
-     * @param srcName        Name of the originator of the message (may be null)
-     * @param textOrPassword Text sent in this message (may be null)
+     * @param handle             Handle of the message to be generated.
+     * @param srcName            Name of the originator of the message (may be null)
+     * @param textOrPassword     Text sent in this message (may be null)
      * @param receiverOrPassword The third parameter which can have different values based on the type of the message
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
      */
     private static Message handleMakeUserMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
-        if(handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0){
-            return makeUserProfileUpdateMessage(srcName,textOrPassword,receiverOrPassword);
+        if (handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0) {
+            return makeUserProfileUpdateMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
             return makeDeleteUserMessage(srcName);
         } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
@@ -278,7 +278,7 @@ public class Message {
             return makeGetFolloweesMessage(srcName);
         } else if (handle.compareTo(MessageType.GET_ONLINE_USERS.toString()) == 0) {
             return makeGetOnlineUserMessage(srcName);
-        } 
+        }
         return null;
     }
 
@@ -286,9 +286,9 @@ public class Message {
      * Given a handle, name and textOrPassword, return the appropriate Communication message instance or an
      * instance from a subclass of message.
      *
-     * @param handle         Handle of the message to be generated.
-     * @param srcName        Name of the originator of the message (may be null)
-     * @param textOrPassword Text sent in this message (may be null)
+     * @param handle             Handle of the message to be generated.
+     * @param srcName            Name of the originator of the message (may be null)
+     * @param textOrPassword     Text sent in this message (may be null)
      * @param receiverOrPassword The third parameter which can have different values based on the type of the message
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
@@ -303,7 +303,7 @@ public class Message {
         } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
             return makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_PRIVATE_MESSAGE.toString()) == 0) {
-        	return makeDeletePrivateMessageMessage(srcName, textOrPassword);
+            return makeDeletePrivateMessageMessage(srcName, textOrPassword);
         }
         return null;
     }
@@ -312,9 +312,9 @@ public class Message {
      * Given a handle, name and textOrPassword, return the appropriate Invitation message instance or an
      * instance from a subclass of message.
      *
-     * @param handle         Handle of the message to be generated.
-     * @param srcName        Name of the originator of the message (may be null)
-     * @param textOrPassword Text sent in this message (may be null)
+     * @param handle             Handle of the message to be generated.
+     * @param srcName            Name of the originator of the message (may be null)
+     * @param textOrPassword     Text sent in this message (may be null)
      * @param receiverOrPassword The third parameter which can have different values based on the type of the message
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
@@ -349,10 +349,10 @@ public class Message {
     protected static Message makeMessage(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
         Message result = null;
         result = handleMakeGeneralMessages(handle, srcName, textOrPassword, receiverOrPassword);
-        result = (result == null)? handleMakeGroupMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
-        result = (result == null)? handleMakeUserMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
-        result = (result == null)? handleMakeCommunicationMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
-        result = (result == null)? handleMakeInvitationMessages(handle, srcName, textOrPassword, receiverOrPassword):result;
+        result = (result == null) ? handleMakeGroupMessages(handle, srcName, textOrPassword, receiverOrPassword) : result;
+        result = (result == null) ? handleMakeUserMessages(handle, srcName, textOrPassword, receiverOrPassword) : result;
+        result = (result == null) ? handleMakeCommunicationMessages(handle, srcName, textOrPassword, receiverOrPassword) : result;
+        result = (result == null) ? handleMakeInvitationMessages(handle, srcName, textOrPassword, receiverOrPassword) : result;
 
         return result;
     }
@@ -426,60 +426,72 @@ public class Message {
     /**
      * This message creates a group invitation message sent from one user to another.
      *
-     * @param inviter - The user sending an invitation.
-     * @param invitee - The user receiving an invitation.
+     * @param inviter   - The user sending an invitation.
+     * @param invitee   - The user receiving an invitation.
      * @param groupName - The group to which the inviter invites the invitee.
      * @return a Message of type invitationMessage
      */
-    public static Message makeCreateInvitationMessage(String inviter , String invitee, String groupName) { return new Message(MessageType.INVITE_USER_GROUP, inviter, invitee, groupName); }
+    public static Message makeCreateInvitationMessage(String inviter, String invitee, String groupName) {
+        return new Message(MessageType.INVITE_USER_GROUP, inviter, invitee, groupName);
+    }
 
     /**
      * This message deletes a group invitation message.
      *
-     * @param inviter - The user sending an invitation.
-     * @param invitee - The user receiving an invitation.
+     * @param inviter   - The user sending an invitation.
+     * @param invitee   - The user receiving an invitation.
      * @param groupName - The group to which the inviter invites the invitee.
      * @return a Message of type invitationMessage
      */
-    public static Message makeDeleteInvitationMessage(String inviter , String invitee, String groupName) { return new Message(MessageType.DELETE_USER_INVITATION, inviter, invitee, groupName); }
+    public static Message makeDeleteInvitationMessage(String inviter, String invitee, String groupName) {
+        return new Message(MessageType.DELETE_USER_INVITATION, inviter, invitee, groupName);
+    }
 
     /**
      * This message creates an accept invitation message for a given group
      *
-     * @param acceptor - The user accepting the invitation
+     * @param acceptor  - The user accepting the invitation
      * @param groupName - The group to which the acceptor will be added
      * @return a Message of type AcceptInviteUser
      */
-    public static Message makeAcceptInviteUserMessage(String acceptor, String groupName) { return new Message(MessageType.ACCEPT_INVITE_USER, acceptor, groupName); }
+    public static Message makeAcceptInviteUserMessage(String acceptor, String groupName) {
+        return new Message(MessageType.ACCEPT_INVITE_USER, acceptor, groupName);
+    }
 
     /**
      * This message creates an deny invitation message for a given group
      *
-     * @param denier - The user denying the invitation
+     * @param denier    - The user denying the invitation
      * @param groupName - The group to which the acceptor will be added
      * @return a Message of type AcceptInviteUser
      */
-    public static Message makeDenyInviteUserMessage(String denier, String groupName) { return new Message(MessageType.DENY_INVITE_USER, denier, groupName); }
+    public static Message makeDenyInviteUserMessage(String denier, String groupName) {
+        return new Message(MessageType.DENY_INVITE_USER, denier, groupName);
+    }
 
     /**
-     *  This message creates an approve invite message for moderator.
+     * This message creates an approve invite message for moderator.
      *
      * @param moderator -  The moderator of the group
-     * @param invitee - The user invited to the group
+     * @param invitee   - The user invited to the group
      * @param groupName - The name of the group
      * @return a Message of type ApproveInviteModerator
      */
-    public static Message makeApproveInviteModeratorMessage(String moderator, String invitee, String groupName) { return new Message(MessageType.APPROVE_INVITE_MODERATOR, moderator, invitee, groupName); }
+    public static Message makeApproveInviteModeratorMessage(String moderator, String invitee, String groupName) {
+        return new Message(MessageType.APPROVE_INVITE_MODERATOR, moderator, invitee, groupName);
+    }
 
     /**
-     *  This message creates a reject invite message for moderator.
+     * This message creates a reject invite message for moderator.
      *
      * @param moderator -  The moderator of the group
-     * @param invitee - The user invited to the group
+     * @param invitee   - The user invited to the group
      * @param groupName - The name of the group
      * @return a Message of type RejectInviteModerator
      */
-    public static Message makeRejectInviteModeratorMessage(String moderator, String invitee, String groupName) { return new Message(MessageType.REJECT_INVITE_MODERATOR, moderator, invitee, groupName); }
+    public static Message makeRejectInviteModeratorMessage(String moderator, String invitee, String groupName) {
+        return new Message(MessageType.REJECT_INVITE_MODERATOR, moderator, invitee, groupName);
+    }
 
     /**
      * This method creates a delete group message based on the given group_name and moderator
@@ -598,7 +610,7 @@ public class Message {
     }
 
     /**
-     * This method creates a Get Followees message 
+     * This method creates a Get Followees message
      *
      * @param follower - string of the follower user name
      * @return a Message object of type Get Followees
@@ -606,17 +618,17 @@ public class Message {
     public static Message makeGetFolloweesMessage(String follower) {
         return new Message(MessageType.GET_FOLLOWEES, follower);
     }
-    
+
     /**
-    * This method creates a Get Online Users message 
-    *
-    * @param currentUser - string of the current user name
-    * @return a Message object of type Get Online Users
-    */
-   public static Message makeGetOnlineUserMessage(String follower) {
-       return new Message(MessageType.GET_ONLINE_USERS, follower);
-   }
-    
+     * This method creates a Get Online Users message
+     *
+     * @param currentUser - string of the current user name
+     * @return a Message object of type Get Online Users
+     */
+    public static Message makeGetOnlineUserMessage(String follower) {
+        return new Message(MessageType.GET_ONLINE_USERS, follower);
+    }
+
     /**
      * This method creates a unfollow user message
      *
@@ -648,7 +660,7 @@ public class Message {
      * @return msg
      */
     public static Message addUniqueKeyToMsg(Message msg, String text) {
-    	return new Message(msg.msgType, msg.msgSender, text, msg.msgReceiverOrPassword);
+        return new Message(msg.msgType, msg.msgSender, text, msg.msgReceiverOrPassword);
     }
 
     /**
@@ -662,54 +674,54 @@ public class Message {
     public static Message makeGroupMessage(String srcName, String text, String grpName) {
         return new Message(MessageType.MESSAGE_GROUP, srcName, text, grpName);
     }
-    
-    
+
+
     /**
      * Make a message for deleting private message.
      *
      * @param srcName the name of the sender
-     * @param text the text representing the unique message key for the message to be deleted 
+     * @param text    the text representing the unique message key for the message to be deleted
      * @return the message object
      */
     public static Message makeDeletePrivateMessageMessage(String srcName, String text) {
-    	return new Message(MessageType.DELETE_PRIVATE_MESSAGE, srcName, text);
+        return new Message(MessageType.DELETE_PRIVATE_MESSAGE, srcName, text);
     }
-    
+
     /**
      * Make a message for deleting a group message.
      *
      * @param srcName the name of the sender
-     * @param text the text representing the unique group message key for the message to be deleted
+     * @param text    the text representing the unique group message key for the message to be deleted
      * @return the message object
      */
     public static Message makeDeleteGroupMessageMessage(String srcName, String text) {
-    	return new Message(MessageType.DELETE_GROUP_MESSAGE, srcName, text);
+        return new Message(MessageType.DELETE_GROUP_MESSAGE, srcName, text);
     }
-    
+
     /**
      * Make a message for adding a group to group.
      *
-     * @param srcName the name of the sender
+     * @param srcName      the name of the sender
      * @param guestGrpName the guest group name
-     * @param hostGrpName the host group name
+     * @param hostGrpName  the host group name
      * @return the message object
      */
     public static Message makeAddGroupToGroupMessage(String srcName, String guestGrpName, String hostGrpName) {
-    	return new Message(MessageType.ADD_GROUP_TO_GROUP, srcName, guestGrpName, hostGrpName);
+        return new Message(MessageType.ADD_GROUP_TO_GROUP, srcName, guestGrpName, hostGrpName);
     }
-    
+
     /**
      * Make a message for removing a group from group.
      *
-     * @param srcName the name of the sender
+     * @param srcName      the name of the sender
      * @param guestGrpName the group name of the group to be removed
-     * @param hostGrpName the group name of the group from which the group will be removed
+     * @param hostGrpName  the group name of the group from which the group will be removed
      * @return the message object
      */
     public static Message makeRemoveGroupFromGroupMessage(String srcName, String guestGrpName, String hostGrpName) {
-    	return new Message(MessageType.REMOVE_GROUP_FROM_GROUP, srcName, guestGrpName, hostGrpName);
+        return new Message(MessageType.REMOVE_GROUP_FROM_GROUP, srcName, guestGrpName, hostGrpName);
     }
-    
+
     /**
      * Return the name of the sender of this message.
      *
@@ -739,6 +751,7 @@ public class Message {
 
     /**
      * Set the invitation approved flag
+     *
      * @param invitationApproved - true or false value to be set
      */
     public void setInvitationApproved(boolean invitationApproved) {
@@ -746,7 +759,8 @@ public class Message {
     }
 
     /**
-     *  Set the invitation accepted flag
+     * Set the invitation accepted flag
+     *
      * @param invitationAccepted - true or false value to be set
      */
     public void setInvitationAccepted(boolean invitationAccepted) {
@@ -755,6 +769,7 @@ public class Message {
 
     /**
      * Get the value of Invitation Approved flag
+     *
      * @return true or false based on the flag's value
      */
     public boolean isInvitationApproved() {
@@ -763,6 +778,7 @@ public class Message {
 
     /**
      * Get the value of Invitation Accepted flag
+     *
      * @return true or false based on the flag's value
      */
     public boolean isInvitationAccepted() {
@@ -771,6 +787,7 @@ public class Message {
 
     /**
      * Set the invitation rejected flag
+     *
      * @param invitationRejected - true or false value to be set
      */
     public void setInvitationRejected(boolean invitationRejected) {
@@ -779,6 +796,7 @@ public class Message {
 
     /**
      * Get the value of Invitation Rejected flag
+     *
      * @return true or false based on the flag's value
      */
     public boolean isInvitationRejected() {
@@ -787,6 +805,7 @@ public class Message {
 
     /**
      * Set the invitation denied flag
+     *
      * @param invitationDenied - true or false value to be set
      */
     public void setInvitationDenied(boolean invitationDenied) {
@@ -795,6 +814,7 @@ public class Message {
 
     /**
      * Get the value of Invitation Denied flag
+     *
      * @return true or false based on the flag's value
      */
     public boolean isInvitationDenied() {
@@ -803,6 +823,7 @@ public class Message {
 
     /**
      * Set the invitation deleted flag
+     *
      * @param invitationDeleted - true or false value to be set
      */
     public void setInvitationDeleted(boolean invitationDeleted) {
@@ -811,6 +832,7 @@ public class Message {
 
     /**
      * Get the value of Invitation Deleted flag
+     *
      * @return true or false based on the flag's value
      */
     public boolean isInvitationDeleted() {
@@ -951,25 +973,25 @@ public class Message {
     public boolean isGetFollowersMessage() {
         return (msgType == MessageType.GET_FOLLOWERS);
     }
-    
+
     /**
      * This method verifies if the current message has the handle GFE (is a Get_Followees message)
      *
      * @return true or false based on the comparison result
      */
-    public boolean isGetFolloweesMessage(){
+    public boolean isGetFolloweesMessage() {
         return (msgType == MessageType.GET_FOLLOWEES);
     }
-    
+
     /**
      * This method verifies if the current message has the handle GOU (is a GET_ONLINE_USERS)
      *
      * @return true or false based on the comparison result
      */
-    public boolean isGetOnlineUsersMessage(){
+    public boolean isGetOnlineUsersMessage() {
         return (msgType == MessageType.GET_ONLINE_USERS);
     }
-    
+
 
     /**
      * This method verifies if the current message has the handle GTG (is a GET_GROUP message)
@@ -1004,38 +1026,48 @@ public class Message {
      * @return the boolean, true if the message is a search message, false otherwise
      */
 
-    public boolean isSearchMessage(){ return (msgType == MessageType.SEARCH_MESSAGE);}
-    
-    
+    public boolean isSearchMessage() {
+        return (msgType == MessageType.SEARCH_MESSAGE);
+    }
+
+
     /**
      * Verify if the message is a message for deleting a private message
      *
-     * @return true, if message is for deleting a private message 
+     * @return true, if message is for deleting a private message
      */
-    public boolean isDeletePrivateMessageMessage() {return (msgType == MessageType.DELETE_PRIVATE_MESSAGE);}
-    
-    
+    public boolean isDeletePrivateMessageMessage() {
+        return (msgType == MessageType.DELETE_PRIVATE_MESSAGE);
+    }
+
+
     /**
      * Verify if the message is a message for deleting a group message
      *
      * @return true, if message is for deleting a group message
      */
-    public boolean isDeleteGroupMessageMessage() {return (msgType == MessageType.DELETE_GROUP_MESSAGE);}
-    
+    public boolean isDeleteGroupMessageMessage() {
+        return (msgType == MessageType.DELETE_GROUP_MESSAGE);
+    }
+
     /**
      * Verify if the message is a message for adding a group to group
      *
-     * @return true, if message is for adding a group to group 
+     * @return true, if message is for adding a group to group
      */
-    public boolean isAddGroupToGroupMessage() { return (msgType == MessageType.ADD_GROUP_TO_GROUP);}
-    
+    public boolean isAddGroupToGroupMessage() {
+        return (msgType == MessageType.ADD_GROUP_TO_GROUP);
+    }
+
     /**
      * Verify if the message is a message for removing a group from group
      *
-     * @return true, if message is for removing a group from group 
+     * @return true, if message is for removing a group from group
      */
-    public boolean isRemoveGroupFromGroupMessage() {return (msgType == MessageType.REMOVE_GROUP_FROM_GROUP);}
-    
+    public boolean isRemoveGroupFromGroupMessage() {
+        return (msgType == MessageType.REMOVE_GROUP_FROM_GROUP);
+    }
+
     /**
      * Determine if this message is a message signing off from the IM server.
      *
@@ -1046,23 +1078,25 @@ public class Message {
     }
 
     /**
-     *  Checks if the current message is of type Invitation Message
+     * Checks if the current message is of type Invitation Message
      *
      * @return - true or false based on the condition evaluation for the handle
      */
-    public boolean isCreateInvitationMessage(){
+    public boolean isCreateInvitationMessage() {
         return (msgType == MessageType.INVITE_USER_GROUP);
     }
 
     /**
-     *  Checks if the current message is of type Delete Invitation Message
+     * Checks if the current message is of type Delete Invitation Message
      *
      * @return - true or false based on the condition evaluation for the handle
      */
-    public boolean isDeleteInvitationMessage() { return (msgType == MessageType.DELETE_USER_INVITATION); }
+    public boolean isDeleteInvitationMessage() {
+        return (msgType == MessageType.DELETE_USER_INVITATION);
+    }
 
     /**
-     *  Checks if the current message is of type Accept Invite Message
+     * Checks if the current message is of type Accept Invite Message
      *
      * @return - true or false based on the condition evaluation for the handle
      */
@@ -1071,7 +1105,7 @@ public class Message {
     }
 
     /**
-     *  Checks if the current message is of type Deny Invite Message
+     * Checks if the current message is of type Deny Invite Message
      *
      * @return - true or false based on the condition evaluation for the handle
      */
@@ -1080,7 +1114,7 @@ public class Message {
     }
 
     /**
-     *  Checks if the current message is of type Approve Invitation Message
+     * Checks if the current message is of type Approve Invitation Message
      *
      * @return - true or false based on the condition evaluation for the handle
      */
@@ -1089,7 +1123,7 @@ public class Message {
     }
 
     /**
-     *  Checks if the current message is of type Reject Invitation Message
+     * Checks if the current message is of type Reject Invitation Message
      *
      * @return - true or false based on the condition evaluation for the handle
      */

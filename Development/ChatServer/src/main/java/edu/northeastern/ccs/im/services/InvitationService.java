@@ -13,9 +13,8 @@ import java.sql.SQLException;
  * This class defines the Invitation Service which facilitates the
  * sending, approval and acceptance of invitations in the slack app.
  *
- * @version  1.0
- * @author  Sachin
- *
+ * @author Sachin
+ * @version 1.0
  */
 public class InvitationService implements InvitationDao {
 
@@ -68,8 +67,8 @@ public class InvitationService implements InvitationDao {
     /**
      * The implementation for the interface method for getting an invitation
      *
-     * @param inviter - the person who is the sender of the invitation
-     * @param invitee - the person who is receiving the invitation
+     * @param inviter   - the person who is the sender of the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return the message retrieved or null if not record is found
      * @throws SQLException the SQL exception is thrown due to some query or database interaction
@@ -81,7 +80,7 @@ public class InvitationService implements InvitationDao {
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, inviter, invitee, groupName);
         result = preparedStatement.executeQuery();
         Message message = null;
-        if(result.first()) {
+        if (result.first()) {
             boolean isAccepted = result.getBoolean(IS_ACCEPTED);
             boolean isDenied = result.getBoolean(IS_DENIED);
             boolean isApproved = result.getBoolean(IS_APPROVED);
@@ -101,7 +100,7 @@ public class InvitationService implements InvitationDao {
     /**
      * The implementation for the interface method for getting an invitation
      *
-     * @param invitee - the person who is receiving the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return the message retrieved or null if not record is found
      * @throws SQLException - the SQL exception is thrown due to some query or database interaction
@@ -113,7 +112,7 @@ public class InvitationService implements InvitationDao {
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         result = preparedStatement.executeQuery();
         Message message = null;
-        if(result.first()) {
+        if (result.first()) {
             boolean isAccepted = result.getBoolean(IS_ACCEPTED);
             boolean isDenied = result.getBoolean(IS_DENIED);
             boolean isApproved = result.getBoolean(IS_APPROVED);
@@ -134,9 +133,9 @@ public class InvitationService implements InvitationDao {
     /**
      * The implementation for the interface method for approving or rejecting an invitation
      *
-     * @param invitee - The person who is invited
+     * @param invitee   - The person who is invited
      * @param groupName - The group for which the invite is sent
-     * @param approved - The flag denoting true for approval and false for rejection
+     * @param approved  - The flag denoting true for approval and false for rejection
      * @return true if the update was successful, false if not
      * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
@@ -153,9 +152,9 @@ public class InvitationService implements InvitationDao {
     /**
      * The implementation for the interface method for accepting or denying an invitation
      *
-     * @param invitee - The person who is invited
+     * @param invitee   - The person who is invited
      * @param groupName - The group for which the invite is sent
-     * @param accepted - The flag denoting true for acceptance and false for denial
+     * @param accepted  - The flag denoting true for acceptance and false for denial
      * @return true if the update was successful, false if not
      * @throws SQLException - the SQL exception is thrown due to some query or database interaction
      */
@@ -172,8 +171,8 @@ public class InvitationService implements InvitationDao {
     /**
      * The implementation for the interface method for creating an invitation
      *
-     * @param inviter - the person who is the sender of the invitation
-     * @param invitee - the person who is receiving the invitation
+     * @param inviter   - the person who is the sender of the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return true if the update was successful, false if not
      * @throws SQLException - the SQL exception is thrown due to some query or database interaction
@@ -191,8 +190,8 @@ public class InvitationService implements InvitationDao {
     /**
      * The implementation for the interface method for deleting an invitation
      *
-     * @param inviter - the person who is the sender of the invitation
-     * @param invitee - the person who is receiving the invitation
+     * @param inviter   - the person who is the sender of the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return true if the update was successful, false if not
      * @throws SQLException - the SQL exception is thrown due to some query or database interaction

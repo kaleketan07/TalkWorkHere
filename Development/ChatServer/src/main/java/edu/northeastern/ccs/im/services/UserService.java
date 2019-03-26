@@ -271,10 +271,10 @@ public class UserService implements UserDao {
     }
 
     /**
-     * Returns a Map<String, String> which contains username of all the followers of a given user
+     * Returns a Map<String, String> which contains username  and fullname of all the followers of a given user
      *
      * @param followee user who is the followee
-     * @return String which contains username of all the followers
+     * @return a Map<String, String> which contains username and fullname
      * @throws SQLException the sql exception
      */
     @Override
@@ -295,9 +295,10 @@ public class UserService implements UserDao {
     }
     
     /**
-     * Returns a Map<String, String> which contains username of all the followee of a given user
-     * @param followee user who is the followee
-     * @return String which contains username of all the followers
+     * Returns a Map<String, String> which contains username and fullname of all the followee of a given user
+     * 
+     * @param follower user who is the follower
+     * @return a Map<String, String> which contains username and fullname
      * @throws SQLException  the sql exception
      */
     @Override
@@ -317,6 +318,32 @@ public class UserService implements UserDao {
         return resultUsers;
     }
 
-
+    
+    /**
+     * Returns a Map<String, String> which contains username and fullname of all the user who are
+     * online from the list of followees of the given user
+     * 
+     * @param follower user who is the follower
+     * @return a Map<String, String> which contains username and fullname
+     * @throws SQLException  the sql exception
+     */
+    @Override
+    public Map<String, String> getOnlineUsers(User follower) throws SQLException {
+    	Map<String, String> resultUsers = new HashMap<>();
+        final String GET_FOLLOWERS =
+        		"select username from user_profile where username in" +  
+        		" (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?) and logged_in = 1";
+        pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
+        pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
+        result = pstmt.executeQuery();
+        while (result.next()) {
+            String username = result.getString(USER_NAME);
+            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
+            resultUsers.put(username, fullName);
+        }
+        pstmt.close();
+        return resultUsers;
+    }
+    
 }
 

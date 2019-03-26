@@ -1201,6 +1201,18 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
+    
+    /**
+     * Test Get Online Users
+     *
+     */
+    @Test
+    public void testGetOnlineUsers(){
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_ONLINE_USER));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
     /**
      * Test Get Followees .
@@ -1380,6 +1392,23 @@ public class TestClientRunnable {
     }
 
     /**
+     * Test get online user message.
+     *
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testGetTwoOnlineUserMessage() throws SQLException{
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_ONLINE_USER));
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("kkg", "kk");
+        testSet.put("kkGroup", "kk");
+        when(mockedUserService.getOnlineUsers(Mockito.any())).thenReturn(testSet);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
      * Test get follower message for user.
      *
      * @throws SQLException           the sql exception
@@ -1388,10 +1417,21 @@ public class TestClientRunnable {
     public void testGetFollowerMessageForException() throws SQLException{
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWERS));
-        HashMap<String, String> testSet = new HashMap<>();
-        testSet.put("kkg", "kk");
-        testSet.put("kkGroup", "kk");
         when(mockedUserService.getFollowers(Mockito.any())).thenThrow(SQLException.class);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test get online user for user.
+     *
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testGetOnlineUserForException() throws SQLException{
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_ONLINE_USER));
+        when(mockedUserService.getOnlineUsers(Mockito.any())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1422,9 +1462,6 @@ public class TestClientRunnable {
     public void testGetFolloweeMessageForException() throws SQLException{
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWEES));
-        HashMap<String, String> testSet = new HashMap<>();
-        testSet.put("kkg", "kk");
-        testSet.put("kkGroup", "kk");
         when(mockedUserService.getFollowees(Mockito.any())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1962,6 +1999,7 @@ public class TestClientRunnable {
     private static final Message UNFOLLOW_USER_MESSAGE = Message.makeUnfollowUserMessage(SENDER_NAME,"Alex");
     private static final Message GET_FOLLOWERS = Message.makeGetFollowersMessage(SENDER_NAME);
     private static final Message GET_FOLLOWEES = Message.makeGetFolloweesMessage(SENDER_NAME);
+    private static final Message GET_ONLINE_USER = Message.makeGetOnlineUserMessage(SENDER_NAME);
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME);
     private static final String DUMMY_USER = "Bob";

@@ -74,6 +74,11 @@ public enum MessageType {
      */
     GET_FOLLOWEES("GFE"),
     
+    /**
+     * Handle To send prattle messages to the client
+     */
+    GET_ONLINE_USERS("GOU"),
+
 	/**
     * Message whose contents are to delete a user profile from a group
     */ 

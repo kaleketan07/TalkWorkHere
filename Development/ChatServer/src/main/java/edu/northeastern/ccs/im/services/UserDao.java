@@ -122,6 +122,15 @@ public interface UserDao {
      * @throws SQLException  the sql exception
      */
     Map<String, String> getFollowees(User follower) throws SQLException;
+    
+    /**
+     * Returns a Map<String, String> which contains username of all the user who are
+     * online from the list of followees of the given user
+     * @param followee user who is the followee
+     * @return String which contains username of all the followers
+     * @throws SQLException  the sql exception
+     */
+	Map<String, String> getOnlineUsers(User follower) throws SQLException;
 	
 
 }

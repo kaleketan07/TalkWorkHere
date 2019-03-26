@@ -45,7 +45,7 @@ public class TestClientTimer {
         long timeAfterActivity = calendar.getTimeInMillis();
         ct.updateAfterInitialization();
 
-        assertTrue(Math.abs(calendar.getTimeInMillis() - timeAfterActivity) < 10);
+        assertTrue(Math.abs(calendar.getTimeInMillis() - timeAfterActivity) < 100);
         assertTrue(ClientTimer.class.isInstance(ct));
 
     }

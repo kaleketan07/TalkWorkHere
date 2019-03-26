@@ -641,7 +641,7 @@ public class ClientRunnable implements Runnable {
             }
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
                     " using HELP GFR.");
         }
     }
@@ -1093,4 +1093,6 @@ public class ClientRunnable implements Runnable {
     public static ClientRunnable getClientByUsername(String username) {
         return userClients.getOrDefault(username, null);
     }
+    
+    private static final String ERROR_MESSAGE = "Something went wrong while retrieving data. Please check your syntax";
 }

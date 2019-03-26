@@ -1754,6 +1754,23 @@ public class TestClientRunnable {
     }
     
     /**
+     * Test add group to group could not add.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testAddGroupToGroupCouldNotAdd() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
+        when(mockedGroupService.addGroupToGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
      * Test add group to group when host group does not exist.
      *
      * @throws SQLException the SQL exception
@@ -1764,8 +1781,7 @@ public class TestClientRunnable {
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
-        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
-        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp, null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1786,13 +1802,78 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
     
+    /**
+     * Test add group to group when guest group does not exist.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testAddGroupToGroupWhenGuestGroupDoesNotExist() throws SQLException{
         clientRunnableObject.run();
         Group temp = new Group();
         temp.setModeratorName(SENDER_NAME);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,ADD_GROUP_TO_GROUP));
-        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp,(Group) null);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null,temp);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    @Test
+    public void testRemoveGroupFromGroup() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
+        when(mockedGroupService.removeGroupFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    
+    @Test
+    public void testRemoveGroupFromGroupCouldNotRemove() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp);
+        when(mockedGroupService.removeGroupFromGroup(Mockito.anyString(),Mockito.anyString())).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    
+    @Test
+    public void testRemoveGroupFromGroupWhenHostGroupDoesNotExist() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(temp, null);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    @Test
+    public void testRemoveGroupFromGroupWhenSenderNotTheModeratorOfTheHostGroup() throws SQLException{
+        clientRunnableObject.run();
+        when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(mockedGroup);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    
+    @Test
+    public void testRemoveGroupFromGroupWhenGuestGroupDoesNotExist() throws SQLException{
+        clientRunnableObject.run();
+        Group temp = new Group();
+        temp.setModeratorName(SENDER_NAME);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,REMOVE_GROUP_FROM_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null,temp);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1838,6 +1919,6 @@ public class TestClientRunnable {
     private static final Message DELETE_GROUPMSG_MSG_SENDER_NOT_IN_KEY = Message.makeDeleteGroupMessageMessage(SENDER_NAME, DUMMY_GROUP_MESSAGE_KEY2);
     private static final Message DELETE_PRIVATEMESSAGE_MESSAGE = Message.makeDeletePrivateMessageMessage(SENDER_NAME, DUMMY_MSG_UNIQUE_KEY);
     private static final Message ADD_GROUP_TO_GROUP = Message.makeAddGroupToGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
-    private static final Message ADD_GROUP_TO_GROUP2 = Message.makeAddGroupToGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
     private static final String ANOTHER_USER = "another_user";
+    private static final Message REMOVE_GROUP_FROM_GROUP = Message.makeRemoveGroupFromGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
 }

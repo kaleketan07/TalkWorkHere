@@ -891,6 +891,12 @@ public class ClientRunnable implements Runnable {
         }
     }
     
+    /**
+     * Handle remove group from group message.
+     *
+     * @param msg the msg object of type Remove Group from Group
+     * @throws SQLException the SQL exception
+     */
     private void handleRemoveGroupFromGroupMessage(Message msg) throws SQLException {
         User currentUser = userService.getUserByUserName(msg.getName());
         Group currentGroup = groupService.getGroup(msg.getReceiverOrPassword());

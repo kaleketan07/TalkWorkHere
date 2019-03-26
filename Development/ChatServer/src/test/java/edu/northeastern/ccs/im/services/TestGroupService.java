@@ -532,4 +532,44 @@ public class TestGroupService {
         Assertions.assertThrows(SQLException.class, () -> testGS.searchGroup("Gr"));
     }
 
+    /**
+     * Test remove group from group with guest in descendants of host.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testRemoveGroupFromGroupWithGuestNotInDescendantsOfHost() throws SQLException {
+        Assertions.assertFalse(testGS.removeGroupFromGroup("Group201", "ABC"));
+    }
+
+
+    /**
+     * Test remove group from group with no queries affected.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testRemoveGroupFromGroupWithNoQueriesAffected() throws SQLException {
+    	when(mockedRS.next()).thenReturn(true, true, false, true, true, false);
+        when(mockedRS.getString("group_name")).thenReturn("Group201", "Group202");
+        when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
+    	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(testGS.removeGroupFromGroup("ABC", "Group202"));
+    }
+
+    
+    /**
+	 * Test add group to group with guest in descendants of host.
+	 *
+	 * @throws SQLException the SQL exception
+	 */
+	@Test
+    public void testAddGroupToGroupWithGuestInDescendantsOfHost() throws SQLException {
+        when(mockedRS.next()).thenReturn(true, true, false, true, true, false);
+        when(mockedRS.getString("group_name")).thenReturn("Group201", "Group202");
+        when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
+        Assertions.assertTrue(testGS.removeGroupFromGroup("ABC", "Group202"));
+    }
+    
+    
 }

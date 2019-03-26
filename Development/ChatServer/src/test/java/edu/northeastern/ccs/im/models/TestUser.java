@@ -271,11 +271,11 @@ public class TestUser {
     }
     
     /**
-     * Test hash code for non null group name.
+     * Test hash code for non null user name.
      */
     @Test
-    public void testHashCodeForNonNullGroupName() {
-    	assertTrue(ALICE.hashCode()==ALICEBOB.hashCode());
+    public void testHashCodeForNonNullUserName() {
+    	assertTrue(ALICE.hashCode()== 31 * ALICEBOB.hashCode());
     }
     
     

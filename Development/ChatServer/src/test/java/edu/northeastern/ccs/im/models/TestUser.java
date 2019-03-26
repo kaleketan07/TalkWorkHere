@@ -190,7 +190,7 @@ public class TestUser {
         userClients.put(ALICE.getUserName(), mockedClientRunnable);
         Field mapField = ClientRunnable.class.getDeclaredField("userClients");
         mapField.setAccessible(true);
-        mapField.set(mockedClientRunnable, userClients);
+        mapField.set(mockedClientRunnable, userClients);  
         ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
                 "Hello, Alice", false);

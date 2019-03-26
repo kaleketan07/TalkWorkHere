@@ -271,54 +271,50 @@ public class UserService implements UserDao {
     }
 
     /**
-     * Returns a string which contains username of all the followers of a given user
+     * Returns a Map<String, String> which contains username of all the followers of a given user
      *
      * @param followee user who is the followee
      * @return String which contains username of all the followers
      * @throws SQLException the sql exception
      */
     @Override
-    public String getFollowers(User followee) throws SQLException {
-        final String GET_FOLLOWERS =
-                "SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?";
-        StringBuilder followers = new StringBuilder();
-        int count = 0;
+    public Map<String, String> getFollowers(User followee) throws SQLException {
+    	Map<String, String> resultUsers = new HashMap<>();
+    	final String GET_FOLLOWERS =
+    			"select * from user_profile where username in (SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?)";
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName());
         result = pstmt.executeQuery();
         while (result.next()) {
-            followers.append(result.getString("follower_user"));
-            followers.append(System.lineSeparator());
-            count += 1;
+            String username = result.getString(USER_NAME);
+            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
+            resultUsers.put(username, fullName);
         }
-        followers.append("Number of followers " + Integer.toString(count));
         pstmt.close();
-        return followers.toString();
+        return resultUsers;
     }
     
     /**
-     * Returns a string which contains username of all the followee of a given user
+     * Returns a Map<String, String> which contains username of all the followee of a given user
      * @param followee user who is the followee
      * @return String which contains username of all the followers
      * @throws SQLException  the sql exception
      */
     @Override
-    public String getFollowees(User follower) throws SQLException {
+    public Map<String, String> getFollowees(User follower) throws SQLException {
+    	Map<String, String> resultUsers = new HashMap<>();
         final String GET_FOLLOWERS =
-                "SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?";
-        StringBuilder followers = new StringBuilder();
-        int count = 0;
+        		"SELECT * from user_profile WHERE username in (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?)";
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
-        while(result.next()) {
-        	followers.append(result.getString("followee_user"));
-        	followers.append(System.lineSeparator());
-        	count += 1;
+        while (result.next()) {
+            String username = result.getString(USER_NAME);
+            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
+            resultUsers.put(username, fullName);
         }
-        followers.append("Number of followees " + Integer.toString(count));
         pstmt.close();
-        return followers.toString();
+        return resultUsers;
     }
 
 

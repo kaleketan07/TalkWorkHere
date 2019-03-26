@@ -1363,6 +1363,74 @@ public class TestClientRunnable {
     }
 
     /**
+     * Test get follower message for user.
+     *
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testGetFollowerOneMessage() throws SQLException{
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWERS));
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("kkg", "kk");
+        testSet.put("kkGroup", "kk");
+        when(mockedUserService.getFollowers(Mockito.any())).thenReturn(testSet);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test get follower message for user.
+     *
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testGetFollowerMessageForException() throws SQLException{
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWERS));
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("kkg", "kk");
+        testSet.put("kkGroup", "kk");
+        when(mockedUserService.getFollowers(Mockito.any())).thenThrow(SQLException.class);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test get follower message for user.
+     *
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testGetFolloweeOneMessage() throws SQLException{
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWEES));
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("kkg", "kk");
+        testSet.put("kkGroup", "kk");
+        when(mockedUserService.getFollowees(Mockito.any())).thenReturn(testSet);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test get follower message for user.
+     *
+     * @throws SQLException           the sql exception
+     */
+    @Test
+    public void testGetFolloweeMessageForException() throws SQLException{
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_FOLLOWEES));
+        HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("kkg", "kk");
+        testSet.put("kkGroup", "kk");
+        when(mockedUserService.getFollowees(Mockito.any())).thenThrow(SQLException.class);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
      * Test search message for group when no such group is found.
      *
      * @throws SQLException           the sql exception

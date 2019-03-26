@@ -101,7 +101,7 @@ public interface UserDao {
      * @return String which contains username of all the followers
      * @throws SQLException  the sql exception
      */
-	String getFollowers(User followee) throws SQLException;
+	Map<String, String> getFollowers(User followee) throws SQLException;
 	
 
     /**
@@ -121,7 +121,7 @@ public interface UserDao {
      * @return String which contains username of all the followees
      * @throws SQLException  the sql exception
      */
-  String getFollowees(User follower) throws SQLException;
+    Map<String, String> getFollowees(User follower) throws SQLException;
 	
 
 }

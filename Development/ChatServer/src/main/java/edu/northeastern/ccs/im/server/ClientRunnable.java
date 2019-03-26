@@ -865,54 +865,45 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Unable to deny invitation.");
         }
     }
-/*
-    private void handleApproveInvitationModeratorMessage(Message msg) throws SQLException {
 
+    /**
+     * The handle for messages of type Approve Invitation where a moderator
+     * approves an invitation for a user to join their group
+     *
+     * @param msg - The message to be handled
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
+    private void handleApproveInvitationModeratorMessage(Message msg) throws SQLException {
         String moderator = msg.getName();
         String invitee = msg.getTextOrPassword();
         String groupName = msg.getReceiverOrPassword();
-
-        if(!groupService.isModerator(groupName, moderator)) {
-            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are not a moderator of this group");
-            return;
-        }
-
         User userInvitee = userService.getUserByUserName(invitee);
         Set<User> groupUsers = groupService.getMemberUsers(groupName);
-        if(groupUsers.contains(userInvitee)) {
-            this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
-            return;
-        }
-
         Message invitation = invitationService.getInvitation(invitee, groupName);
-        if(invitation == null) {
+        Group group = groupService.getGroup(groupName);
+
+        if(group == null)
+            this.enqueuePrattleResponseMessage("Invalid group name");
+        else if(!groupService.isModerator(groupName, moderator))
+            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are not a moderator of this group");
+        else if(groupUsers.contains(userInvitee))
+            this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
+        else if(invitation == null)
             this.enqueuePrattleResponseMessage("This invitation does not exist" + groupName);
-            return;
-        }
-
-        if(invitation.isInvitationRejected()) {
+        else if(invitation.isInvitationRejected())
             this.enqueuePrattleResponseMessage("You have already rejected this invitation, you cannot approve it now.");
-            return;
-        }
-
-        if(invitation.isInvitationDeleted()) {
+        else if(invitation.isInvitationDeleted())
             this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, hence cannot be approved");
-            return;
-        }
-
-        if(invitationService.approveRejectInvitation(invitee, groupName, true)) {
+        else if(invitationService.approveRejectInvitation(invitee, groupName, true)) {
             this.enqueuePrattleResponseMessage("The invitation was successfully approved.");
-            Group group = groupService.getGroup(groupName);
-            if(invitation.isInvitationAccepted() && group != null) {
-                boolean result = groupService.addUserToGroup(groupName, invitee);
-                if(result)
-                    this.enqueuePrattleResponseMessage("Since this invitation is already accepted, the user " + invitee + " was added to "+ groupName);
+            if(invitation.isInvitationAccepted() && groupService.addUserToGroup(groupName, invitee)) {
+                this.enqueuePrattleResponseMessage("Since this invitation is already accepted, the user " + invitee + " was added to "+ groupName);
             }
-        }
-        else
+        } else
             this.enqueuePrattleResponseMessage("Unable to approve invitation.");
     }
 
+    /*
     private void handleRejectInvitationModeratorMessage(Message msg) throws SQLException {
         String moderator = msg.getName();
         String invitee = msg.getTextOrPassword();
@@ -1248,9 +1239,9 @@ public class ClientRunnable implements Runnable {
         } else if (msg.isDenyInviteUserMessage()) {
             handleDenyInvitationUserMessage(msg);
             return true;
-//        } else if(msg.isApproveInviteModeratorMessage()) {
-//            handleApproveInvitationModeratorMessage(msg);
-//            return true;
+        } else if(msg.isApproveInviteModeratorMessage()) {
+            handleApproveInvitationModeratorMessage(msg);
+            return true;
 //        } else if(msg.isRejectInviteModeratorMessage()) {
 //            handleRejectInvitationModeratorMessage(msg);
 //            return true;

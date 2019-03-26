@@ -332,7 +332,9 @@ public class TestUserService {
     @Test
     public void testGetFollowersOne() throws SQLException {
     	when(mockedRS.next()).thenReturn(true,false);
-        Assertions.assertTrue(us.getFollowers(testUser).contains("ABC"));
+    	 HashMap<String, String> testSet = new HashMap<>();
+         testSet.put("AB", "ABC BCD");
+         Assertions.assertEquals(testSet.size(), us.getFollowers(testUser).size());
     }
 
     /**
@@ -343,19 +345,21 @@ public class TestUserService {
     @Test
     public void testGetFolloweesOne() throws SQLException {
     	when(mockedRS.next()).thenReturn(true,false);
-        Assertions.assertTrue(us.getFollowees(testUser).contains("ABC"));
+   	 	HashMap<String, String> testSet = new HashMap<>();
+        testSet.put("AB", "ABC BCD");
+        Assertions.assertEquals(testSet.size(), us.getFollowees(testUser).size());
     }
     
     
     /**
-     * Test get followees with 0 followers.
+     * Test get followers with 0 followers.
      *
      * @throws SQLException the sql exception
      */
     @Test
     public void testGetFollowersZero() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
-        Assertions.assertEquals(us.getFollowers(testUser), "Number of followers 0");
+        Assertions.assertEquals(us.getFollowers(testUser).size(), 0);
     }
     
     /**
@@ -366,7 +370,7 @@ public class TestUserService {
     @Test
     public void testGetFolloweesZero() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
-        Assertions.assertEquals(us.getFollowees(testUser), "Number of followees 0");
+        Assertions.assertEquals(us.getFollowees(testUser).size(), 0);
     }
 
     /**

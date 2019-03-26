@@ -7,6 +7,8 @@ import org.mockito.Mockito;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.Field;
@@ -148,6 +150,62 @@ public class TestGroup {
 
     }
 
+    
+    /**
+     * Test equals method for false.
+     */
+    @Test
+    public void testEqualsMethodForFalse() {
+    	Group testGroup = new Group();
+    	testGroup.setGroupName(TEST_GROUP_NAME);
+    	Group testGroup2 = new Group();
+    	testGroup2.setGroupName(TEST_GROUP_NAME_1);
+    	assertFalse(testGroup.equals(testGroup2));
+    }
+    
+    /**
+     * Test equals method for true.
+     */
+    @Test
+    public void testEqualsMethodForTrue() {
+    	Group testGroup = new Group();
+    	testGroup.setGroupName(TEST_GROUP_NAME);
+    	Group testGroup2 = new Group();
+    	testGroup2.setGroupName(TEST_GROUP_NAME);
+    	assertTrue(testGroup.equals(testGroup2));
+    }
+    
+    /**
+     * Test equals method for different type.
+     */
+    @Test
+    public void testEqualsMethodForDifferentType() {
+    	Group testGroup = new Group();
+    	testGroup.setGroupName(TEST_GROUP_NAME);
+    	assertFalse(testGroup.equals(null));
+    }
+    
+    /**
+     * Test hash code for null group name.
+     */
+    @Test
+    public void testHashCodeForNullGroupName() {
+    	Group testGroup = new Group();
+    	testGroup.setGroupName(null);
+    	assertTrue(testGroup.hashCode()==0);
+    }
+    
+    /**
+     * Test get member groups.
+     */
+    @Test
+    public void testGetMemberGroups() {
+    	Group testGroup = new Group();
+    	testGroup.setGroupName(null);
+    	assertTrue(testGroup.getMemberGroups().isEmpty());
+    }
+    
+    
 
     private static final User CAROL = Mockito.mock(User.class);
     private static final User DAN = Mockito.mock(User.class);

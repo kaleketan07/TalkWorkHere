@@ -166,7 +166,7 @@ public class GroupService implements GroupDao {
     }
 
     /**
-     * Gets the member groups.
+     * Gets the member groups of the given group.
      *
      * @param groupName the group name
      * @return the member groups
@@ -174,7 +174,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Set<String> getMemberGroups(String groupName) throws SQLException {
-        final String FETCH_MEMBER_GROUPS = "SELECT prattle.membership_groups.guest_group_name FROM prattle.groups JOIN prattle.membership_groups on prattle.groups.group_name = prattle.membership_groups.host_group_name where prattle.groups.group_name = ?";
+        final String FETCH_MEMBER_GROUPS = "SELECT prattle.membership_groups.guest_group_name FROM prattle.groups JOIN prattle.membership_groups on prattle.groups.group_name = prattle.membership_groups.host_group_name WHERE prattle.groups.group_name = ? AND is_removed = 0";
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_GROUPS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<String> groups = new HashSet<>();
@@ -188,7 +188,7 @@ public class GroupService implements GroupDao {
     }
 
     /**
-     * Gets the all groups.
+     * Get all the groups.
      *
      * @return the all groups
      * @throws SQLException the SQL exception
@@ -320,8 +320,13 @@ public class GroupService implements GroupDao {
     }
 
 
-    /* (non-Javadoc)
-     * @see edu.northeastern.ccs.im.services.GroupDao#isUserMemberOfTheGroup(java.lang.String, java.lang.String)
+    /**
+     * Checks if is user member of the group.
+     *
+     * @param grpName  the name of the group in which the user name is to be checked
+     * @param userName the user name to be checked
+     * @return true, if is user is a member of the group
+     * @throws SQLException the SQL exception
      */
     public boolean isUserMemberOfTheGroup(String grpName, String userName) throws SQLException {
         Group group = getGroup(grpName);
@@ -403,6 +408,31 @@ public class GroupService implements GroupDao {
         }
         return resultMap;
     }
+
+    /**
+     * Removes the group from the given group
+     *
+     * @param hostGroupName
+     * @param guestGroupName
+     * @return true, if successfully removes the group else returns false
+     * @throws SQLException
+     */
+	@Override
+	public boolean removeGroupFromGroup(String hostGroupName, String guestGroupName) throws SQLException {
+		Group grp = getGroup(hostGroupName);
+        Set<String> descendantGroups = new HashSet<>();
+        descendantGroups = getFlatListOfGroups(grp, descendantGroups);
+        if (descendantGroups.contains(guestGroupName)) {
+        	final String REMOVE_GROUP_FROM_GROUP = "UPDATE prattle.membership_groups SET is_removed = 1 WHERE membership_groups.host_group_name = ? AND membership_groups.guest_group_name = ?";
+            pstmt = conn.getPreparedStatement(REMOVE_GROUP_FROM_GROUP);
+            pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestGroupName);
+            int qResult = pstmt.executeUpdate();
+            pstmt.close();
+            return (qResult > 0);
+        } else {
+            return false;
+        }
+	}
 
 
 }

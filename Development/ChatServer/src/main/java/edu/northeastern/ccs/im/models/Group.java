@@ -159,7 +159,7 @@ public class Group implements Member {
     
     @Override
 	public boolean equals(Object obj) {
-		if(obj instanceof User) {
+		if(obj instanceof Group) {
 			return this.groupName.equals(((Group) obj).getGroupName());
 		}
 		return false;

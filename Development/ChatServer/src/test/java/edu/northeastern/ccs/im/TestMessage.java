@@ -313,7 +313,7 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isDeleteGroupMessage());
         assertFalse(message.isDeleteUserMessage());
-        assertFalse(message.isPrivateReplyMessage());
+        assertFalse(message.isPrivateReplyMessage()); 
     }
 
     /**
@@ -558,6 +558,27 @@ public class TestMessage {
         Assertions.assertEquals("attributes", message.getReceiverOrPassword());
         Assertions.assertTrue(message.isUpdateGroupMessage());
     }
+    
+    /**
+     * Test is add group to group message true.
+     */
+    @Test
+    public void testIsAddGroupToGroupMessageTrue() {
+        Message message = Message.makeAddGroupToGroupMessage(SENDER_NAME, "testGroup", "testGroup2");
+        Assertions.assertEquals(SENDER_NAME, message.getName());
+        Assertions.assertEquals("testGroup", message.getTextOrPassword());
+        Assertions.assertEquals("testGroup2", message.getReceiverOrPassword());
+        Assertions.assertTrue(message.isAddGroupToGroupMessage());
+    }
+    
+    /**
+     * Test is add group to group message false.
+     */
+    @Test
+    public void testIsAddGroupToGroupMessageFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isAddGroupToGroupMessage());
+    }
 
     /**
      * Test is update group message for false.
@@ -575,6 +596,26 @@ public class TestMessage {
     public void testMakeMessageAddUserGroupMessageCondition() {
         Message message = Message.makeMessage(AUG, SENDER_NAME, GROUP_NAME, ANOTHER_USER);
         Assertions.assertTrue(message.isAddUserToGroupMessage());
+    }
+    
+    
+    /**
+     * Test make message add user group message condition for false.
+     */
+    @Test
+    public void testMakeMessageAddUserGroupMessageConditionForFalse() {
+    	Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isAddUserToGroupMessage());
+    }
+    
+    
+    /**
+     * Test make message add group group message condition.
+     */
+    @Test
+    public void testMakeMessageAddGroupGroupMessageCondition() {
+        Message message = Message.makeMessage(AGG, SENDER_NAME, GROUP_NAME, ANOTHER_GROUP_NAME);
+        Assertions.assertTrue(message.isAddGroupToGroupMessage());
     }
 
     /**
@@ -679,6 +720,61 @@ public class TestMessage {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isSearchMessage());
     }
+    
+    /**
+     * Test make delete group message message.
+     */
+    @Test
+    public void testMakeDeleteGroupMessageMessage() {
+    	Message message = Message.makeMessage(DGM, SENDER_NAME, GROUP_NAME, MSG_KEY);
+        Assertions.assertTrue(message.isDeleteGroupMessageMessage());
+    }
+    
+    /**
+     * Test make delete group message message for false.
+     */
+    @Test
+    public void testMakeDeleteGroupMessageMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isDeleteGroupMessageMessage());
+    }
+    
+    /**
+     * Test make remove group from group message.
+     */
+    @Test
+    public void testMakeRemoveGroupFromGroupMessage() {
+    	Message message = Message.makeMessage(RGG, SENDER_NAME, GROUP_NAME, ANOTHER_GROUP_NAME);
+        Assertions.assertTrue(message.isRemoveGroupFromGroupMessage());
+    }
+    
+    /**
+     * Test make remove group from group message for false.
+     */
+    @Test
+    public void testMakeRemoveGroupFromGroupMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isRemoveGroupFromGroupMessage());
+    }
+    
+    /**
+     * Test make delete private message message.
+     */
+    @Test
+    public void testMakeDeletePrivateMessageMessage() {
+    	Message message = Message.makeMessage(DPM, SENDER_NAME, null, null);
+        Assertions.assertTrue(message.isDeletePrivateMessageMessage());
+    }
+    
+    /**
+     * Test make delete private message message for false.
+     */
+    @Test
+    public void testMakeDeletePrivateMessageMessageForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isDeletePrivateMessageMessage());
+    }
+    
 
     /**
      * Test the isCreateInvitationMessage method
@@ -907,8 +1003,12 @@ public class TestMessage {
     private static final String SRH = "SRH";
     private static final String MSG = "MSG";
     private static final String UPG = "UPG";
+    private static final String AGG = "AGG";
+    private static final String DGM = "DGM";
+    private static final String RGG = "RGG";
     private static final String GFR = "GFR";
     private static final String GFE = "GFE";
+    private static final String DPM = "DPM";
     private static final String GOU = "GOU";
     private static final String IUG = "IUG";
     private static final String DUI = "DUI";
@@ -923,7 +1023,9 @@ public class TestMessage {
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final String PASS = "some_p@$$worD";
     private static final String GROUP_NAME = "group";
+    private static final String ANOTHER_GROUP_NAME = "group2";
     private static final String ANOTHER_USER = "another-user";
+    private static final String MSG_KEY = "dummy_msg_key";
     private static final String MODERATOR = "moderator";
     private static final String INVITEE = "invitee";
     private static final String INVITER = "inviter";

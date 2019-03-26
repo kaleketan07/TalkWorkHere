@@ -236,9 +236,55 @@ public class TestUser {
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
                 "Hello, Alice", true);
     }
+    
+    
+    /**
+     * Test equals method for false.
+     */
+    @Test
+    public void testEqualsMethodForFalse() {
+    	assertFalse(ALICE.equals(TOM));
+    }
+    
+    /**
+     * Test equals method for true.
+     */
+    @Test
+    public void testEqualsMethodForTrue() {
+    	assertTrue(ALICE.equals(GARY));
+    }
+    
+    /**
+     * Test equals method for different type.
+     */
+    @Test
+    public void testEqualsMethodForDifferentType() {
+    	assertFalse(ALICE.equals(null));
+    }
+    
+    /**
+     * Test hash code for null user name.
+     */
+    @Test
+    public void testHashCodeForNullGroupName() {
+    	assertTrue(NULLESH.hashCode()==0);
+    }
+    
+    /**
+     * Test hash code for non null user name.
+     */
+    @Test
+    public void testHashCodeForNonNullUserName() {
+    	assertTrue(ALICE.hashCode()== 31 * ALICEBOB.hashCode());
+    }
+    
+    
 
     private static final User TOM = new User("Tom", "Harris", "tomharris", "123", false);
     private static final User ALICE = new User("Alice", "Bob", "alicebob", "password", false);
+    private static final User GARY = new User("Alice", "Bob", "alicebob", "password", false);
+    private static final User NULLESH = new User("Alice", "Bob", null, "password", false);
+    private static final String ALICEBOB = "alicebob";
     private static final String RUBY = "RUBY";
     private static final String ALICERUBY = "aliceruby";
     private static final String DUMMY_GROUP_NAME = "dummy group";

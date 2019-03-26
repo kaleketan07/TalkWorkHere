@@ -364,6 +364,39 @@ public class TestMessage {
     }
     
     /**
+     * Test makeDeleteGroupMessage()
+     */
+    @Test
+    public void testMakeDeleteGroupMessage() {
+        Message message = Message.makeMessage("DGM", SENDER_NAME , PASS, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append("DGM");
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeleteGroupMessageMessage());
+        assertFalse(message.isDeletePrivateMessageMessage());
+    }
+     
+    /**
+    * Test makeDeletePrivateMessage()
+    */
+   @Test
+   public void testMakeDeletePrivateMessage() {
+       Message message = Message.makeMessage("DPM", SENDER_NAME , PASS, NULL_OUTPUT);
+       StringBuilder strBuild = new StringBuilder();
+       strBuild.append("DPM");
+       strBuild.append(toStringHelper(SENDER_NAME));
+       strBuild.append(toStringHelper(PASS));
+       strBuild.append(toStringHelper(NULL_OUTPUT));
+       assertEquals(strBuild.toString(), message.toString());
+       assertTrue(message.isDeletePrivateMessageMessage());
+       assertFalse(message.isDeleteGroupMessageMessage());
+       assertFalse(message.isAddUserToGroupMessage());
+   }
+    
+    /**
      * Test makeGetFolloweesMessage()
      */
     @Test

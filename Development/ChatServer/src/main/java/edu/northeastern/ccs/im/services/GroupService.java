@@ -148,7 +148,7 @@ public class GroupService implements GroupDao {
     @Override
     public Set<User> getMemberUsers(String groupName) throws SQLException {
 
-        final String FETCH_MEMBER_USERS = "WITH cte AS (SELECT * FROM prattle.groups JOIN prattle.membership_users ON prattle.groups.group_name = prattle.membership_users.host_group_name WHERE prattle.groups.group_name = ?) SELECT user_id, username, first_name, last_name, logged_in FROM cte JOIN prattle.user_profile ON cte.guest_user_name = prattle.user_profile.username;";
+        final String FETCH_MEMBER_USERS = "WITH cte AS (SELECT * FROM prattle.groups JOIN prattle.membership_users ON prattle.groups.group_name = prattle.membership_users.host_group_name WHERE prattle.groups.group_name = ?) SELECT user_id, username, first_name, last_name, logged_in FROM cte JOIN prattle.user_profile ON cte.guest_user_name = prattle.user_profile.username WHERE is_removed = 0;";
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_USERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<User> users = new HashSet<>();

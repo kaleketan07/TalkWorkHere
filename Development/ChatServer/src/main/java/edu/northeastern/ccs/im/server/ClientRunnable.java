@@ -401,6 +401,8 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
         } else {
             groupService.createGroup(msg.getTextOrPassword(), msg.getName());
+            groupService.addUserToGroup(msg.getTextOrPassword(), msg.getName());
+            this.enqueuePrattleResponseMessage("Successfully created group: "+ msg.getTextOrPassword());
         }
     }
 
@@ -642,7 +644,18 @@ public class ClientRunnable implements Runnable {
      */
     private void handleGetFollowersMessage(Message msg) throws SQLException {
     	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage(userService.getFollowers(currUser));
+    	Map<String, String> resultantSet;
+        try {
+            resultantSet = userService.getFollowers(currUser);
+            if (resultantSet.isEmpty()) {
+                this.enqueuePrattleResponseMessage("Sorry, did not find any followers");
+                return;
+            }
+        helperForBuildingAndSendingSearchMessage(resultantSet,"User");
+        } catch (Exception e) {
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP GFR.");
+        }
     }
     
     /**
@@ -653,7 +666,18 @@ public class ClientRunnable implements Runnable {
      */
     private void handleGetFolloweesMessage(Message msg) throws SQLException {
     	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage(userService.getFollowees(currUser));
+    	Map<String, String> resultantSet;
+        try {
+            resultantSet = userService.getFollowees(currUser);
+            if (resultantSet.isEmpty()) {
+                this.enqueuePrattleResponseMessage("Sorry, did not find any followees");
+                return;
+            }
+        helperForBuildingAndSendingSearchMessage(resultantSet,"User");
+        } catch (Exception e) {
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP GFE.");
+        }
     }
 
     /**
@@ -759,7 +783,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
-            helperForBuildingAndSendingSearchMessage(resultantSet);
+            helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
@@ -779,7 +803,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, did not find any matching records.");
                 return;
             }
-            helperForBuildingAndSendingSearchMessage(resultantSet);
+            helperForBuildingAndSendingSearchMessage(resultantSet,"Group");
         } catch (Exception e) {
             this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
                     " using HELP SRH.");
@@ -793,16 +817,17 @@ public class ClientRunnable implements Runnable {
      *
      * @param resultantSet the set containing the mapped values that is retrieved from the database
      */
-    private void helperForBuildingAndSendingSearchMessage(Map<String, String> resultantSet) {
+    private void helperForBuildingAndSendingSearchMessage(Map<String, String> resultantSet, String userOrGroup) {
         StringBuilder workString = new StringBuilder();
-        workString.append("\nResults: \n");
-        for (Map.Entry<String, String> pair : resultantSet.entrySet()) {
-            workString.append(pair.getKey());
-            workString.append(" ");
-            workString.append(pair.getValue());
-            workString.append("\n");
-        }
+        if(userOrGroup.equalsIgnoreCase("User"))
+            workString.append(String.format("%n%-15s | %-15s %n","Username::","Full Name::"));
+        else
+            workString.append(String.format("%n%-15s | %-15s %n","Group Name::","Moderator Name::"));
+        for (Map.Entry<String, String> pair : resultantSet.entrySet())
+            workString.append(String.format("%-15s | %-15s %n",pair.getKey(),pair.getValue()));
+        workString.append("Number of results : " + resultantSet.size());
         String answerString = workString.toString();
+
         this.enqueuePrattleResponseMessage(answerString);
     }
     

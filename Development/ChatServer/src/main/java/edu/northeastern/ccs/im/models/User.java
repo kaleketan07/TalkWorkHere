@@ -161,19 +161,28 @@ public class User {
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
         if (clientRunnable != null && clientRunnable.isInitialized()) {
             uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
-            if (msg.isGroupMessage()) {
-            	clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
-                        System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator()));
-            } else {
-            	clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
-                        System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
-            }
-            
+            enqueueMessageToUser(msg, uniqueKey);
             return uniqueKey;
         }
 
         return cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
+
+	/**
+	 * Enqueue message to user depending on the type of the message.
+	 *
+	 * @param msg the message object
+	 * @param uniqueKey the unique key of the message
+	 */
+	public void enqueueMessageToUser(Message msg, String uniqueKey) {
+		if (msg.isGroupMessage()) {
+			clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
+		            System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator()));
+		} else {
+			clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
+		            System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
+		}
+	}
     
     @Override
 	public boolean equals(Object obj) {

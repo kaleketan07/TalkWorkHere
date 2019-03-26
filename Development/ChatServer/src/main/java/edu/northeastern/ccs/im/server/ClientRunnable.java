@@ -647,6 +647,29 @@ public class ClientRunnable implements Runnable {
     }
     
     /**
+     * Handles the messages get online users.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleGetOnlineUserMessage(Message msg) throws SQLException {
+    	User currUser = userService.getUserByUserName(msg.getName());
+    	Map<String, String> resultantSet;
+        try {
+            resultantSet = userService.getOnlineUsers(currUser);
+            if (resultantSet.isEmpty()) {
+                this.enqueuePrattleResponseMessage("Sorry, did not find any online users");
+                return;
+            }
+        helperForBuildingAndSendingSearchMessage(resultantSet,"User");
+        } catch (Exception e) {
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP GFR.");
+        }
+    }
+    
+    
+    /**
      * Handles the messages get followees.
      *
      * @param msg the msg
@@ -958,10 +981,13 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isGetFollowersMessage()) {
         	handleGetFollowersMessage(msg);
-          return true;
+            return true;
         } else if (msg.isGetFolloweesMessage()) {
         	handleGetFolloweesMessage(msg);
-          return true;
+            return true;
+        } else if (msg.isGetOnlineUsersMessage()) {
+        	handleGetOnlineUserMessage(msg);
+            return true;
         } 
         return false;
     }

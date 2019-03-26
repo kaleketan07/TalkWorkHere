@@ -238,7 +238,9 @@ public class Message {
             return makeGetFollowersMessage(srcName);
         } else if (handle.compareTo(MessageType.GET_FOLLOWEES.toString()) == 0) {
             return makeGetFolloweesMessage(srcName);
-        }
+        } else if (handle.compareTo(MessageType.GET_ONLINE_USERS.toString()) == 0) {
+            return makeGetOnlineUserMessage(srcName);
+        } 
         return null;
     }
 
@@ -481,6 +483,16 @@ public class Message {
     }
     
     /**
+    * This method creates a Get Online Users message 
+    *
+    * @param currentUser - string of the current user name
+    * @return a Message object of type Get Online Users
+    */
+   public static Message makeGetOnlineUserMessage(String follower) {
+       return new Message(MessageType.GET_ONLINE_USERS, follower);
+   }
+    
+    /**
      * This method creates a unfollow user message
      *
      * @param follower - String of the follower user name
@@ -720,6 +732,16 @@ public class Message {
     public boolean isGetFolloweesMessage(){
         return (msgType == MessageType.GET_FOLLOWEES);
     }
+    
+    /**
+     * This method verifies if the current message has the handle GOU (is a GET_ONLINE_USERS)
+     *
+     * @return true or false based on the comparison result
+     */
+    public boolean isGetOnlineUsersMessage(){
+        return (msgType == MessageType.GET_ONLINE_USERS);
+    }
+    
 
     /**
      * This method verifies if the current message has the handle GTG (is a GET_GROUP message)

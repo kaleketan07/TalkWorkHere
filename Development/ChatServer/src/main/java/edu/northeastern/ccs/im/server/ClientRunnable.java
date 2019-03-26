@@ -470,7 +470,7 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
-     * Helper for checking the validity of input before calling the handlers
+     * Helper for checking the validity of input before calling the handlers for add or remove user to group message
      *
      * @param currentUser  - the current user requesting the service
      * @param currentGroup - the group from which the user needs to be removed or added to.
@@ -483,19 +483,27 @@ public class ClientRunnable implements Runnable {
         else if (!currentGroup.getModeratorName().equals(currentUser.getUserName()))
             this.enqueuePrattleResponseMessage("You do not have the permissions to perform this operation");
         else if (guestUser == null)
-            this.enqueuePrattleResponseMessage("The user you are trying to add does not exist");
+            this.enqueuePrattleResponseMessage("The user you are trying to add/remove does not exist");
         else
             return true;
         return false;
     }
     
+    /**
+     * Helper for checking the validity of the input before calling handlers for add or remove group to group message.
+     *
+     * @param currentUser the current user
+     * @param currentGroup the current group
+     * @param guestGroup the guest group
+     * @return true, if successful
+     */
     private boolean helperAddRemoveGroupToGroupMessage(User currentUser, Group currentGroup, Group guestGroup) {
         if (currentGroup == null)
             this.enqueuePrattleResponseMessage("The group you are trying to add to does not exist!");
         else if (!currentGroup.getModeratorName().equals(currentUser.getUserName()))
             this.enqueuePrattleResponseMessage("You do not have the permissions to perform this operation");
         else if (guestGroup == null)
-            this.enqueuePrattleResponseMessage("The user you are trying to add does not exist");
+            this.enqueuePrattleResponseMessage("The group you are trying to add/remove does not exist");
         else
             return true;
         return false;

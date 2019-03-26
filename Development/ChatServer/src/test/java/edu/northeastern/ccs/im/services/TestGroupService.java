@@ -533,7 +533,7 @@ public class TestGroupService {
     }
 
     /**
-     * Test remove group from group with guest in descendants of host.
+     * Test remove group from group with guest not in descendants of host.
      *
      * @throws SQLException the SQL exception
      */

@@ -648,10 +648,33 @@ public class ClientRunnable implements Runnable {
             }
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFR.");
         }
     }
+    
+    /**
+     * Handles the messages get online users.
+     *
+     * @param msg the msg
+     * @throws SQLException the SQL exception
+     */
+    private void handleGetOnlineUserMessage(Message msg) throws SQLException {
+    	User currUser = userService.getUserByUserName(msg.getName());
+    	Map<String, String> resultantSet;
+        try {
+            resultantSet = userService.getOnlineUsers(currUser);
+            if (resultantSet.isEmpty()) {
+                this.enqueuePrattleResponseMessage("Sorry, did not find any online users");
+                return;
+            }
+        helperForBuildingAndSendingSearchMessage(resultantSet,"User");
+        } catch (Exception e) {
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
+                    " using HELP GOU.");
+        }
+    }
+    
     
     /**
      * Handles the messages get followees.
@@ -670,7 +693,7 @@ public class ClientRunnable implements Runnable {
             }
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFE.");
         }
     }
@@ -970,7 +993,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage("Something went wrong with the update. Please refer to the correct " +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     "group update syntax using HELP UPG");
         }
     }
@@ -1026,7 +1049,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
     }
@@ -1046,7 +1069,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet,"Group");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
     }
@@ -1211,10 +1234,13 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isGetFollowersMessage()) {
         	handleGetFollowersMessage(msg);
-          return true;
+            return true;
         } else if (msg.isGetFolloweesMessage()) {
         	handleGetFolloweesMessage(msg);
-          return true;
+            return true;
+        } else if (msg.isGetOnlineUsersMessage()) {
+        	handleGetOnlineUserMessage(msg);
+            return true;
         } 
         return false;
     }
@@ -1350,4 +1376,6 @@ public class ClientRunnable implements Runnable {
     public static ClientRunnable getClientByUsername(String username) {
         return userClients.getOrDefault(username, null);
     }
+    
+	private static final String CHECK_SYNTAX_ERROR_MESSAGE = "Something went wrong while retrieving data. Please check your syntax";
 }

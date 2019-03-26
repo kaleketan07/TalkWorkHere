@@ -30,7 +30,7 @@ public class TestUserService {
 
     private User testUser;
     private UserService us;
-
+    private HashMap<String, String> testSet = new HashMap<>();
     /**
      * The Mocked db connection.
      */
@@ -96,6 +96,7 @@ public class TestUserService {
         Field ut = UserService.class.getDeclaredField("utils");
         ut.setAccessible(true);
         ut.set(us, mockedDBUtils);
+        testSet.put("AB", "ABC BCD");
     }
 
     /**
@@ -332,8 +333,6 @@ public class TestUserService {
     @Test
     public void testGetFollowersOne() throws SQLException {
     	when(mockedRS.next()).thenReturn(true,false);
-    	 HashMap<String, String> testSet = new HashMap<>();
-         testSet.put("AB", "ABC BCD");
          Assertions.assertEquals(testSet.size(), us.getFollowers(testUser).size());
     }
 
@@ -345,9 +344,19 @@ public class TestUserService {
     @Test
     public void testGetFolloweesOne() throws SQLException {
     	when(mockedRS.next()).thenReturn(true,false);
-   	 	HashMap<String, String> testSet = new HashMap<>();
-        testSet.put("AB", "ABC BCD");
         Assertions.assertEquals(testSet.size(), us.getFollowees(testUser).size());
+    }
+    
+    
+    /**
+     * Test get online with 1 online user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetOnlineWithOneOutput() throws SQLException {
+    	when(mockedRS.next()).thenReturn(true,false);
+        Assertions.assertEquals(testSet.size(), us.getOnlineUsers(testUser).size());
     }
     
     
@@ -371,6 +380,19 @@ public class TestUserService {
     public void testGetFolloweesZero() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
         Assertions.assertEquals(us.getFollowees(testUser).size(), 0);
+    }
+    
+    
+    
+    /**
+     * Test get online user with 0  online user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testGetOnlineWithZeroOutput() throws SQLException {
+    	when(mockedRS.next()).thenReturn(false);
+        Assertions.assertEquals(us.getOnlineUsers(testUser).size(), 0);
     }
 
     /**
@@ -494,8 +516,6 @@ public class TestUserService {
      */
     @Test
     public void testSearchUser() throws SQLException {
-        HashMap<String, String> testSet = new HashMap<>();
-        testSet.put("AB", "ABC BCD");
         Assertions.assertEquals(testSet.size(), us.searchUser("AB").size());
     }
 

@@ -909,7 +909,7 @@ public class ClientRunnable implements Runnable {
         else if(groupUsers.contains(userInvitee))
             this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
         else if(invitation == null)
-            this.enqueuePrattleResponseMessage("This invitation does not exist" + groupName);
+            this.enqueuePrattleResponseMessage("The invitation for invitee " + invitee + " group " + groupName +" does not exist");
         else if(invitation.isInvitationRejected())
             this.enqueuePrattleResponseMessage("You have already rejected this invitation, you cannot approve it now.");
         else if(invitation.isInvitationDeleted())

@@ -1921,6 +1921,121 @@ public class TestClientRunnable {
     }
 
     /**
+     * This test verifies deny Invitation handle when invitation is not found.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageDoesNotExist() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(null);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies deny Invitation handle when invitation is already accepted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageAlreadyAccepted() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        DENY_INVITATION_MESSAGE.setInvitationAccepted(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        DENY_INVITATION_MESSAGE.setInvitationAccepted(false);
+    }
+
+    /**
+     * This test verifies deny Invitation handle when invitation is already denied.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageAlreadyDenied() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        DENY_INVITATION_MESSAGE.setInvitationDenied(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        DENY_INVITATION_MESSAGE.setInvitationDenied(false);
+    }
+
+    /**
+     * This test verifies deny Invitation handle when invitation is already rejected.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageAlreadyRejected() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        DENY_INVITATION_MESSAGE.setInvitationRejected(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        DENY_INVITATION_MESSAGE.setInvitationRejected(false);
+    }
+
+    /**
+     * This test verifies deny Invitation handle when invitation is already deleted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageAlreadyDeleted() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        DENY_INVITATION_MESSAGE.setInvitationDeleted(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        DENY_INVITATION_MESSAGE.setInvitationDeleted(false);
+    }
+
+    /**
+     * This test verifies deny Invitation handle when invitation is denied successful
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageDenySuccessful() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
+        when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, false)).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies deny Invitation handle when invitation is not denied
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDenyInvitationMessageDenyunsuccessful() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DENY_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(DENY_INVITATION_MESSAGE);
+        when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, false)).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
      * Test for user does not exist, that is, user is null and msg is not a login message neither a register message
      */
     @Test
@@ -2144,6 +2259,7 @@ public class TestClientRunnable {
     private static final Message DELETE_INVITATION_MESSAGE = Message.makeDeleteInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message DELETE_INVITATION_MESSAGE_INVITER = Message.makeDeleteInvitationMessage(INVITER, INVITEE, GROUP_NAME);
     private static final Message ACCEPT_INVITATION_MESSAGE = Message.makeAcceptInviteUserMessage(SENDER_NAME, GROUP_NAME);
+    private static final Message DENY_INVITATION_MESSAGE = Message.makeDenyInviteUserMessage(SENDER_NAME, GROUP_NAME);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(SENDER_NAME, GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, "hello", "rb");
     private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, "hello", "rb");

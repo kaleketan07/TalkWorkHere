@@ -345,7 +345,91 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
     }
+    
+    /**
+     * Test makeGetFollowersMessage()
+     */
+    @Test
+    public void testMakeGetFollowersMessage() {
+        Message message = Message.makeMessage(GFR, SENDER_NAME , NULL_OUTPUT, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(GFR);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isGetFollowersMessage());
+        assertFalse(message.isGetFolloweesMessage());
+        assertFalse(message.isGetOnlineUsersMessage());
+    }
+    
+    /**
+     * Test makeDeleteGroupMessage()
+     */
+    @Test
+    public void testMakeDeleteGroupMessage() {
+        Message message = Message.makeMessage("DGM", SENDER_NAME , PASS, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append("DGM");
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeleteGroupMessageMessage());
+        assertFalse(message.isDeletePrivateMessageMessage());
+    }
+     
+    /**
+    * Test makeDeletePrivateMessage()
+    */
+   @Test
+   public void testMakeDeletePrivateMessage() {
+       Message message = Message.makeMessage("DPM", SENDER_NAME , PASS, NULL_OUTPUT);
+       StringBuilder strBuild = new StringBuilder();
+       strBuild.append("DPM");
+       strBuild.append(toStringHelper(SENDER_NAME));
+       strBuild.append(toStringHelper(PASS));
+       strBuild.append(toStringHelper(NULL_OUTPUT));
+       assertEquals(strBuild.toString(), message.toString());
+       assertTrue(message.isDeletePrivateMessageMessage());
+       assertFalse(message.isDeleteGroupMessageMessage());
+       assertFalse(message.isAddUserToGroupMessage());
+   }
+    
+    /**
+     * Test makeGetFolloweesMessage()
+     */
+    @Test
+    public void testMakeGetFolloweesMessage() {
+        Message message = Message.makeMessage(GFE, SENDER_NAME , NULL_OUTPUT, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(GFE);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertFalse(message.isGetFollowersMessage());
+        assertTrue(message.isGetFolloweesMessage());
+        assertFalse(message.isGetOnlineUsersMessage());
+    }
 
+    /**
+     * Test makeGetOnlineUserMessage()
+     */
+    @Test
+    public void testMakeGetOnlineUserMessage() {
+        Message message = Message.makeMessage(GOU, SENDER_NAME , NULL_OUTPUT, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(GOU);
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertFalse(message.isGetFollowersMessage());
+        assertFalse(message.isGetFolloweesMessage());
+        assertTrue(message.isGetOnlineUsersMessage());
+    }
+    
     /**
      * Test makeMessage with Delete_User as the handle
      */
@@ -961,12 +1045,14 @@ public class TestMessage {
     private static final String GFR = "GFR";
     private static final String GFE = "GFE";
     private static final String DPM = "DPM";
+    private static final String GOU = "GOU";
     private static final String IUG = "IUG";
     private static final String DUI = "DUI";
     private static final String AIU = "AIU";
     private static final String DIU = "DIU";
     private static final String AIM = "AIM";
     private static final String RIM = "RIM";
+
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

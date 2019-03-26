@@ -391,6 +391,13 @@ public class ClientRunnable implements Runnable {
             boolean updated = userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1");
             if (!updated) {
                 this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
+            } else {
+            	Map<Message, String> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName());
+            	for(Map.Entry<Message, String> m : unsentMessages.entrySet()) {
+            		currentUser.enqueueMessageToUser(m.getKey(), m.getValue());
+            		conversationalMessagesService.markMessageAsSent(m.getValue());
+            	}
+            	
             }
         }
     }

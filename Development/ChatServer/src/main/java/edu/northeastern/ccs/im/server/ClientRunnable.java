@@ -829,11 +829,8 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have to wait for another invite.");
             else if(invitationService.acceptDenyInvitation(invitee, groupName, true)) {
                 this.enqueuePrattleResponseMessage("The invitation was successfully accepted.");
-                Group group = groupService.getGroup(groupName);
-                if(invitation.isInvitationApproved()) {
-                    boolean result = groupService.addUserToGroup(groupName, invitee);
-                    if(result)
-                        this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
+                if(invitation.isInvitationApproved() && groupService.addUserToGroup(groupName, invitee)) {
+                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
                 }
             } else
                 this.enqueuePrattleResponseMessage("Unable to accept invitation.");

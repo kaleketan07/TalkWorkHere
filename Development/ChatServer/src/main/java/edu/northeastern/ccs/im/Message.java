@@ -792,7 +792,7 @@ public class Message {
     /**
      * Verify if the message is a message for adding a group to group
      *
-     * @return true, if message is for deleting a group message
+     * @return true, if message is for adding a group to group
      */
     public boolean isAddGroupToGroupMessage() { return (msgType == MessageType.ADD_GROUP_TO_GROUP);}
     

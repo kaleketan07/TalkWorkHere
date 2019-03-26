@@ -313,7 +313,7 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isDeleteGroupMessage());
         assertFalse(message.isDeleteUserMessage());
-        assertFalse(message.isPrivateReplyMessage());
+        assertFalse(message.isPrivateReplyMessage()); 
     }
 
     /**
@@ -755,42 +755,6 @@ public class TestMessage {
     public void testMakeRemoveGroupFromGroupMessageForFalse() {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isRemoveGroupFromGroupMessage());
-    }
-    
-    /**
-     * Test make get followers message.
-     */
-    @Test
-    public void testMakeGetFollowersMessage() {
-    	Message message = Message.makeMessage(GFR, SENDER_NAME, null, null);
-        Assertions.assertTrue(message.isGetFollowersMessage());
-    }
-    
-    /**
-     * Test make get followers message for false.
-     */
-    @Test
-    public void testMakeGetFollowersMessageForFalse() {
-        Message message = Message.makeQuitMessage(SENDER_NAME);
-        Assertions.assertFalse(message.isGetFollowersMessage());
-    }
-    
-    /**
-     * Test make get followees message.
-     */
-    @Test
-    public void testMakeGetFolloweesMessage() {
-    	Message message = Message.makeMessage(GFE, SENDER_NAME, null, null);
-        Assertions.assertTrue(message.isGetFolloweesMessage());
-    }
-    
-    /**
-     * Test make get followees message for false.
-     */
-    @Test
-    public void testMakeGetFolloweesMessageForFalse() {
-        Message message = Message.makeQuitMessage(SENDER_NAME);
-        Assertions.assertFalse(message.isGetFolloweesMessage());
     }
     
     /**

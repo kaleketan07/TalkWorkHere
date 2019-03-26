@@ -648,7 +648,7 @@ public class ClientRunnable implements Runnable {
             }
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFR.");
         }
     }
@@ -670,7 +670,7 @@ public class ClientRunnable implements Runnable {
             }
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GOU.");
         }
     }
@@ -693,7 +693,7 @@ public class ClientRunnable implements Runnable {
             }
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFE.");
         }
     }
@@ -1002,7 +1002,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     "group update syntax using HELP UPG");
         }
     }
@@ -1058,7 +1058,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
     }
@@ -1078,7 +1078,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet,"Group");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
     }
@@ -1386,5 +1386,5 @@ public class ClientRunnable implements Runnable {
         return userClients.getOrDefault(username, null);
     }
     
-	private static final String ERROR_MESSAGE = "Something went wrong while retrieving data. Please check your syntax";
+	private static final String CHECK_SYNTAX_ERROR_MESSAGE = "Something went wrong while retrieving data. Please check your syntax";
 }

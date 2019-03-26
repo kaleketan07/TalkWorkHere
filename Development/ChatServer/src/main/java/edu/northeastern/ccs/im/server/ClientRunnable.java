@@ -671,7 +671,7 @@ public class ClientRunnable implements Runnable {
         helperForBuildingAndSendingSearchMessage(resultantSet,"User");
         } catch (Exception e) {
             this.enqueuePrattleResponseMessage(ERROR_MESSAGE +
-                    " using HELP GFR.");
+                    " using HELP GOU.");
         }
     }
     

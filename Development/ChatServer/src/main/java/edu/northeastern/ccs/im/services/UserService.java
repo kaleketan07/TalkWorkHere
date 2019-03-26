@@ -271,10 +271,10 @@ public class UserService implements UserDao {
     }
 
     /**
-     * Returns a Map<String, String> which contains username of all the followers of a given user
+     * Returns a Map<String, String> which contains username  and fullname of all the followers of a given user
      *
      * @param followee user who is the followee
-     * @return String which contains username of all the followers
+     * @return a Map<String, String> which contains username and fullname
      * @throws SQLException the sql exception
      */
     @Override
@@ -295,9 +295,10 @@ public class UserService implements UserDao {
     }
     
     /**
-     * Returns a Map<String, String> which contains username of all the followee of a given user
-     * @param followee user who is the followee
-     * @return String which contains username of all the followers
+     * Returns a Map<String, String> which contains username and fullname of all the followee of a given user
+     * 
+     * @param follower user who is the follower
+     * @return a Map<String, String> which contains username and fullname
      * @throws SQLException  the sql exception
      */
     @Override
@@ -319,10 +320,11 @@ public class UserService implements UserDao {
 
     
     /**
-     * Returns a Map<String, String> which contains username of all the user who are
+     * Returns a Map<String, String> which contains username and fullname of all the user who are
      * online from the list of followees of the given user
-     * @param followee user who is the followee
-     * @return String which contains username of all the followers
+     * 
+     * @param follower user who is the follower
+     * @return a Map<String, String> which contains username and fullname
      * @throws SQLException  the sql exception
      */
     @Override

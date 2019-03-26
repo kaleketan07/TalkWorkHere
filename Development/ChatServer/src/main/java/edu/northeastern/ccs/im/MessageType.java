@@ -120,6 +120,16 @@ public enum MessageType {
 	 * Handle to delete a group message. 
 	 */
 	DELETE_GROUP_MESSAGE("DGM"),
+	
+	/** 
+	 * Handle to add a group to group. 
+	 */
+	ADD_GROUP_TO_GROUP("AGG"),
+	
+	/** 
+	 * Handle to remove a group from group. 
+	 */
+	REMOVE_GROUP_FROM_GROUP("RGG"),
 
     /**
      * Message handle for Inviting user to a group

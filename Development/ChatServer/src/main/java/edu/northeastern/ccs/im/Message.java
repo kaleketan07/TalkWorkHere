@@ -244,7 +244,11 @@ public class Message {
             return makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_GROUP_MESSAGE.toString()) == 0) {
         	return makeDeleteGroupMessageMessage(srcName, textOrPassword);
-        }
+        } else if (handle.compareTo(MessageType.ADD_GROUP_TO_GROUP.toString()) == 0) {
+        	return makeAddGroupToGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        } else if (handle.compareTo(MessageType.REMOVE_GROUP_FROM_GROUP.toString()) == 0) {
+        	return makeRemoveGroupFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
+        }	
         return null;
     }
 
@@ -682,7 +686,30 @@ public class Message {
     	return new Message(MessageType.DELETE_GROUP_MESSAGE, srcName, text);
     }
     
-
+    /**
+     * Make a message for adding a group to group.
+     *
+     * @param srcName the name of the sender
+     * @param guestGrpName the guest group name
+     * @param hostGrpName the host group name
+     * @return the message object
+     */
+    public static Message makeAddGroupToGroupMessage(String srcName, String guestGrpName, String hostGrpName) {
+    	return new Message(MessageType.ADD_GROUP_TO_GROUP, srcName, guestGrpName, hostGrpName);
+    }
+    
+    /**
+     * Make a message for removing a group from group.
+     *
+     * @param srcName the name of the sender
+     * @param guestGrpName the group name of the group to be removed
+     * @param hostGrpName the group name of the group from which the group will be removed
+     * @return the message object
+     */
+    public static Message makeRemoveGroupFromGroupMessage(String srcName, String guestGrpName, String hostGrpName) {
+    	return new Message(MessageType.REMOVE_GROUP_FROM_GROUP, srcName, guestGrpName, hostGrpName);
+    }
+    
     /**
      * Return the name of the sender of this message.
      *
@@ -994,6 +1021,20 @@ public class Message {
      * @return true, if message is for deleting a group message
      */
     public boolean isDeleteGroupMessageMessage() {return (msgType == MessageType.DELETE_GROUP_MESSAGE);}
+    
+    /**
+     * Verify if the message is a message for adding a group to group
+     *
+     * @return true, if message is for adding a group to group 
+     */
+    public boolean isAddGroupToGroupMessage() { return (msgType == MessageType.ADD_GROUP_TO_GROUP);}
+    
+    /**
+     * Verify if the message is a message for removing a group from group
+     *
+     * @return true, if message is for removing a group from group 
+     */
+    public boolean isRemoveGroupFromGroupMessage() {return (msgType == MessageType.REMOVE_GROUP_FROM_GROUP);}
     
     /**
      * Determine if this message is a message signing off from the IM server.

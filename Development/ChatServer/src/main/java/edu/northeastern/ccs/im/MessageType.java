@@ -124,7 +124,7 @@ public enum MessageType {
 	/** 
 	 * Handle to remove a group from group. 
 	 */
-	REMOVE_GROUP_FROM_GROUP("RGG");
+	REMOVE_GROUP_FROM_GROUP("RGG"),
 
     /**
      * Message handle for Inviting user to a group

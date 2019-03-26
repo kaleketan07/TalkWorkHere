@@ -732,7 +732,7 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     private boolean checkInvitationMessageFromUserHelper(String inviter, String invitee, String groupName) throws SQLException {
-        User userInviter = userService.getUserByUserName(inviter);
+        User userInviter = (inviter == null)? null: userService.getUserByUserName(inviter);
         User userInvitee = userService.getUserByUserName(invitee);
         Group group = groupService.getGroup(groupName);
         Set<User> groupUsers = groupService.getMemberUsers(groupName);
@@ -747,11 +747,10 @@ public class ClientRunnable implements Runnable {
         } else if(groupUsers.contains(userInvitee)) {
             this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName);
             result = false;
-        } else if(!groupUsers.contains(userInviter)) {
+        } else if(userInviter != null && !groupUsers.contains(userInviter)) {
             this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName + "; you cannot perform this operation.");
             result = false;
         }
-
         return result;
     }
 
@@ -805,52 +804,41 @@ public class ClientRunnable implements Runnable {
         }
     }
 
-    /*
+    /**
+     * The handle for messages of type Accept Invitation
+     *
+     * @param msg - The message to be handled
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
     private void handleAcceptInvitationUserMessage(Message msg) throws SQLException {
         String invitee = msg.getName();
         String groupName = msg.getTextOrPassword();
-        User userInvitee = userService.getUserByUserName(invitee);
-        Set<User> groupUsers = groupService.getMemberUsers(groupName);
-        if(groupUsers.contains(userInvitee)) {
-            this.enqueuePrattleResponseMessage("You are already a member of the group " + groupName);
-            return;
-        }
 
-        Message invitation = invitationService.getInvitation(invitee, groupName);
-        if(invitation == null) {
-            this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
-            return;
+        if(checkInvitationMessageFromUserHelper(null,invitee, groupName)) {
+            Message invitation = invitationService.getInvitation(invitee, groupName);
+            if(invitation == null)
+                this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
+            else if(invitation.isInvitationAccepted())
+                this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been removed from the group");
+            else if(invitation.isInvitationDenied())
+                this.enqueuePrattleResponseMessage("You have already denied this invitation; you cannot accept it now.");
+            else if(invitation.isInvitationRejected())
+                this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you will have to wait for an invite from another user");
+            else if(invitation.isInvitationDeleted())
+                this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have to wait for another invite.");
+            else if(invitationService.acceptDenyInvitation(invitee, groupName, true)) {
+                this.enqueuePrattleResponseMessage("The invitation was successfully accepted.");
+                Group group = groupService.getGroup(groupName);
+                if(invitation.isInvitationApproved()) {
+                    boolean result = groupService.addUserToGroup(groupName, invitee);
+                    if(result)
+                        this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
+                }
+            } else
+                this.enqueuePrattleResponseMessage("Unable to accept invitation.");
         }
-
-        if(invitation.isInvitationAccepted()) {
-            this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been removed from the group");
-            return;
-        }
-
-        if(invitation.isInvitationRejected()) {
-            this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you will have to wait for an invite from another user");
-            return;
-        }
-
-        if(invitation.isInvitationDeleted()) {
-            this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have to wait for another invite.");
-            return;
-        }
-
-        if(invitationService.acceptDenyInvitation(invitee, groupName, true)) {
-            this.enqueuePrattleResponseMessage("The invitation was successfully accepted.");
-            Group group = groupService.getGroup(groupName);
-            if(invitation.isInvitationApproved() && group != null) {
-                boolean result = groupService.addUserToGroup(groupName, invitee);
-                if(result)
-                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
-            }
-        }
-        else
-            this.enqueuePrattleResponseMessage("Unable to accept invitation.");
-
     }
-
+/*
     private void handleDenyInvitationUserMessage(Message msg) throws SQLException {
         String invitee = msg.getName();
         String groupName = msg.getTextOrPassword();
@@ -1264,9 +1252,9 @@ public class ClientRunnable implements Runnable {
         } else if(msg.isDeleteInvitationMessage()) {
             handleDeleteInvitationUserMessage(msg);
             return true;
-//        } else if(msg.isAcceptInviteUserMessage()) {
-//            handleAcceptInvitationUserMessage(msg);
-//            return true;
+        } else if(msg.isAcceptInviteUserMessage()) {
+            handleAcceptInvitationUserMessage(msg);
+            return true;
 //        } else if (msg.isDenyInviteUserMessage()) {
 //            handleDenyInvitationUserMessage(msg);
 //            return true;

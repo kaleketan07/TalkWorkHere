@@ -732,7 +732,7 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     private boolean checkInvitationMessageFromUserHelper(String inviter, String invitee, String groupName) throws SQLException {
-        User userInviter = userService.getUserByUserName(inviter);
+        User userInviter = (inviter == null)? null: userService.getUserByUserName(inviter);
         User userInvitee = userService.getUserByUserName(invitee);
         Group group = groupService.getGroup(groupName);
         Set<User> groupUsers = groupService.getMemberUsers(groupName);
@@ -747,7 +747,7 @@ public class ClientRunnable implements Runnable {
         } else if(groupUsers.contains(userInvitee)) {
             this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName);
             result = false;
-        } else if(!groupUsers.contains(userInviter)) {
+        } else if(userInviter != null && !groupUsers.contains(userInviter)) {
             this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName + "; you cannot perform this operation.");
             result = false;
         }
@@ -814,7 +814,7 @@ public class ClientRunnable implements Runnable {
         String invitee = msg.getName();
         String groupName = msg.getTextOrPassword();
 
-        if(checkInvitationMessageFromUserHelper(invitee,invitee, groupName)) {
+        if(checkInvitationMessageFromUserHelper(null,invitee, groupName)) {
             Message invitation = invitationService.getInvitation(invitee, groupName);
             if(invitation == null)
                 this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);

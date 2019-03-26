@@ -1714,6 +1714,7 @@ public class TestClientRunnable {
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized ());
+        DELETE_INVITATION_MESSAGE.setInvitationDeleted(false);
     }
 
     /**
@@ -1762,6 +1763,159 @@ public class TestClientRunnable {
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
         when(mockedInvitationService.deleteInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is not found.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageDoesNotExist() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(null);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is already accepted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAlreadyAccepted() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        ACCEPT_INVITATION_MESSAGE.setInvitationAccepted(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        ACCEPT_INVITATION_MESSAGE.setInvitationAccepted(false);
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is already denied.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAlreadyDenied() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        ACCEPT_INVITATION_MESSAGE.setInvitationDenied(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        ACCEPT_INVITATION_MESSAGE.setInvitationDenied(false);
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is already rejected.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAlreadyRejected() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        ACCEPT_INVITATION_MESSAGE.setInvitationRejected(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        ACCEPT_INVITATION_MESSAGE.setInvitationRejected(false);
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is already deleted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAlreadyDeleted() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        ACCEPT_INVITATION_MESSAGE.setInvitationDeleted(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        ACCEPT_INVITATION_MESSAGE.setInvitationDeleted(false);
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is accepted successful
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAcceptSuccessful() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is accepted successful and already approved
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAcceptSuccessfulAndApproved() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        ACCEPT_INVITATION_MESSAGE.setInvitationApproved(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        ACCEPT_INVITATION_MESSAGE.setInvitationApproved(false);
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is accepted successful
+     * and already approved and addition is successful
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAcceptSuccessfulAndApprovedAndAdditionSuccessful() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        ACCEPT_INVITATION_MESSAGE.setInvitationApproved(true);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(true);
+        when(mockedGroupService.addUserToGroup(GROUP_NAME, INVITEE)).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+        ACCEPT_INVITATION_MESSAGE.setInvitationApproved(false);
+    }
+
+    /**
+     * This test verifies accept Invitation handle when invitation is accepted unsuccessful
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageAcceptInvitationMessageAcceptUnsuccessful() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, ACCEPT_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedInvitationService.getInvitation(SENDER_NAME, GROUP_NAME)).thenReturn(ACCEPT_INVITATION_MESSAGE);
+        when(mockedInvitationService.acceptDenyInvitation(SENDER_NAME, GROUP_NAME, true)).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized ());
     }
@@ -1989,6 +2143,7 @@ public class TestClientRunnable {
     private static final Message CREATE_INVITATION_MESSAGE = Message.makeCreateInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message DELETE_INVITATION_MESSAGE = Message.makeDeleteInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message DELETE_INVITATION_MESSAGE_INVITER = Message.makeDeleteInvitationMessage(INVITER, INVITEE, GROUP_NAME);
+    private static final Message ACCEPT_INVITATION_MESSAGE = Message.makeAcceptInviteUserMessage(SENDER_NAME, GROUP_NAME);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(SENDER_NAME, GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, "hello", "rb");
     private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, "hello", "rb");

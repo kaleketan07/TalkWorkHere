@@ -1582,7 +1582,7 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageNullInvitee() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized ());
@@ -1596,7 +1596,7 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageGroupIsInvalid() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getGroup(GROUP_NAME)).thenReturn(null);
         clientRunnableObject.run();
@@ -1611,7 +1611,7 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageInviterNotPartOfGroup() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>());
         clientRunnableObject.run();
@@ -1626,7 +1626,7 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageInviteeAlreadyPartOfGroup() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(INVITEE_USER)));
         clientRunnableObject.run();
@@ -1641,10 +1641,10 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageInvitationAlreadySent() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
-        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(CREATE_INVITAITON_MESSAGE);
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(CREATE_INVITATION_MESSAGE);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized ());
     }
@@ -1657,7 +1657,7 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessful() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
@@ -1674,11 +1674,94 @@ public class TestClientRunnable {
     @Test
     public void testHandleIncomingMessageCreateInvitationMessageUpdateUnsuccessful() throws SQLException {
         clientRunnableObject.run();
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,CREATE_INVITAITON_MESSAGE));
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
         when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies delete Invitation handle when the invitation does not exist.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDeleteInvitationMessageInvitationDoesNotExist() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies delete Invitation handle when the invitation is already deleted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDeleteInvitationMessageInvitationAlreadyDeleted() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        DELETE_INVITATION_MESSAGE.setInvitationDeleted(true);
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies delete Invitation handle when the invitation is already deleted.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDeleteInvitationInviterNotTheInvitationSender() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE_INVITER);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * This test verifies delete Invitation handle when the invitation is deleted successfully.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDeleteInvitationMessageInvitationDeletedSuccessfully() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
+        when(mockedInvitationService.deleteInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized ());
+    }
+
+    /**
+     * This test verifies delete Invitation handle when the invitation cannot be deleted due to some error.
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageDeleteInvitationMessageInvitationUnableToDelete() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, DELETE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(DELETE_INVITATION_MESSAGE);
+        when(mockedInvitationService.deleteInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized ());
     }
@@ -1898,11 +1981,14 @@ public class TestClientRunnable {
     private static final String PASS = "some_p@$$worD";
     private static final String MODERATOR = "moderator";
     private static final String INVITEE = "invitee";
+    private static final String INVITER = "inviter";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
     private static final Message BROADCAST = Message.makeBroadcastMessage(SENDER_NAME, MESSAGE_TEXT);
-    private static final Message CREATE_INVITAITON_MESSAGE = Message.makeCreateInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
+    private static final Message CREATE_INVITATION_MESSAGE = Message.makeCreateInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
+    private static final Message DELETE_INVITATION_MESSAGE = Message.makeDeleteInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
+    private static final Message DELETE_INVITATION_MESSAGE_INVITER = Message.makeDeleteInvitationMessage(INVITER, INVITEE, GROUP_NAME);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(SENDER_NAME, GROUP_NAME);
     private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, "hello", "rb");
     private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, "hello", "rb");

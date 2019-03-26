@@ -903,7 +903,7 @@ public class ClientRunnable implements Runnable {
         Group group = groupService.getGroup(groupName);
 
         if(group == null)
-            this.enqueuePrattleResponseMessage("Invalid group name");
+            this.enqueuePrattleResponseMessage("Invalid group name " + groupName);
         else if(!groupService.isModerator(groupName, moderator))
             this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are not a moderator of this group");
         else if(groupUsers.contains(userInvitee))
@@ -923,46 +923,40 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("Unable to approve invitation.");
     }
 
-    /*
+    /**
+     * The handle for messages of type Reject Invitation where a moderator
+     * reject an invitation for a user to not allow them to join their group
+     *
+     * @param msg - The message to be handled
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
     private void handleRejectInvitationModeratorMessage(Message msg) throws SQLException {
         String moderator = msg.getName();
         String invitee = msg.getTextOrPassword();
         String groupName = msg.getReceiverOrPassword();
-
-        if(!groupService.isModerator(groupName, moderator)) {
-            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are not a moderator of this group");
-            return;
-        }
-
         User userInvitee = userService.getUserByUserName(invitee);
         Set<User> groupUsers = groupService.getMemberUsers(groupName);
-        if(groupUsers.contains(userInvitee)) {
-            this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
-            return;
-        }
-
         Message invitation = invitationService.getInvitation(invitee, groupName);
-        if(invitation == null) {
+        Group group = groupService.getGroup(groupName);
+
+        if(group == null)
+            this.enqueuePrattleResponseMessage("Invalid Group name " + groupName);
+        if(!groupService.isModerator(groupName, moderator))
+            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are not a moderator of this group");
+        else if(groupUsers.contains(userInvitee))
+            this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
+        else if(invitation == null)
             this.enqueuePrattleResponseMessage("This invitation does not exist" + groupName);
-            return;
-        }
-
-        if(invitation.isInvitationApproved()) {
+        else if(invitation.isInvitationApproved())
             this.enqueuePrattleResponseMessage("You have already approved this invitation, you cannot reject it now.");
-            return;
-        }
-
-        if(invitation.isInvitationDeleted()) {
+        else if(invitation.isInvitationDeleted())
             this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, hence cannot be rejected");
-            return;
-        }
-
-        if(invitationService.approveRejectInvitation(invitee, groupName, false))
+        else if(invitationService.approveRejectInvitation(invitee, groupName, false))
             this.enqueuePrattleResponseMessage("The invitation was successfully rejected.");
         else
             this.enqueuePrattleResponseMessage("Unable to reject invitation.");
     }
-*/
+
     /**
      * Handle the update group message method
      *
@@ -1308,9 +1302,9 @@ public class ClientRunnable implements Runnable {
         } else if(msg.isApproveInviteModeratorMessage()) {
             handleApproveInvitationModeratorMessage(msg);
             return true;
-//        } else if(msg.isRejectInviteModeratorMessage()) {
-//            handleRejectInvitationModeratorMessage(msg);
-//            return true;
+        } else if(msg.isRejectInviteModeratorMessage()) {
+            handleRejectInvitationModeratorMessage(msg);
+            return true;
         }
         return false;
     }

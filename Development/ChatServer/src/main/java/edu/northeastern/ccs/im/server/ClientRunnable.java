@@ -632,7 +632,18 @@ public class ClientRunnable implements Runnable {
      */
     private void handleGetFollowersMessage(Message msg) throws SQLException {
     	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage(userService.getFollowers(currUser));
+    	Map<String, String> resultantSet;
+        try {
+            resultantSet = userService.getFollowers(currUser);
+            if (resultantSet.isEmpty()) {
+                this.enqueuePrattleResponseMessage("Sorry, did not find any followers");
+                return;
+            }
+        helperForBuildingAndSendingSearchMessage(resultantSet,"User");
+        } catch (Exception e) {
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP GFR.");
+        }
     }
     
     /**
@@ -643,7 +654,18 @@ public class ClientRunnable implements Runnable {
      */
     private void handleGetFolloweesMessage(Message msg) throws SQLException {
     	User currUser = userService.getUserByUserName(msg.getName());
-    	this.enqueuePrattleResponseMessage(userService.getFollowees(currUser));
+    	Map<String, String> resultantSet;
+        try {
+            resultantSet = userService.getFollowees(currUser);
+            if (resultantSet.isEmpty()) {
+                this.enqueuePrattleResponseMessage("Sorry, did not find any followees");
+                return;
+            }
+        helperForBuildingAndSendingSearchMessage(resultantSet,"User");
+        } catch (Exception e) {
+            this.enqueuePrattleResponseMessage("Something went wrong while retrieving data. Please check your syntax" +
+                    " using HELP GFE.");
+        }
     }
 
     /**
@@ -791,6 +813,7 @@ public class ClientRunnable implements Runnable {
             workString.append(String.format("%n%-15s | %-15s %n","Group Name::","Moderator Name::"));
         for (Map.Entry<String, String> pair : resultantSet.entrySet())
             workString.append(String.format("%-15s | %-15s %n",pair.getKey(),pair.getValue()));
+        workString.append("Number of results : " + resultantSet.size());
         String answerString = workString.toString();
 
         this.enqueuePrattleResponseMessage(answerString);

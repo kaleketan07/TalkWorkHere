@@ -757,6 +757,7 @@ public class ClientRunnable implements Runnable {
 
     /**
      * The handle for messages of type Create Invitation
+     * where a user sends an invite to another user to join a group
      *
      * @param msg - The message to be handled
      * @throws SQLException - the exception thrown when a downstream database error occurs

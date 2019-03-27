@@ -6,8 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -32,6 +35,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     private static final String DB_COL_MSG_TIMESTAMP = "msg_timestamp";
     private static final String DB_COL_MSG_UNIQUEKEY = "msg_uniquekey";
     private static final String GRP_COL_MSG_KEY = "message_unique_key";
+    private static final String GRP_COL_GRP_KEY = "group_unique_key";
 
     /**
      * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will initialize
@@ -229,6 +233,51 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
             if (!deleteMessage(key)) return false;
         }
         return true;
+    }
+    
+    /**
+     * Gets the unsent messages for the user.
+     *
+     * @param userName the user name for whom the messages are to be fetched
+     * @return the unsent messages for user as Map with keys as the message objects and unique keys as the value
+     * @throws SQLException the SQL exception
+     */
+    public Map<Message, String> getUnsentMessagesForUser(String userName) throws SQLException {
+    	final String GET_UNSENT_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";
+        pstmt = conn.getPreparedStatement(GET_UNSENT_MESSAGES);
+        pstmt = utils.setPreparedStatementArgs(pstmt, userName);
+    	HashMap<Message, String> msgs = new HashMap<>();
+        result = pstmt.executeQuery();
+        while (result.next()) {
+        	String msgSrc = result.getString(DB_COL_MSG_SRC);
+            String msgDest = result.getString(DB_COL_MSG_DEST);
+            String msgText = result.getString(DB_COL_MSG_TEXT);
+            String msgKey = result.getString(DB_COL_MSG_UNIQUEKEY);
+            String grpMsgKey = result.getString(GRP_COL_GRP_KEY);
+        	if (grpMsgKey == null) {
+            	msgs.put(Message.makePrivateUserMessage(msgSrc, msgText, msgDest), msgKey);
+            } else {
+            	msgs.put(Message.makeGroupMessage(msgSrc, msgText, grpMsgKey.split("::")[1]), msgKey);
+            }
+         }
+        pstmt.close();
+    	return msgs;
+    }
+    
+    /**
+     * Marks a message with the provided uniqueKey as sent.
+     *
+     * @param msgUniqueKey the unique key of the message to be marked sent
+     * @return true, if successfully marked the message to be sent else return false
+     * @throws SQLException the SQL exception
+     */
+    public boolean markMessageAsSent(String msgUniqueKey) throws SQLException {
+    	final String MARK_MSG_AS_SENT = "UPDATE prattle.messages set msg_sent = 1 WHERE msg_uniquekey = ?";
+        pstmt = conn.getPreparedStatement(MARK_MSG_AS_SENT);
+        pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
+        int res = pstmt.executeUpdate();
+        pstmt.close();
+        return (res > 0);
     }
 
 

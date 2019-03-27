@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -242,11 +242,11 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @return the unsent messages for user as Map with keys as the message objects and unique keys as the value
      * @throws SQLException the SQL exception
      */
-    public Map<Message, String> getUnsentMessagesForUser(String userName) throws SQLException {
+    public List<ConversationalMessage> getUnsentMessagesForUser(String userName) throws SQLException {
     	final String GET_UNSENT_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";
         pstmt = conn.getPreparedStatement(GET_UNSENT_MESSAGES);
         pstmt = utils.setPreparedStatementArgs(pstmt, userName);
-    	HashMap<Message, String> msgs = new HashMap<>();
+    	List<ConversationalMessage> msgs = new ArrayList<>();
         result = pstmt.executeQuery();
         while (result.next()) {
         	String msgSrc = result.getString(DB_COL_MSG_SRC);
@@ -254,11 +254,11 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
             String msgText = result.getString(DB_COL_MSG_TEXT);
             String msgKey = result.getString(DB_COL_MSG_UNIQUEKEY);
             String grpMsgKey = result.getString(GRP_COL_GRP_KEY);
-        	if (grpMsgKey == null) {
-            	msgs.put(Message.makePrivateUserMessage(msgSrc, msgText, msgDest), msgKey);
-            } else {
-            	msgs.put(Message.makeGroupMessage(msgSrc, msgText, grpMsgKey.split("::")[1]), msgKey);
+            ConversationalMessage msg = new ConversationalMessage(msgSrc, msgDest, msgText, null, msgKey);
+        	if (grpMsgKey != null) {
+            	msg.setGroupUniqueKey(grpMsgKey);
             }
+        	msgs.add(msg);
          }
         pstmt.close();
     	return msgs;

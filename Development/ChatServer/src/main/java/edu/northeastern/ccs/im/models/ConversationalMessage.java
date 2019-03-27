@@ -14,6 +14,7 @@ public class ConversationalMessage {
     private String messageText;
     private Timestamp messageTimeStamp;
     private String messageUniquekey;
+    private String groupUniqueKey;
 
     /**
      * @param sourceName       to have the username of the sender
@@ -27,10 +28,29 @@ public class ConversationalMessage {
         this.messageText = messageText;
         this.messageTimeStamp = messageTimeStamp;
         this.messageUniquekey = messageUniquekey;
+        this.groupUniqueKey = null;
 
     }
 
     /**
+     * Gets the group unique key.
+     *
+     * @return the group unique key
+     */
+    public String getGroupUniqueKey() {
+		return groupUniqueKey;
+	}
+
+	/**
+	 * Sets the group unique key.
+	 *
+	 * @param groupUniqueKey the new group unique key
+	 */
+	public void setGroupUniqueKey(String groupUniqueKey) {
+		this.groupUniqueKey = groupUniqueKey;
+	}
+
+	/**
      * @return username of the sender of the message
      */
     public String getSourceName() {
@@ -71,4 +91,5 @@ public class ConversationalMessage {
     public String toString() {
         return this.getMessageUniquekey();
     }
+    
 }

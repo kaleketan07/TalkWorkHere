@@ -274,10 +274,19 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin(){
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin() throws SQLException{
         clientRunnableObject.run();
+        Map<Message, String> testMsgs = new HashMap<>();
+        testMsgs.put(TEST_USER_MESSAGE, MESSAGE_KEY);
+        testMsgs.put(TEST_USER_MESSAGE2, ANOTHER_MESSAGE_KEY);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString())).thenReturn(testMsgs);
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
+        Mockito.verify(mockedUser, Mockito.atLeastOnce()).enqueueMessageToUser(Mockito.any(), Mockito.anyString());
+        Mockito.verify(mockedcms, Mockito.atLeastOnce()).markMessageAsSent(Mockito.anyString());
+        
     }
 
     /**
@@ -2461,4 +2470,9 @@ public class TestClientRunnable {
     private static final Message ADD_GROUP_TO_GROUP = Message.makeAddGroupToGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
     private static final String ANOTHER_USER = "another_user";
     private static final Message REMOVE_GROUP_FROM_GROUP = Message.makeRemoveGroupFromGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME, ANOTHER_DUMMY_GROUP_NAME);
+    private static final Message TEST_USER_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER);
+    private static final Message TEST_USER_MESSAGE2 = Message.makePrivateUserMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER);
+    private static final String MESSAGE_KEY = "test_key";
+    private static final String ANOTHER_MESSAGE_KEY = "another_test_key";
+    
 }

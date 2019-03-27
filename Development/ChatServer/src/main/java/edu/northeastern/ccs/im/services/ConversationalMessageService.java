@@ -15,7 +15,6 @@ import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.ConversationalMessage;
-import edu.northeastern.ccs.im.server.Prattle;
 
 /**
  * Class for services related to CoversationalMessages

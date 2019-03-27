@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.models.ConversationalMessage;
@@ -284,5 +287,62 @@ public class TestConversationalMessageService {
     	when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
     	assertFalse(cs.deleteGroupMessage("test_key"));
     }
-
+    
+    /**
+     * Test mark message as sent for true.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testMarkMessageAsSentForTrue() throws SQLException {
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(1);
+        assertTrue(cs.markMessageAsSent("BCD"));
+    }
+    
+    /**
+     * Test mark message as sent for false.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testMarkMessageAsSentForFalse() throws SQLException {
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        assertFalse(cs.markMessageAsSent("BCD"));
+    }
+    
+    /**
+     * Test get unsent messages for user.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testGetUnsentMessagesForUser() throws SQLException {
+    	Map<Message, String> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	assertFalse(testMsgs.isEmpty());
+    }
+    
+    /**
+     * Test get unsent messages for user having group messages.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testGetUnsentMessagesForUserHavingGroupMessages() throws SQLException {
+    	when(mockedRS.getString("group_unique_key")).thenReturn("hey::test_group_key");
+    	Map<Message, String> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	assertFalse(testMsgs.isEmpty());
+    }
+    
+    /**
+     * Test get unsent messages for user having no unsent messages.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testGetUnsentMessagesForUserHavingNoUnsentMessages() throws SQLException {
+    	when(mockedRS.next()).thenReturn(false);
+    	Map<Message, String> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	assertTrue(testMsgs.isEmpty());
+    }
+    
 }

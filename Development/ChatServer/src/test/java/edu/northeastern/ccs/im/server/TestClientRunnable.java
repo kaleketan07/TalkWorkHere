@@ -297,11 +297,15 @@ public class TestClientRunnable {
      * which also tests the handleOutgoingMessage() with Private User message in waitList and Message sent successfully
      */
     @Test
-    public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress(){
+    public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress()
+            throws SQLException, ClassNotFoundException, IllegalAccessException, IllegalArgumentException, NoSuchFieldException{
         clientRunnableObject.run();
-        User mockedUser = mock(User.class);
         mockedUser.setLoggedIn(true);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_MESSAGE));
+        Field f = User.class.getDeclaredField("cms");
+        f.setAccessible(true);
+        f.set(USER_LOGGED_ON, mockedcms);
+        when(mockedcms.insertConversationalMessage(SENDER_NAME, SENDER_NAME,HELLO, true)).thenReturn(UNIQUE_MESSAGE_KEY);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -2706,12 +2710,14 @@ public class TestClientRunnable {
     
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
+    private static final String HELLO = "hello";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final int USER_ID = 120000;
     private static final String GROUP_NAME = "FAMILY";
     private static final String PASS = "some_p@$$worD";
     private static final String INVITEE = "invitee";
     private static final String INVITER = "inviter";
+    private static final String UNIQUE_MESSAGE_KEY = "johndoeunique234564T435654";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
@@ -2724,8 +2730,8 @@ public class TestClientRunnable {
     private static final Message APPROVE_INVITATION_MESSAGE = Message.makeApproveInviteModeratorMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message REJECT_INVITATION_MESSAGE = Message.makeRejectInviteModeratorMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message DELETE_GROUP = Message.makeDeleteGroupMessage(SENDER_NAME, GROUP_NAME);
-    private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, "hello", "rb");
-    private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, "hello", "rb");
+    private static final Message PRIVATE_MESSAGE = Message.makePrivateUserMessage(SENDER_NAME, HELLO, "rb");
+    private static final Message NULL_PRIVATE_MESSAGE = Message.makePrivateUserMessage(null, HELLO, "rb");
     private static final Message DELETE_USER = Message.makeDeleteUserMessage(SENDER_NAME);
     private static final Message GET_GROUP = Message.makeGetGroupMessage(SENDER_NAME, GROUP_NAME);
     private static final Message PRIVATE_REPLY = Message.makePrivateReplyMessage(SENDER_NAME,"Alex","MESSAGEKEY");

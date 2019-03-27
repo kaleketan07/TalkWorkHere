@@ -83,6 +83,7 @@ public interface InvitationDao {
     boolean deleteInvitation(String inviter, String invitee, String groupName) throws SQLException;
 
     /**
+     * The method gets invitations that need to be sent to an invitee
      *
      * @param invitee - the person who is receiving the invitation
      * @return the set of messages which have to be delivered to the user
@@ -91,11 +92,28 @@ public interface InvitationDao {
     Set<Message> getInvitationsForInvitee(String invitee) throws SQLException;
 
     /**
+     *  The method that gets invitations that need to be sent to a group moderator
+     *
+     * @param groupName - the group for which the invitations need to be fetched
+     * @return the set of messages which have to be delivered to the user
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
+     */
+    Set<Message> getInvitationsForGroup(String groupName) throws SQLException;
+
+    /**
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being sent
      * @return the set of messages which have to be delivered to the user
      * @throws SQLException the SQL exception is thrown due to some query or database interaction
      */
     boolean setInvitationIsSentToInvitee(String invitee, String groupName) throws SQLException;
+
+    /**
+     * @param invitee - the person who is receiving the invitation
+     * @param groupName - the group for which the invite is being sent
+     * @return the set of messages which have to be delivered to the user
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
+     */
+    boolean setInvitationIsSentToModerator(String invitee, String groupName) throws SQLException;
 
 }

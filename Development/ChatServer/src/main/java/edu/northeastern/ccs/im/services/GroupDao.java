@@ -155,4 +155,11 @@ public interface GroupDao {
      * @throws SQLException
      */
     boolean removeGroupFromGroup(String hostGroupName, String guestGroupName) throws SQLException;
+
+
+    /**
+     * Get groups by moderator name
+     * @param  moderatorName - the moderator whose groups need to be found
+     */
+    Set<String> getGroupsByModerator(String moderatorName) throws SQLException;
 }

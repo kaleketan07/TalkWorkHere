@@ -304,6 +304,8 @@ public class Message {
             return makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_PRIVATE_MESSAGE.toString()) == 0) {
             return makeDeletePrivateMessageMessage(srcName, textOrPassword);
+        } else if(handle.compareTo(MessageType.GET_PAST_MESSAGES.toString()) == 0){
+            return makeGetPastMessages(srcName);
         }
         return null;
     }
@@ -622,7 +624,7 @@ public class Message {
     /**
      * This method creates a Get Online Users message
      *
-     * @param currentUser - string of the current user name
+     * @param follower - string of the follower's username
      * @return a Message object of type Get Online Users
      */
     public static Message makeGetOnlineUserMessage(String follower) {
@@ -720,6 +722,15 @@ public class Message {
      */
     public static Message makeRemoveGroupFromGroupMessage(String srcName, String guestGrpName, String hostGrpName) {
         return new Message(MessageType.REMOVE_GROUP_FROM_GROUP, srcName, guestGrpName, hostGrpName);
+    }
+
+    /**
+     * Make a message of the type GPM (Get Past Messages), that will retrieve all the messages for the user
+     * @param srcName the username of the user requesting to see all messages
+     * @return a new Message object of type GET_PAST_MESSAGES
+     */
+    public static Message makeGetPastMessages(String srcName){
+        return new Message(MessageType.GET_PAST_MESSAGES, srcName);
     }
 
     /**
@@ -1129,6 +1140,10 @@ public class Message {
      */
     public boolean isRejectInviteModeratorMessage() {
         return (msgType == MessageType.REJECT_INVITE_MODERATOR);
+    }
+
+    public boolean isGetPastMessages(){
+        return (msgType == MessageType.GET_PAST_MESSAGES);
     }
 
     /**

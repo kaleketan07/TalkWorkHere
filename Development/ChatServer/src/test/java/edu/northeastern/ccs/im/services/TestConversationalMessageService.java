@@ -317,7 +317,7 @@ public class TestConversationalMessageService {
      */
     @Test
     public void testGetUnsentMessagesForUser() throws SQLException {
-    	Map<Message, String> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC");
     	assertFalse(testMsgs.isEmpty());
     }
     
@@ -329,7 +329,7 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingGroupMessages() throws SQLException {
     	when(mockedRS.getString("group_unique_key")).thenReturn("hey::test_group_key");
-    	Map<Message, String> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC");
     	assertFalse(testMsgs.isEmpty());
     }
     
@@ -341,7 +341,7 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingNoUnsentMessages() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
-    	Map<Message, String> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC");
     	assertTrue(testMsgs.isEmpty());
     }
     

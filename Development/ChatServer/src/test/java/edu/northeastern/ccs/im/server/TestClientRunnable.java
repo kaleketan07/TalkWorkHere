@@ -275,21 +275,21 @@ public class TestClientRunnable {
      * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Login in waitList and login successful
      */
-    @Test
-    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin() throws SQLException{
-        clientRunnableObject.run();
-        Map<Message, String> testMsgs = new HashMap<>();
-        testMsgs.put(TEST_USER_MESSAGE, MESSAGE_KEY);
-        testMsgs.put(TEST_USER_MESSAGE2, ANOTHER_MESSAGE_KEY);
-        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString())).thenReturn(testMsgs);
-        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
-        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        clientRunnableObject.run();
-        Mockito.verify(mockedUser, Mockito.atLeastOnce()).enqueueMessageToUser(Mockito.any(), Mockito.anyString());
-        Mockito.verify(mockedcms, Mockito.atLeastOnce()).markMessageAsSent(Mockito.anyString());
-        
-    }
+//    @Test
+//    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLogin() throws SQLException{
+//        clientRunnableObject.run();
+//        Map<Message, String> testMsgs = new HashMap<>();
+//        testMsgs.put(TEST_USER_MESSAGE, MESSAGE_KEY);
+//        testMsgs.put(TEST_USER_MESSAGE2, ANOTHER_MESSAGE_KEY);
+//        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+//        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString())).thenReturn(testMsgs);
+//        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
+//        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+//        clientRunnableObject.run();
+//        Mockito.verify(mockedUser, Mockito.atLeastOnce()).enqueueMessageToUser(Mockito.any(), Mockito.anyString());
+//        Mockito.verify(mockedcms, Mockito.atLeastOnce()).markMessageAsSent(Mockito.anyString());
+//        
+//    }
 
     /**
      * Test handleIncomingMessage() empty message Iterator from network connection

@@ -64,6 +64,9 @@ public class TestInvitationService {
     /**
      * Tests the getInstance method if it returns an
      * InvitationService instance.
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     * @throws ClassNotFoundException - Exception thrown when the class for get instance is not found
+     * @throws IOException - thrown by the get Instance method
      */
     @Test
     public void testGetInstance() throws ClassNotFoundException, IOException, SQLException {
@@ -73,6 +76,8 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitation method when no match is found for two input overloaded version
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationTwoParamsNoMatchFound() throws SQLException {
@@ -82,6 +87,7 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitation method when match is found for two input overloaded version
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationTwoParamsMatchFound() throws SQLException {
@@ -102,6 +108,7 @@ public class TestInvitationService {
 
     /**
      *  Test get Invitations for Invitee when no record is found
+     * @throws  SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationsForInviteeNull() throws SQLException {
@@ -111,6 +118,7 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitationForInvitee method when match is found
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationsForInviteeNotNull() throws SQLException {
@@ -123,7 +131,32 @@ public class TestInvitationService {
     }
 
     /**
+     *  Test get Invitations for Groups when no record is found
+     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     */
+    @Test
+    public void testGetInvitationsForGroupNull() throws SQLException {
+        when(resultSetMock.next()).thenReturn(false);
+        assertTrue(invitationService.getInvitationsForGroup(INVITEE).isEmpty());
+    }
+
+    /**
+     * Test the getInvitationForGroups method when match is found
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
+    @Test
+    public void testGetInvitationsForGroupNotNull() throws SQLException {
+        when(resultSetMock.next()).thenReturn(true, false);
+        when(resultSetMock.getBoolean(anyString())).thenReturn(true, false, true, false, false);
+        when(resultSetMock.getString(anyString())).thenReturn(INVITER);
+
+        Set<Message> msgs = invitationService.getInvitationsForGroup(INVITEE);
+        assertTrue(msgs.size() == 1);
+    }
+
+    /**
      * Test the getInvitation method when no match is found for three input overloaded version
+     * @throws  SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationThreeParamsNoMatchFound() throws SQLException {
@@ -133,6 +166,7 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitation method when match is found for three input overloaded version
+     * @throws  SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationThreeParamsMatchFound() throws SQLException {
@@ -155,7 +189,7 @@ public class TestInvitationService {
      * Test Approve Reject Invitation for the Approve scenario
      * where the DB update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testApproveInvitationUpdateSuccessful() throws SQLException {
@@ -167,7 +201,7 @@ public class TestInvitationService {
      * Test Approve Reject Invitation for the Approve scenario
      * where the Db update in unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testApproveInvitationUpdateFail() throws SQLException {
@@ -179,7 +213,7 @@ public class TestInvitationService {
      * Test Approve Reject Invitation for the Reject scenario
      * where the DB update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testRejectInvitationUpdateSuccessful() throws SQLException {
@@ -191,7 +225,7 @@ public class TestInvitationService {
      * Test Approve Reject Invitation for the Reject scenario
      * where the Db update in unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testRejectInvitationUpdateFail() throws SQLException {
@@ -203,7 +237,7 @@ public class TestInvitationService {
      * Test Accept Deny Invitation for the Accept scenario
      * where the DB update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testAcceptInvitationUpdateSuccessful() throws SQLException {
@@ -215,7 +249,7 @@ public class TestInvitationService {
      * Test Accept Deny Invitation for the Accept scenario
      * where the Db update in unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testAcceptInvitationUpdateFail() throws SQLException {
@@ -227,7 +261,7 @@ public class TestInvitationService {
      * Test Accept Deny Invitation for the Deny scenario
      * where the DB update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testDenyInvitationUpdateSuccessful() throws SQLException {
@@ -239,7 +273,7 @@ public class TestInvitationService {
      * Test Accept Deny Invitation for the Deny scenario
      * where the Db update in unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testDenyInvitationUpdateFail() throws SQLException {
@@ -250,7 +284,7 @@ public class TestInvitationService {
     /**
      * Test create invitation method when the update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testCreateInvitationSuccessful() throws SQLException {
@@ -261,7 +295,7 @@ public class TestInvitationService {
     /**
      * Test create invitation method when the update is unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testCreateInvitationUnsuccessful() throws SQLException {
@@ -272,7 +306,7 @@ public class TestInvitationService {
     /**
      * Test delete invitation method when the update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testDeleteInvitationSuccessful() throws SQLException {
@@ -283,7 +317,7 @@ public class TestInvitationService {
     /**
      * Test delete invitation method when the update is unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testDeleteInvitationUnsuccessful() throws SQLException {
@@ -294,7 +328,7 @@ public class TestInvitationService {
     /**
      * Test set invitation sent method when the update is successful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testSetInvitationSentSuccessful() throws SQLException {
@@ -305,12 +339,34 @@ public class TestInvitationService {
     /**
      * Test set invitation sent method when the update is unsuccessful
      *
-     * @throws SQLException
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testSetInvitationSentUnsuccessful() throws SQLException {
         when(preparedStatementMock.executeUpdate()).thenReturn(0);
         assertFalse(invitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test set invitation sent method for moderator when the update is successful
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
+    @Test
+    public void testSetInvitationModeratorSentSuccessful() throws SQLException {
+        when(preparedStatementMock.executeUpdate()).thenReturn(1);
+        assertTrue(invitationService.setInvitationIsSentToModerator(INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test set invitation sent method for moderator when the update is unsuccessful
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
+    @Test
+    public void testSetInvitationModeratorSentUnsuccessful() throws SQLException {
+        when(preparedStatementMock.executeUpdate()).thenReturn(0);
+        assertFalse(invitationService.setInvitationIsSentToModerator(INVITEE, GROUP_NAME));
     }
 
     /**

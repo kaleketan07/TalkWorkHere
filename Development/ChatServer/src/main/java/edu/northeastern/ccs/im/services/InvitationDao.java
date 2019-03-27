@@ -6,20 +6,20 @@ import java.sql.SQLException;
 
 /**
  * The DAO for Invitation Service
- * @author  Sachin Haldavanekar
- * @version 1.0
  *
+ * @author Sachin Haldavanekar
+ * @version 1.0
  */
 public interface InvitationDao {
 
     /**
      * The method to get an invitation based on the three inputs provided
      *
-     * @param inviter - the person who is the sender of the invitation
-     * @param invitee - the person who is receiving the invitation
+     * @param inviter   - the person who is the sender of the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return - returns null or a Message based on whether a record was found in the database for the
-     *             given search criteria
+     * given search criteria
      * @throws SQLException
      */
     Message getInvitation(String inviter, String invitee, String groupName) throws SQLException;
@@ -27,10 +27,10 @@ public interface InvitationDao {
     /**
      * The method to get an invitation based on the two inputs provided
      *
-     * @param invitee - the person who is receiving the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return - returns null or a Message based on whether a record was found in the database for the
-     *             given search criteria
+     * given search criteria
      * @throws SQLException
      */
     Message getInvitation(String invitee, String groupName) throws SQLException;
@@ -39,9 +39,9 @@ public interface InvitationDao {
      * The method for accepting or denying an invitation. This method will be used by users
      * who have received an invite
      *
-     * @param invitee - The person who is invited
+     * @param invitee   - The person who is invited
      * @param groupName - The group for which the invite is sent
-     * @param accepted - The flag denoting true for acceptance and false for denial
+     * @param accepted  - The flag denoting true for acceptance and false for denial
      * @return - Returns true or false based on whether the update to the database was successful.
      * @throws SQLException
      */
@@ -51,9 +51,9 @@ public interface InvitationDao {
      * The method for accepting or denying an invitation. This method will be used by moderators
      * of the group for which the invite was sent.
      *
-     * @param invitee - The person who is invited
+     * @param invitee   - The person who is invited
      * @param groupName - The group for which the invite is sent
-     * @param approved - The flag denoting true for approval and false for rejection
+     * @param approved  - The flag denoting true for approval and false for rejection
      * @return - Returns true or false based on whether the update to the database was successful.
      * @throws SQLException
      */
@@ -62,8 +62,8 @@ public interface InvitationDao {
     /**
      * The method create a new invitation
      *
-     * @param inviter - the person who is the sender of the invitation
-     * @param invitee - the person who is receiving the invitation
+     * @param inviter   - the person who is the sender of the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return - returns true if the record was entered in the databasse else false
      * @throws SQLException
@@ -73,8 +73,8 @@ public interface InvitationDao {
     /**
      * The method delete an invitation.
      *
-     * @param inviter - the person who is the sender of the invitation
-     * @param invitee - the person who is receiving the invitation
+     * @param inviter   - the person who is the sender of the invitation
+     * @param invitee   - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being send
      * @return - returns true if the invite was deleted, false if there was any issue that occurred.
      * @throws SQLException

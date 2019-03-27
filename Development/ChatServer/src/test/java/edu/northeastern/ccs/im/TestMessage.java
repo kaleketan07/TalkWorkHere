@@ -313,7 +313,7 @@ public class TestMessage {
         assertEquals(strBuild.toString(), message.toString());
         assertTrue(message.isDeleteGroupMessage());
         assertFalse(message.isDeleteUserMessage());
-        assertFalse(message.isPrivateReplyMessage()); 
+        assertFalse(message.isPrivateReplyMessage());
     }
 
     /**
@@ -345,13 +345,13 @@ public class TestMessage {
         strBuild.append(toStringHelper(NULL_OUTPUT));
         assertEquals(strBuild.toString(), message.toString());
     }
-    
+
     /**
      * Test makeGetFollowersMessage()
      */
     @Test
     public void testMakeGetFollowersMessage() {
-        Message message = Message.makeMessage(GFR, SENDER_NAME , NULL_OUTPUT, NULL_OUTPUT);
+        Message message = Message.makeMessage(GFR, SENDER_NAME, NULL_OUTPUT, NULL_OUTPUT);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(GFR);
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -362,13 +362,13 @@ public class TestMessage {
         assertFalse(message.isGetFolloweesMessage());
         assertFalse(message.isGetOnlineUsersMessage());
     }
-    
+
     /**
      * Test makeDeleteGroupMessage()
      */
     @Test
     public void testMakeDeleteGroupMessage() {
-        Message message = Message.makeMessage("DGM", SENDER_NAME , PASS, NULL_OUTPUT);
+        Message message = Message.makeMessage("DGM", SENDER_NAME, PASS, NULL_OUTPUT);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append("DGM");
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -378,30 +378,30 @@ public class TestMessage {
         assertTrue(message.isDeleteGroupMessageMessage());
         assertFalse(message.isDeletePrivateMessageMessage());
     }
-     
+
     /**
-    * Test makeDeletePrivateMessage()
-    */
-   @Test
-   public void testMakeDeletePrivateMessage() {
-       Message message = Message.makeMessage("DPM", SENDER_NAME , PASS, NULL_OUTPUT);
-       StringBuilder strBuild = new StringBuilder();
-       strBuild.append("DPM");
-       strBuild.append(toStringHelper(SENDER_NAME));
-       strBuild.append(toStringHelper(PASS));
-       strBuild.append(toStringHelper(NULL_OUTPUT));
-       assertEquals(strBuild.toString(), message.toString());
-       assertTrue(message.isDeletePrivateMessageMessage());
-       assertFalse(message.isDeleteGroupMessageMessage());
-       assertFalse(message.isAddUserToGroupMessage());
-   }
-    
+     * Test makeDeletePrivateMessage()
+     */
+    @Test
+    public void testMakeDeletePrivateMessage() {
+        Message message = Message.makeMessage("DPM", SENDER_NAME, PASS, NULL_OUTPUT);
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append("DPM");
+        strBuild.append(toStringHelper(SENDER_NAME));
+        strBuild.append(toStringHelper(PASS));
+        strBuild.append(toStringHelper(NULL_OUTPUT));
+        assertEquals(strBuild.toString(), message.toString());
+        assertTrue(message.isDeletePrivateMessageMessage());
+        assertFalse(message.isDeleteGroupMessageMessage());
+        assertFalse(message.isAddUserToGroupMessage());
+    }
+
     /**
      * Test makeGetFolloweesMessage()
      */
     @Test
     public void testMakeGetFolloweesMessage() {
-        Message message = Message.makeMessage(GFE, SENDER_NAME , NULL_OUTPUT, NULL_OUTPUT);
+        Message message = Message.makeMessage(GFE, SENDER_NAME, NULL_OUTPUT, NULL_OUTPUT);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(GFE);
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -418,7 +418,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeGetOnlineUserMessage() {
-        Message message = Message.makeMessage(GOU, SENDER_NAME , NULL_OUTPUT, NULL_OUTPUT);
+        Message message = Message.makeMessage(GOU, SENDER_NAME, NULL_OUTPUT, NULL_OUTPUT);
         StringBuilder strBuild = new StringBuilder();
         strBuild.append(GOU);
         strBuild.append(toStringHelper(SENDER_NAME));
@@ -429,7 +429,7 @@ public class TestMessage {
         assertFalse(message.isGetFolloweesMessage());
         assertTrue(message.isGetOnlineUsersMessage());
     }
-    
+
     /**
      * Test makeMessage with Delete_User as the handle
      */
@@ -465,7 +465,6 @@ public class TestMessage {
         message = Message.addUniqueKeyToMsg(message, "ABC");
         assertEquals(message.getTextOrPassword(), "ABC");
     }
-
 
 
     /**
@@ -558,7 +557,7 @@ public class TestMessage {
         Assertions.assertEquals("attributes", message.getReceiverOrPassword());
         Assertions.assertTrue(message.isUpdateGroupMessage());
     }
-    
+
     /**
      * Test is add group to group message true.
      */
@@ -570,7 +569,7 @@ public class TestMessage {
         Assertions.assertEquals("testGroup2", message.getReceiverOrPassword());
         Assertions.assertTrue(message.isAddGroupToGroupMessage());
     }
-    
+
     /**
      * Test is add group to group message false.
      */
@@ -597,18 +596,18 @@ public class TestMessage {
         Message message = Message.makeMessage(AUG, SENDER_NAME, GROUP_NAME, ANOTHER_USER);
         Assertions.assertTrue(message.isAddUserToGroupMessage());
     }
-    
-    
+
+
     /**
      * Test make message add user group message condition for false.
      */
     @Test
     public void testMakeMessageAddUserGroupMessageConditionForFalse() {
-    	Message message = Message.makeQuitMessage(SENDER_NAME);
+        Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isAddUserToGroupMessage());
     }
-    
-    
+
+
     /**
      * Test make message add group group message condition.
      */
@@ -720,16 +719,16 @@ public class TestMessage {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isSearchMessage());
     }
-    
+
     /**
      * Test make delete group message message.
      */
     @Test
     public void testMakeDeleteGroupMessageMessage() {
-    	Message message = Message.makeMessage(DGM, SENDER_NAME, GROUP_NAME, MSG_KEY);
+        Message message = Message.makeMessage(DGM, SENDER_NAME, GROUP_NAME, MSG_KEY);
         Assertions.assertTrue(message.isDeleteGroupMessageMessage());
     }
-    
+
     /**
      * Test make delete group message message for false.
      */
@@ -738,16 +737,16 @@ public class TestMessage {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isDeleteGroupMessageMessage());
     }
-    
+
     /**
      * Test make remove group from group message.
      */
     @Test
     public void testMakeRemoveGroupFromGroupMessage() {
-    	Message message = Message.makeMessage(RGG, SENDER_NAME, GROUP_NAME, ANOTHER_GROUP_NAME);
+        Message message = Message.makeMessage(RGG, SENDER_NAME, GROUP_NAME, ANOTHER_GROUP_NAME);
         Assertions.assertTrue(message.isRemoveGroupFromGroupMessage());
     }
-    
+
     /**
      * Test make remove group from group message for false.
      */
@@ -756,16 +755,16 @@ public class TestMessage {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isRemoveGroupFromGroupMessage());
     }
-    
+
     /**
      * Test make delete private message message.
      */
     @Test
     public void testMakeDeletePrivateMessageMessage() {
-    	Message message = Message.makeMessage(DPM, SENDER_NAME, null, null);
+        Message message = Message.makeMessage(DPM, SENDER_NAME, null, null);
         Assertions.assertTrue(message.isDeletePrivateMessageMessage());
     }
-    
+
     /**
      * Test make delete private message message for false.
      */
@@ -774,7 +773,7 @@ public class TestMessage {
         Message message = Message.makeQuitMessage(SENDER_NAME);
         Assertions.assertFalse(message.isDeletePrivateMessageMessage());
     }
-    
+
 
     /**
      * Test the isCreateInvitationMessage method
@@ -930,7 +929,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForRejectInvitationModeratorMessage() {
-        assertTrue(invitationTestHelper(RIM,INVITEE, GROUP_NAME, GROUP_NAME));
+        assertTrue(invitationTestHelper(RIM, INVITEE, GROUP_NAME, GROUP_NAME));
     }
 
     /**

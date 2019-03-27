@@ -332,8 +332,8 @@ public class TestUserService {
      */
     @Test
     public void testGetFollowersOne() throws SQLException {
-    	when(mockedRS.next()).thenReturn(true,false);
-         Assertions.assertEquals(testSet.size(), us.getFollowers(testUser).size());
+        when(mockedRS.next()).thenReturn(true, false);
+        Assertions.assertEquals(testSet.size(), us.getFollowers(testUser).size());
     }
 
     /**
@@ -343,11 +343,11 @@ public class TestUserService {
      */
     @Test
     public void testGetFolloweesOne() throws SQLException {
-    	when(mockedRS.next()).thenReturn(true,false);
+        when(mockedRS.next()).thenReturn(true, false);
         Assertions.assertEquals(testSet.size(), us.getFollowees(testUser).size());
     }
-    
-    
+
+
     /**
      * Test get online with 1 online user.
      *
@@ -355,11 +355,11 @@ public class TestUserService {
      */
     @Test
     public void testGetOnlineWithOneOutput() throws SQLException {
-    	when(mockedRS.next()).thenReturn(true,false);
+        when(mockedRS.next()).thenReturn(true, false);
         Assertions.assertEquals(testSet.size(), us.getOnlineUsers(testUser).size());
     }
-    
-    
+
+
     /**
      * Test get followers with 0 followers.
      *
@@ -367,10 +367,10 @@ public class TestUserService {
      */
     @Test
     public void testGetFollowersZero() throws SQLException {
-    	when(mockedRS.next()).thenReturn(false);
+        when(mockedRS.next()).thenReturn(false);
         Assertions.assertEquals(us.getFollowers(testUser).size(), 0);
     }
-    
+
     /**
      * Test get followers with 0 followees.
      *
@@ -378,12 +378,11 @@ public class TestUserService {
      */
     @Test
     public void testGetFolloweesZero() throws SQLException {
-    	when(mockedRS.next()).thenReturn(false);
+        when(mockedRS.next()).thenReturn(false);
         Assertions.assertEquals(us.getFollowees(testUser).size(), 0);
     }
-    
-    
-    
+
+
     /**
      * Test get online user with 0  online user.
      *
@@ -391,7 +390,7 @@ public class TestUserService {
      */
     @Test
     public void testGetOnlineWithZeroOutput() throws SQLException {
-    	when(mockedRS.next()).thenReturn(false);
+        when(mockedRS.next()).thenReturn(false);
         Assertions.assertEquals(us.getOnlineUsers(testUser).size(), 0);
     }
 

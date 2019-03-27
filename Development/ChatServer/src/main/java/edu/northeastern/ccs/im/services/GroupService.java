@@ -417,13 +417,13 @@ public class GroupService implements GroupDao {
      * @return true, if successfully removes the group else returns false
      * @throws SQLException
      */
-	@Override
-	public boolean removeGroupFromGroup(String hostGroupName, String guestGroupName) throws SQLException {
-		Group grp = getGroup(hostGroupName);
+    @Override
+    public boolean removeGroupFromGroup(String hostGroupName, String guestGroupName) throws SQLException {
+        Group grp = getGroup(hostGroupName);
         Set<String> descendantGroups = new HashSet<>();
         descendantGroups = getFlatListOfGroups(grp, descendantGroups);
         if (descendantGroups.contains(guestGroupName)) {
-        	final String REMOVE_GROUP_FROM_GROUP = "UPDATE prattle.membership_groups SET is_removed = 1 WHERE membership_groups.host_group_name = ? AND membership_groups.guest_group_name = ?";
+            final String REMOVE_GROUP_FROM_GROUP = "UPDATE prattle.membership_groups SET is_removed = 1 WHERE membership_groups.host_group_name = ? AND membership_groups.guest_group_name = ?";
             pstmt = conn.getPreparedStatement(REMOVE_GROUP_FROM_GROUP);
             pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestGroupName);
             int qResult = pstmt.executeUpdate();
@@ -432,7 +432,7 @@ public class GroupService implements GroupDao {
         } else {
             return false;
         }
-	}
+    }
 
 
 }

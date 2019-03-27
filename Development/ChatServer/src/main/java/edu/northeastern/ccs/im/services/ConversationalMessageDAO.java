@@ -62,8 +62,8 @@ public interface ConversationalMessageDAO {
      * @throws SQLException the SQL exception
      */
     boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException;
-    
-    
+
+
     /**
      * Delete group message and the mappings from the group message table and all the messages from the .
      *
@@ -71,7 +71,7 @@ public interface ConversationalMessageDAO {
      * @return true, if successfully deleted else return false
      * @throws SQLException the SQL exception
      */
-    boolean deleteGroupMessage(String grpMsgUniqueKey) throws SQLException; 
-    
+    boolean deleteGroupMessage(String grpMsgUniqueKey) throws SQLException;
+
 
 }

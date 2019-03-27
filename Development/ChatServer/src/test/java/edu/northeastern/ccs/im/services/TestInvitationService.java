@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -97,6 +98,28 @@ public class TestInvitationService {
         assertEquals(INVITER, msg.getName());
         assertEquals(INVITEE, msg.getTextOrPassword());
         assertEquals(GROUP_NAME, msg.getReceiverOrPassword());
+    }
+
+    /**
+     *  Test get Invitations for Invitee when no record is found
+     */
+    @Test
+    public void testGetInvitationsForInviteeNull() throws SQLException {
+        when(resultSetMock.next()).thenReturn(false);
+        assertTrue(invitationService.getInvitationsForInvitee(INVITEE).isEmpty());
+    }
+
+    /**
+     * Test the getInvitationForInvitee method when match is found
+     */
+    @Test
+    public void testGetInvitationsForInviteeNotNull() throws SQLException {
+        when(resultSetMock.next()).thenReturn(true, false);
+        when(resultSetMock.getBoolean(anyString())).thenReturn(true, false, true, false, false);
+        when(resultSetMock.getString(anyString())).thenReturn(INVITER);
+
+        Set<Message> msgs = invitationService.getInvitationsForInvitee(INVITEE);
+        assertTrue(msgs.size() == 1);
     }
 
     /**
@@ -266,6 +289,28 @@ public class TestInvitationService {
     public void testDeleteInvitationUnsuccessful() throws SQLException {
         when(preparedStatementMock.executeUpdate()).thenReturn(0);
         assertFalse(invitationService.deleteInvitation(INVITER, INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test set invitation sent method when the update is successful
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testSetInvitationSentSuccessful() throws SQLException {
+        when(preparedStatementMock.executeUpdate()).thenReturn(1);
+        assertTrue(invitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME));
+    }
+
+    /**
+     * Test set invitation sent method when the update is unsuccessful
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testSetInvitationSentUnsuccessful() throws SQLException {
+        when(preparedStatementMock.executeUpdate()).thenReturn(0);
+        assertFalse(invitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME));
     }
 
     /**

@@ -487,6 +487,19 @@ public class TestClientRunnable {
     }
 
     /**
+     * Test login when unsent invitations are sent
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLoginSendUnsentInvitations() throws SQLException {
+        clientRunnableObject.run();
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedInvitationService.getInvitationsForInvitee(SENDER_NAME)).thenReturn(new HashSet(Arrays.asList(CREATE_INVITATION_MESSAGE)));
+        when(mockedInvitationService.setInvitationIsSentToInvitee(SENDER_NAME, GROUP_NAME)).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
+        clientRunnableObject.run();
+    }
+
+    /**
      * Test handleIncomingMessage() empty message Iterator from network connection
      * which also tests the handleOutgoingMessage() with Delete User Message with invalid user
      */
@@ -1652,17 +1665,49 @@ public class TestClientRunnable {
 
     /**
      * This test verifies create Invitation handle when create invitation successfully updates the database
+     * and does not send to invitee since they are offline
      *
      * @throws SQLException - thrown when a downstream database calls fails.
      */
     @Test
-    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessful() throws SQLException {
+    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessfulNotSent() throws SQLException, NoSuchFieldException,IllegalAccessException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
         when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
+        when(mockedInvitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME)).thenReturn(true);
+        Field hm = ClientRunnable.class.getDeclaredField("userClients");
+        hm.setAccessible(true);
+        Map<String, ClientRunnable> userClientsEmpty = new HashMap<>();
+        userClientsEmpty.clear();
+        hm.set(null, userClientsEmpty);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * This test verifies create Invitation handle when create invitation successfully updates the database
+     * and sends to the invitee since they are online
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessfulAndSent() throws SQLException, NoSuchFieldException,IllegalAccessException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
+        when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
+        when(mockedInvitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME)).thenReturn(true);
+        Field hm = ClientRunnable.class.getDeclaredField("userClients");
+        hm.setAccessible(true);
+        ClientRunnable mockedClient = mock(ClientRunnable.class);
+        Map<String, ClientRunnable> userClients = new HashMap();
+        userClients.put(INVITEE, mockedClient);
+        hm.set(null, userClients);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }

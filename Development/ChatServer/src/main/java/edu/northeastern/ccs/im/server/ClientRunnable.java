@@ -407,6 +407,16 @@ public class ClientRunnable implements Runnable {
                     this.enqueuePrattleResponseMessage("You have been invited to join the group " + invitation.getReceiverOrPassword() + " by user " + invitation.getName());
                     invitationService.setInvitationIsSentToInvitee(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
                 }
+
+                //send unsent invitations to the moderator for each group
+                Set<String> groups = groupService.getGroupsByModerator(msg.getName());
+            	for(String groupName: groups) {
+                    Set<Message> invitationsGroup = invitationService.getInvitationsForGroup(groupName);
+                    for(Message invitation: invitationsGroup) {
+                        this.enqueuePrattleResponseMessage("User " + invitation.getName() + " has invited user " + invitation.getTextOrPassword() + " to join the group " + groupName);
+                        invitationService.setInvitationIsSentToModerator(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
+                    }
+                }
             }
         }
     }
@@ -819,6 +829,12 @@ public class ClientRunnable implements Runnable {
                 if(inviteeClient != null) {
                     inviteeClient.enqueuePrattleResponseMessage("You have been invited to join group " + groupName + " by user " + inviter);
                     invitationService.setInvitationIsSentToInvitee(invitee, groupName);
+                }
+                String moderator = groupService.getGroup(groupName).getModeratorName();
+                ClientRunnable moderatorClient = userClients.getOrDefault(moderator, null);
+                if(moderatorClient != null) {
+                    moderatorClient.enqueuePrattleResponseMessage("User " + inviter + " has invited user " + invitee + " to join the group " + groupName);
+                    invitationService.setInvitationIsSentToModerator(invitee, groupName);
                 }
                 this.enqueuePrattleResponseMessage("The invitation was successfully sent.");
             }

@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class User {
 
-	private String firstName;
+    private String firstName;
     private String lastName;
     private String userName;
     private String userPassword;
@@ -184,15 +184,18 @@ public class User {
 		}
 	}
     
+
     @Override
-	public boolean equals(Object obj) {
-		if(obj instanceof User) {
-			return this.userName.equals(((User) obj).getUserName());
-		}
-		return false;
-	}
-   
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            return this.userName.equals(((User) obj).getUserName());
+        }
+        return false;
+    }
+
     @Override
-	public int hashCode() {	return (this.userName != null) ? 31 * userName.hashCode(): 0; }
+    public int hashCode() {
+        return (this.userName != null) ? 31 * userName.hashCode() : 0;
+    }
 }
 

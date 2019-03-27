@@ -68,20 +68,20 @@ public enum MessageType {
      * Message to get followers of the followee
      */
     GET_FOLLOWERS("GFR"),
-    
+
     /**
      * Message to get followees of the follower
      */
     GET_FOLLOWEES("GFE"),
-    
+
     /**
      * Handle To send prattle messages to the client
      */
     GET_ONLINE_USERS("GOU"),
 
-	/**
-    * Message whose contents are to delete a user profile from a group
-    */ 
+    /**
+     * Message whose contents are to delete a user profile from a group
+     */
     REMOVE_USER_GROUP("RUG"),
 
     /**
@@ -110,26 +110,26 @@ public enum MessageType {
      * Handle to search a user or a group
      */
     SEARCH_MESSAGE("SRH"),
-	
-	/** 
-	 * Handle to delete a private message.
-	 */
-	DELETE_PRIVATE_MESSAGE("DPM"),
-	
-	/** 
-	 * Handle to delete a group message. 
-	 */
-	DELETE_GROUP_MESSAGE("DGM"),
-	
-	/** 
-	 * Handle to add a group to group. 
-	 */
-	ADD_GROUP_TO_GROUP("AGG"),
-	
-	/** 
-	 * Handle to remove a group from group. 
-	 */
-	REMOVE_GROUP_FROM_GROUP("RGG"),
+
+    /**
+     * Handle to delete a private message.
+     */
+    DELETE_PRIVATE_MESSAGE("DPM"),
+
+    /**
+     * Handle to delete a group message.
+     */
+    DELETE_GROUP_MESSAGE("DGM"),
+
+    /**
+     * Handle to add a group to group.
+     */
+    ADD_GROUP_TO_GROUP("AGG"),
+
+    /**
+     * Handle to remove a group from group.
+     */
+    REMOVE_GROUP_FROM_GROUP("RGG"),
 
     /**
      * Message handle for Inviting user to a group
@@ -161,7 +161,7 @@ public enum MessageType {
      */
     REJECT_INVITE_MODERATOR("RIM");
 
-	/**
+    /**
      * Store the short name of this message type.
      */
     private String abbreviation;

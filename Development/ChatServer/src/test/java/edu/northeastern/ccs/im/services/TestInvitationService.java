@@ -42,7 +42,7 @@ public class TestInvitationService {
         dBConnectionMock = Mockito.mock(DBConnection.class);
         Field db = InvitationService.class.getDeclaredField("connection");
         db.setAccessible(true);
-        db.set( invitationService, dBConnectionMock);
+        db.set(invitationService, dBConnectionMock);
         preparedStatementMock = Mockito.mock(PreparedStatement.class);
         resultSetMock = Mockito.mock(ResultSet.class);
 
@@ -63,12 +63,11 @@ public class TestInvitationService {
     /**
      * Tests the getInstance method if it returns an
      * InvitationService instance.
-     *
      */
     @Test
     public void testGetInstance() throws ClassNotFoundException, IOException, SQLException {
         Object instance = InvitationService.getInstance();
-        assertTrue(instance instanceof  InvitationService);
+        assertTrue(instance instanceof InvitationService);
     }
 
     /**
@@ -86,7 +85,7 @@ public class TestInvitationService {
     @Test
     public void testGetInvitationTwoParamsMatchFound() throws SQLException {
         when(resultSetMock.first()).thenReturn(true);
-        when(resultSetMock.getBoolean(anyString())).thenReturn(true,false, true, false, false);
+        when(resultSetMock.getBoolean(anyString())).thenReturn(true, false, true, false, false);
         when(resultSetMock.getString(anyString())).thenReturn(INVITER);
 
         Message msg = invitationService.getInvitation(INVITEE, GROUP_NAME);
@@ -115,7 +114,7 @@ public class TestInvitationService {
     @Test
     public void testGetInvitationThreeParamsMatchFound() throws SQLException {
         when(resultSetMock.first()).thenReturn(true);
-        when(resultSetMock.getBoolean(anyString())).thenReturn(true,false, true, false, false);
+        when(resultSetMock.getBoolean(anyString())).thenReturn(true, false, true, false, false);
         when(resultSetMock.getString(anyString())).thenReturn(INVITER);
 
         Message msg = invitationService.getInvitation(INVITER, INVITEE, GROUP_NAME);
@@ -132,6 +131,7 @@ public class TestInvitationService {
     /**
      * Test Approve Reject Invitation for the Approve scenario
      * where the DB update is successful
+     *
      * @throws SQLException
      */
     @Test
@@ -143,6 +143,7 @@ public class TestInvitationService {
     /**
      * Test Approve Reject Invitation for the Approve scenario
      * where the Db update in unsuccessful
+     *
      * @throws SQLException
      */
     @Test
@@ -154,6 +155,7 @@ public class TestInvitationService {
     /**
      * Test Approve Reject Invitation for the Reject scenario
      * where the DB update is successful
+     *
      * @throws SQLException
      */
     @Test
@@ -165,6 +167,7 @@ public class TestInvitationService {
     /**
      * Test Approve Reject Invitation for the Reject scenario
      * where the Db update in unsuccessful
+     *
      * @throws SQLException
      */
     @Test
@@ -176,6 +179,7 @@ public class TestInvitationService {
     /**
      * Test Accept Deny Invitation for the Accept scenario
      * where the DB update is successful
+     *
      * @throws SQLException
      */
     @Test
@@ -187,6 +191,7 @@ public class TestInvitationService {
     /**
      * Test Accept Deny Invitation for the Accept scenario
      * where the Db update in unsuccessful
+     *
      * @throws SQLException
      */
     @Test
@@ -198,6 +203,7 @@ public class TestInvitationService {
     /**
      * Test Accept Deny Invitation for the Deny scenario
      * where the DB update is successful
+     *
      * @throws SQLException
      */
     @Test
@@ -209,6 +215,7 @@ public class TestInvitationService {
     /**
      * Test Accept Deny Invitation for the Deny scenario
      * where the Db update in unsuccessful
+     *
      * @throws SQLException
      */
     @Test
@@ -219,6 +226,7 @@ public class TestInvitationService {
 
     /**
      * Test create invitation method when the update is successful
+     *
      * @throws SQLException
      */
     @Test
@@ -229,6 +237,7 @@ public class TestInvitationService {
 
     /**
      * Test create invitation method when the update is unsuccessful
+     *
      * @throws SQLException
      */
     @Test
@@ -239,6 +248,7 @@ public class TestInvitationService {
 
     /**
      * Test delete invitation method when the update is successful
+     *
      * @throws SQLException
      */
     @Test
@@ -249,6 +259,7 @@ public class TestInvitationService {
 
     /**
      * Test delete invitation method when the update is unsuccessful
+     *
      * @throws SQLException
      */
     @Test
@@ -266,7 +277,6 @@ public class TestInvitationService {
 
     /**
      * All the mocks used in the tests.
-     *
      */
     private IDBConnection dBConnectionMock;
     private PreparedStatement preparedStatementMock;

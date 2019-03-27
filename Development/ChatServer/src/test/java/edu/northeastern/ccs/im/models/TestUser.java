@@ -190,7 +190,7 @@ public class TestUser {
         userClients.put(ALICE.getUserName(), mockedClientRunnable);
         Field mapField = ClientRunnable.class.getDeclaredField("userClients");
         mapField.setAccessible(true);
-        mapField.set(mockedClientRunnable, userClients);  
+        mapField.set(mockedClientRunnable, userClients);
         ALICE.userSendMessage(BROADCAST_FROM_ALICERUBY);
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
                 "Hello, Alice", false);
@@ -213,7 +213,7 @@ public class TestUser {
         ALICE.setSearchable(false);
         assertFalse(ALICE.isSearchable());
     }
-    
+
     @Test
     public void testUserSendMessageWhenClientRunnableNotNullWithGroupMessage() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
             IllegalAccessException {
@@ -236,49 +236,48 @@ public class TestUser {
         verify(mockedCMS, times(1)).insertConversationalMessage(ALICERUBY, ALICE.getUserName(),
                 "Hello, Alice", true);
     }
-    
-    
+
+
     /**
      * Test equals method for false.
      */
     @Test
     public void testEqualsMethodForFalse() {
-    	assertFalse(ALICE.equals(TOM));
+        assertFalse(ALICE.equals(TOM));
     }
-    
+
     /**
      * Test equals method for true.
      */
     @Test
     public void testEqualsMethodForTrue() {
-    	assertTrue(ALICE.equals(GARY));
+        assertTrue(ALICE.equals(GARY));
     }
-    
+
     /**
      * Test equals method for different type.
      */
     @Test
     public void testEqualsMethodForDifferentType() {
-    	assertFalse(ALICE.equals(null));
+        assertFalse(ALICE.equals(null));
     }
-    
+
     /**
      * Test hash code for null user name.
      */
     @Test
     public void testHashCodeForNullGroupName() {
-    	assertTrue(NULLESH.hashCode()==0);
+        assertTrue(NULLESH.hashCode() == 0);
     }
-    
+
     /**
      * Test hash code for non null user name.
      */
     @Test
     public void testHashCodeForNonNullUserName() {
-    	assertTrue(ALICE.hashCode()== 31 * ALICEBOB.hashCode());
+        assertTrue(ALICE.hashCode() == 31 * ALICEBOB.hashCode());
     }
-    
-    
+
 
     private static final User TOM = new User("Tom", "Harris", "tomharris", "123", false);
     private static final User ALICE = new User("Alice", "Bob", "alicebob", "password", false);

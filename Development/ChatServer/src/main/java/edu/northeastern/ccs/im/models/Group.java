@@ -156,15 +156,17 @@ public class Group implements Member {
             g.groupSendMessage(msg, uniqueGroupKey);
         }
     }
-    
+
     @Override
-	public boolean equals(Object obj) {
-		if(obj instanceof Group) {
-			return this.groupName.equals(((Group) obj).getGroupName());
-		}
-		return false;
-	}
-   
+    public boolean equals(Object obj) {
+        if (obj instanceof Group) {
+            return this.groupName.equals(((Group) obj).getGroupName());
+        }
+        return false;
+    }
+
     @Override
-	public int hashCode() {	return (this.groupName != null) ? 31 * groupName.hashCode(): 0; }
+    public int hashCode() {
+        return (this.groupName != null) ? 31 * groupName.hashCode() : 0;
+    }
 }

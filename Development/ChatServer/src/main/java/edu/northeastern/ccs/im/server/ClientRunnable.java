@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
 
+import com.mysql.cj.xdevapi.Client;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
@@ -396,7 +397,13 @@ public class ClientRunnable implements Runnable {
             		currentUser.enqueueMessageToUser(m.getKey(), m.getValue());
             		conversationalMessagesService.markMessageAsSent(m.getValue());
             	}
-            	
+
+            	// send unsent invitations to the user
+                Set<Message> invitations = invitationService.getInvitationsForInvitee(msg.getName());
+            	for(Message invitation: invitations) {
+                    this.enqueuePrattleResponseMessage("You have been invited to join the group " + invitation.getReceiverOrPassword() + " by user " + invitation.getName());
+                    invitationService.setInvitationIsSentToInvitee(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
+                }
             }
         }
     }
@@ -555,7 +562,6 @@ public class ClientRunnable implements Runnable {
             }
         }
     }
-
 
     /**
      * Handle remove user from group message.
@@ -790,8 +796,14 @@ public class ClientRunnable implements Runnable {
         if (checkInvitationMessageFromUserHelper(inviter, invitee, groupName)) {
             if (invitationService.getInvitation(invitee, groupName) != null)
                 this.enqueuePrattleResponseMessage("An invitation has already been sent to user " + invitee + " for the group " + groupName);
-            else if (invitationService.createInvitation(inviter, invitee, groupName))
+            else if (invitationService.createInvitation(inviter, invitee, groupName)) {
+                ClientRunnable inviteeClient = userClients.getOrDefault(invitee, null);
+                if(inviteeClient != null) {
+                    inviteeClient.enqueuePrattleResponseMessage("You have been invited to join group " + groupName + " by user " + inviter);
+                    invitationService.setInvitationIsSentToInvitee(invitee, groupName);
+                }
                 this.enqueuePrattleResponseMessage("The invitation was successfully sent.");
+            }
             else
                 this.enqueuePrattleResponseMessage("Unable to send invitation.");
         }

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class defines the Invitation Service which facilitates the
@@ -31,6 +33,7 @@ public class InvitationService implements InvitationDao {
      * Constants used in multiple methods of the service
      */
     private static final String INVITER = "inviter";
+    private static final String GROUP_NAME = "group_name";
     private static final String IS_APPROVED = "is_approved";
     private static final String IS_REJECTED = "is_rejected";
     private static final String IS_ACCEPTED = "is_accepted";
@@ -201,6 +204,57 @@ public class InvitationService implements InvitationDao {
         final String QUERY = "UPDATE group_invitation SET is_deleted = ? WHERE inviter = ? and invitee = ? and group_name = ?";
         preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, true, inviter, invitee, groupName);
+        int qResult = preparedStatement.executeUpdate();
+        preparedStatement.close();
+        return qResult > 0;
+    }
+
+    /**
+     * The method to retrieve all messages for an invitee which have not been sent
+     *
+     * @param invitee - the person who is receiving the invitation
+     * @return the set of invitations not sent to the user yet
+     * @throws SQLException - the SQL exception is thrown due to some query or database interaction
+     */
+    @Override
+    public Set<Message> getInvitationsForInvitee(String invitee) throws SQLException {
+        final String QUERY = "SELECT * from group_invitation where invitee = ? and is_sent_invitee = 0";
+        preparedStatement = connection.getPreparedStatement(QUERY);
+        preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee);
+        result = preparedStatement.executeQuery();
+        Set<Message> messages = new HashSet<>();
+        while (result.next()) {
+            boolean isAccepted = result.getBoolean(IS_ACCEPTED);
+            boolean isDenied = result.getBoolean(IS_DENIED);
+            boolean isApproved = result.getBoolean(IS_APPROVED);
+            boolean isRejected = result.getBoolean(IS_REJECTED);
+            boolean isDeleted = result.getBoolean(IS_DELETED);
+            String inviter = result.getString(INVITER);
+            String groupName = result.getString(GROUP_NAME);
+            Message message = Message.makeCreateInvitationMessage(inviter, invitee, groupName);
+            message.setInvitationAccepted(isAccepted);
+            message.setInvitationDenied(isDenied);
+            message.setInvitationApproved(isApproved);
+            message.setInvitationRejected(isRejected);
+            message.setInvitationDeleted(isDeleted);
+            messages.add(message);
+        }
+        preparedStatement.close();
+        return messages;
+    }
+
+    /**
+     * Sets the sent flag for an invitation when it is sent to a user
+     *
+     * @param invitee - the person who is receiving the invitation
+     * @param groupName - the group for which the invite is being sent
+     * @return the
+     */
+    @Override
+    public boolean setInvitationIsSentToInvitee(String invitee, String groupName) throws SQLException {
+        final String QUERY = "UPDATE group_invitation SET is_sent_invitee = 1 WHERE invitee = ? and group_name = ?";
+        preparedStatement = connection.getPreparedStatement(QUERY);
+        preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
         return qResult > 0;

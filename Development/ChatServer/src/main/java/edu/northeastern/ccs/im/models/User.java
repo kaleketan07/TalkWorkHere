@@ -169,12 +169,13 @@ public class User {
     }
 
 	/**
-	 * Enqueue message to user depending on the type of the message.
+	 * Enqueue message to user depending on the type of the message when the user is logged in.
 	 *
 	 * @param msg the message object
 	 * @param uniqueKey the unique key of the message
 	 */
 	public void enqueueMessageToUser(Message msg, String uniqueKey) {
+		clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
 		if (msg.isGroupMessage()) {
 			clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
 		            System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator()));

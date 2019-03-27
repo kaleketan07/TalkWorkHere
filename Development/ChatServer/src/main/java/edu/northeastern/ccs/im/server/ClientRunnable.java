@@ -11,6 +11,7 @@ import com.mysql.cj.xdevapi.Client;
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
+import edu.northeastern.ccs.im.models.ConversationalMessage;
 import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 import edu.northeastern.ccs.im.services.ConversationalMessageService;
@@ -392,10 +393,12 @@ public class ClientRunnable implements Runnable {
             if (!updated) {
                 this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
             } else {
-            	Map<Message, String> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName());
-            	for(Map.Entry<Message, String> m : unsentMessages.entrySet()) {
-            		currentUser.enqueueMessageToUser(m.getKey(), m.getValue());
-            		conversationalMessagesService.markMessageAsSent(m.getValue());
+            	List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName());
+            	Message resultMessage = null;
+            	for(ConversationalMessage m: unsentMessages) {
+            		resultMessage = createMessageFromConversationalMessage(m);
+            		currentUser.enqueueMessageToUser(resultMessage, m.getMessageUniquekey());
+            		conversationalMessagesService.markMessageAsSent(m.getMessageUniquekey());
             	}
 
             	// send unsent invitations to the user
@@ -408,6 +411,21 @@ public class ClientRunnable implements Runnable {
         }
     }
 
+    /**
+     * Creates the message from conversational message.
+     *
+     * @param m the conversational message object returned by the conversational message service for the unsent message
+     * @return the message object of type Message for depending upon if the message is a group message of a private user message 
+     */
+    private Message createMessageFromConversationalMessage (ConversationalMessage m) {
+    	Message resultMessage = null;
+    	if (m.getGroupUniqueKey() == null) {
+    		resultMessage = Message.makePrivateUserMessage(m.getSourceName(), m.getMessageText(), m.getDestinationName());
+    	} else {
+    		resultMessage = Message.makeGroupMessage(m.getSourceName(), m.getMessageText(), m.getGroupUniqueKey().split("::")[1]);
+    	}
+    	return resultMessage;
+    }
     /**
      * Handles the createGroupMessage
      *

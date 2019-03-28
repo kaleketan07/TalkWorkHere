@@ -3,6 +3,7 @@ package edu.northeastern.ccs.im.services;
 import edu.northeastern.ccs.im.Message;
 
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * The DAO for Invitation Service
@@ -64,7 +65,7 @@ public interface InvitationDao {
      *
      * @param inviter   - the person who is the sender of the invitation
      * @param invitee   - the person who is receiving the invitation
-     * @param groupName - the group for which the invite is being send
+     * @param groupName - the group for which the invite is being sent
      * @return - returns true if the record was entered in the databasse else false
      * @throws SQLException
      */
@@ -75,10 +76,49 @@ public interface InvitationDao {
      *
      * @param inviter   - the person who is the sender of the invitation
      * @param invitee   - the person who is receiving the invitation
-     * @param groupName - the group for which the invite is being send
+     * @param groupName - the group for which the invite is being sent
      * @return - returns true if the invite was deleted, false if there was any issue that occurred.
      * @throws SQLException
      */
     boolean deleteInvitation(String inviter, String invitee, String groupName) throws SQLException;
+
+    /**
+     * The method gets invitations that need to be sent to an invitee
+     *
+     * @param invitee - the person who is receiving the invitation
+     * @return the set of messages which have to be delivered to the user
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
+     */
+    Set<Message> getInvitationsForInvitee(String invitee) throws SQLException;
+
+    /**
+     *  The method that gets invitations that need to be sent to a group moderator
+     *
+     * @param groupName - the group for which the invitations need to be fetched
+     * @return the set of messages which have to be delivered to the user
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
+     */
+    Set<Message> getInvitationsForGroup(String groupName) throws SQLException;
+
+    /**
+     *
+     * Sets the is sent flag for the invitation when sent to intended invitee
+     *
+     * @param invitee - the person who is receiving the invitation
+     * @param groupName - the group for which the invite is being sent
+     * @return the set of messages which have to be delivered to the user
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
+     */
+    boolean setInvitationIsSentToInvitee(String invitee, String groupName) throws SQLException;
+
+    /**
+     * Sets the is sent flag for the invitation when sent to intended moderator
+     *
+     * @param invitee - the person who is receiving the invitation
+     * @param groupName - the group for which the invite is being sent
+     * @return the set of messages which have to be delivered to the user
+     * @throws SQLException the SQL exception is thrown due to some query or database interaction
+     */
+    boolean setInvitationIsSentToModerator(String invitee, String groupName) throws SQLException;
 
 }

@@ -387,37 +387,61 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
         if (currentUser == null) {
             this.enqueuePrattleResponseMessage("Incorrect username and password");
-        } else {
-            // since the user was found, set the loggedIn attribute to true in the database
-            boolean updated = userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1");
-            if (!updated) {
+        } else if (!userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1")) {
                 this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
-            } else {
-            	List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName());
-            	Message resultMessage = null;
-            	for(ConversationalMessage m: unsentMessages) {
-            		resultMessage = createMessageFromConversationalMessage(m);
-            		currentUser.enqueueMessageToUser(resultMessage, m.getMessageUniquekey());
-            		conversationalMessagesService.markMessageAsSent(m.getMessageUniquekey());
-            	}
+        } else {
+            sendMessagesToUser(currentUser);
+            sendInvitationsToUser(msg);
+            sendInvitationsToModerator(msg);
+        }
+    }
 
-            	// send unsent invitations to the user
-                Set<Message> invitations = invitationService.getInvitationsForInvitee(msg.getName());
-            	for(Message invitation: invitations) {
-                    this.enqueuePrattleResponseMessage("You have been invited to join the group " + invitation.getReceiverOrPassword() + " by user " + invitation.getName());
-                    invitationService.setInvitationIsSentToInvitee(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
-                }
+    /**
+     * sends unsent messages to user on successful login
+     *
+     * @param currentUser - the user who has logged on
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void sendMessagesToUser(User currentUser) throws SQLException {
+        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName());
+        Message resultMessage = null;
+        for(ConversationalMessage m: unsentMessages) {
+            resultMessage = createMessageFromConversationalMessage(m);
+            currentUser.enqueueMessageToUser(resultMessage, m.getMessageUniquekey());
+            conversationalMessagesService.markMessageAsSent(m.getMessageUniquekey());
+        }
+    }
 
-                //send unsent invitations to the moderator for each group
-                Set<String> groups = groupService.getGroupsByModerator(msg.getName());
-            	for(String groupName: groups) {
-                    Set<Message> invitationsGroup = invitationService.getInvitationsForGroup(groupName);
-                    for(Message invitation: invitationsGroup) {
-                        this.enqueuePrattleResponseMessage("User " + invitation.getName() + " has invited user " + invitation.getTextOrPassword() + " to join the group " + groupName);
-                        invitationService.setInvitationIsSentToModerator(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
-                    }
-                }
+    /**
+     * sends unsent invitations to user on successful login
+     *
+     * @param msg - the login message received which triggers this action
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void sendInvitationsToModerator(Message msg) throws SQLException {
+        //send unsent invitations to the moderator for each group
+        Set<String> groups = groupService.getGroupsByModerator(msg.getName());
+        for(String groupName: groups) {
+            Set<Message> invitationsGroup = invitationService.getInvitationsForGroup(groupName);
+            for(Message invitation: invitationsGroup) {
+                this.enqueuePrattleResponseMessage(invitation.getName() + " has invited " + invitation.getTextOrPassword() + " to join the group " + groupName);
+                invitationService.setInvitationIsSentToModerator(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
             }
+        }
+    }
+
+    /**
+     * sends unsent invitations to moderator on successful login
+     *
+     * @param msg - the login message received which triggers this action
+     * @throws SQLException - thrown by the database queries and calls
+     */
+    private void sendInvitationsToUser(Message msg) throws SQLException {
+        // send unsent invitations to the user
+        Set<Message> invitations = invitationService.getInvitationsForInvitee(msg.getName());
+        for(Message invitation: invitations) {
+            this.enqueuePrattleResponseMessage("You have been invited to join the group " + invitation.getReceiverOrPassword() + " by user " + invitation.getName());
+            invitationService.setInvitationIsSentToInvitee(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
         }
     }
 
@@ -833,7 +857,7 @@ public class ClientRunnable implements Runnable {
                 String moderator = groupService.getGroup(groupName).getModeratorName();
                 ClientRunnable moderatorClient = userClients.getOrDefault(moderator, null);
                 if(moderatorClient != null) {
-                    moderatorClient.enqueuePrattleResponseMessage("User " + inviter + " has invited user " + invitee + " to join the group " + groupName);
+                    moderatorClient.enqueuePrattleResponseMessage(inviter + " has invited user " + invitee + " to join the group " + groupName);
                     invitationService.setInvitationIsSentToModerator(invitee, groupName);
                 }
                 this.enqueuePrattleResponseMessage("The invitation was successfully sent.");

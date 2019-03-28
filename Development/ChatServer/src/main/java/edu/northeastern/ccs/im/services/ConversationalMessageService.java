@@ -7,9 +7,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -52,7 +49,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     /**
      * Getting the singleton instance of the class
      *
-     * @return
+     * @return the conversational message service
      * @throws SQLException           the sql exception
      * @throws ClassNotFoundException the class not found exception
      */
@@ -238,12 +235,19 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * Gets the unsent messages for the user.
      *
      * @param userName the user name for whom the messages are to be fetched
+     * @param flag for deciding whether this function should retrieve all unsent messages or all past messages
+     *             if true - then retrieve all messages that are not sent to the user
+     *             if false - then retrieve all past messages for the user
      * @return the unsent messages for user as Map with keys as the message objects and unique keys as the value
      * @throws SQLException the SQL exception
      */
-    public List<ConversationalMessage> getUnsentMessagesForUser(String userName) throws SQLException {
-    	final String GET_UNSENT_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";
-        pstmt = conn.getPreparedStatement(GET_UNSENT_MESSAGES);
+    public List<ConversationalMessage> getUnsentMessagesForUser(String userName, boolean flag) throws SQLException {
+    	final String GET_MESSAGES;
+        if(flag)
+            GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";
+        else
+            GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0;";
+        pstmt = conn.getPreparedStatement(GET_MESSAGES);
         pstmt = utils.setPreparedStatementArgs(pstmt, userName);
     	List<ConversationalMessage> msgs = new ArrayList<>();
         result = pstmt.executeQuery();
@@ -278,6 +282,5 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         pstmt.close();
         return (res > 0);
     }
-
 
 }

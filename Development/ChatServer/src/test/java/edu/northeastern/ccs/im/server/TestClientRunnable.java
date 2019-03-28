@@ -28,7 +28,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -91,6 +90,9 @@ public class TestClientRunnable {
     @Mock
     Group mockedGroup;
 
+    @Mock
+    ConversationalMessage mockedCM;
+
     /**
      * Helper method to reset and set the messageList to be used during tests
      *
@@ -135,6 +137,9 @@ public class TestClientRunnable {
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
         when(mockedcms.deleteGroupMessage(Mockito.anyString())).thenReturn(true);
         when(mockedcms.deleteMessage(Mockito.anyString())).thenReturn(true);
+        when(mockedCM.getSourceName()).thenReturn(SENDER_NAME);
+        when(mockedCM.getMessageText()).thenReturn(MESSAGE_TEXT);
+        when(mockedCM.getMessageUniquekey()).thenReturn(MESSAGE_KEY);
 
         //Define behavior for User:
         mockedUser.setLoggedIn(true);
@@ -284,7 +289,7 @@ public class TestClientRunnable {
         TEST_USER_MESSAGE2.setGroupUniqueKey(DUMMY_GROUP_MESSAGE_KEY);
         testMsgs.add(TEST_USER_MESSAGE2);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString())).thenReturn(testMsgs);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
         when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
@@ -2694,7 +2699,7 @@ public class TestClientRunnable {
     /**
      * Test add group to group when guest group does not exist.
      *
-     * @throws SQLException the SQL exception
+     * @throws SQLException the SQL exception when the service fails to retrieve messages
      */
     @Test
     public void testAddGroupToGroupWhenGuestGroupDoesNotExist() throws SQLException {
@@ -2710,7 +2715,7 @@ public class TestClientRunnable {
     /**
      * Test remove group from group.
      *
-     * @throws SQLException the SQL exception
+     * @throws SQLException the SQL exception when the service fails to retrieve messages
      */
     @Test
     public void testRemoveGroupFromGroup() throws SQLException {
@@ -2728,7 +2733,7 @@ public class TestClientRunnable {
     /**
      * Test remove group from group could not remove.
      *
-     * @throws SQLException the SQL exception
+     * @throws SQLException the SQL exception when the service fails to retrieve messages
      */
     @Test
     public void testRemoveGroupFromGroupCouldNotRemove() throws SQLException {
@@ -2792,6 +2797,55 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test handle get past messages for private messages only.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetPastMessagesForPrivateMessagesOnly() throws SQLException{
+        clientRunnableObject.run();
+        List<ConversationalMessage> testMsgs = new ArrayList<>();
+        testMsgs.add(mockedCM);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_PAST_MESSAGES));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle get past messages for group messages only.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetPastMessagesForGroupMessagesOnly() throws SQLException{
+        clientRunnableObject.run();
+        List<ConversationalMessage> testMsgs = new ArrayList<>();
+        testMsgs.add(mockedCM);
+        when(mockedCM.getGroupUniqueKey()).thenReturn(GROUP_KEY);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_PAST_MESSAGES));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle get past messages when exception is thrown.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetPastMessagesWhenExceptionIsThrown() throws SQLException{
+        clientRunnableObject.run();
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenThrow(SQLException.class);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_PAST_MESSAGES));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+
+
 
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
@@ -2804,6 +2858,7 @@ public class TestClientRunnable {
     private static final String INVITER = "inviter";
     private static final String MODERATOR = "moderator";
     private static final String UNIQUE_MESSAGE_KEY = "johndoeunique234564T435654";
+    private static final String GROUP_KEY = "Test::GroupName";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
@@ -2854,5 +2909,6 @@ public class TestClientRunnable {
     private static final String ANOTHER_MESSAGE_KEY = "another_test_key";
     private static final ConversationalMessage TEST_USER_MESSAGE = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, MESSAGE_KEY);
     private static final ConversationalMessage TEST_USER_MESSAGE2 = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, ANOTHER_MESSAGE_KEY);
-    
+    private static final Message GET_PAST_MESSAGES = Message.makeGetPastMessages(SENDER_NAME);
+
 }

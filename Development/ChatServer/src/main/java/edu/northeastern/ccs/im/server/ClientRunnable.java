@@ -1235,6 +1235,44 @@ public class ClientRunnable implements Runnable {
         }
     }
 
+    /**
+     * This function retrieves all the messages that a user has received and formats a giant string to be sent to the
+     * user having all these messages.
+     * It generates two separate strings, one for the group messages and one for the private messages and sends the
+     * concatenated string to the user.
+     * @param msg the message object sent by the user
+     */
+    private void handleGetPastMessages(Message msg){
+        List<ConversationalMessage> msgs = new ArrayList<>();
+        try {
+            msgs = conversationalMessagesService.getUnsentMessagesForUser(msg.getName(), false);
+        }catch (Exception e){
+            enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
+            return;
+        }
+        // Create a string of all messages:
+        StringBuilder workSpaceForPrivate = new StringBuilder();
+        workSpaceForPrivate.append("\nAll your private messages::\n");
+        workSpaceForPrivate.append(String.format("%n%-15s | %-30s | %-15s%n","Sender Username","Message","Message Key"));
+        StringBuilder workSpaceForGroups = new StringBuilder();
+        workSpaceForGroups.append("\n\nAll your group messages::\n");
+        workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s%n","Group Name","Sender Username",
+                "Message","Message Key"));
+        for(ConversationalMessage m : msgs){
+            if(m.getGroupUniqueKey()==null)
+                workSpaceForPrivate.append(String.format("%n%-15s | %-30s | %-15s",m.getSourceName(),
+                        m.getMessageText(),m.getMessageUniquekey()));
+            else
+                workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s",m.getGroupUniqueKey().split("::")[1],
+                        m.getSourceName(), m.getMessageText(),m.getMessageUniquekey()));
+
+        }
+        String resultString = workSpaceForPrivate.append(workSpaceForGroups).toString();
+        this.enqueuePrattleResponseMessage(resultString);
+    }
+
+
+
 
     /**
      * This method handles general messages
@@ -1277,6 +1315,9 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isDeletePrivateMessageMessage()) {
             handleDeletePrivateMessageMessage(msg);
+            return true;
+        } else if (msg.isGetPastMessages()) {
+            handleGetPastMessages(msg);
             return true;
         }
         return false;

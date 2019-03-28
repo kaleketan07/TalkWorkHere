@@ -222,7 +222,8 @@ public class ClientRunnable implements Runnable {
                 setName("invalid-" + userName + "-" + invalidCounter);
                 userId = -1;
                 result = true;
-                ChatLogger.error("There is already a user with this username connected to the portal.");
+                this.enqueuePrattleResponseMessage("There is already a user connected with this username. Please type " +
+                        " BYE and try logging in with another username.");
             }
         } else {
             // Clear this name; we cannot use it. *sigh*
@@ -296,6 +297,7 @@ public class ClientRunnable implements Runnable {
             // when they have, terminate the client.
             if (timer.isBehind()) {
                 ChatLogger.error("Timing out or forcing off a user " + name);
+                this.enqueuePrattleResponseMessage("Timeout occurred. Logging you out. Apologies.\n");
                 terminate = true;
             }
             if (terminate) {
@@ -331,7 +333,7 @@ public class ClientRunnable implements Runnable {
                 } else if (msg.isLoginMessage() || msg.isRegisterMessage() || (user != null && user.isLoggedIn())) {
                     processMessage(msg);
                 } else {
-                    ChatLogger.error("User not logged in.");
+                    this.enqueuePrattleResponseMessage("Sorry, you are not logged in to use Prattle. Please log in and try again.");
                 }
             }
         }
@@ -389,6 +391,7 @@ public class ClientRunnable implements Runnable {
         } else if (!userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1")) {
                 this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
         } else {
+            this.enqueuePrattleResponseMessage("Welcome " + msg.getName() + "!! Here's what you missed::\n");
             sendMessagesToUser(currentUser);
             sendInvitationsToUser(msg);
             sendInvitationsToModerator(msg);
@@ -510,6 +513,7 @@ public class ClientRunnable implements Runnable {
             // if the user is in fact the moderator of the group only then delete the group
             if (groupService.isModerator(currentGroup.getGroupName(), currentUser.getUserName())) {
                 groupService.deleteGroup(currentGroup.getGroupName());
+                this.enqueuePrattleResponseMessage("Group deleted successfully.");
             } else {
                 this.enqueuePrattleResponseMessage("CurrentUser is not the moderator of the group.");
             }
@@ -529,6 +533,7 @@ public class ClientRunnable implements Runnable {
         if (!result) {
             this.enqueuePrattleResponseMessage("User could not be deleted");
         } else {
+            this.enqueuePrattleResponseMessage("User profile set to inactive.");
             this.terminate = true;
         }
     }

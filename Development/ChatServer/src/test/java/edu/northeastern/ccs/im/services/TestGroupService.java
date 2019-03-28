@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -569,6 +570,29 @@ public class TestGroupService {
         when(mockedRS.getString("group_name")).thenReturn("Group201", "Group202");
         when(mockedRS.getString("moderator_name")).thenReturn("Alice", "Bob");
         Assertions.assertTrue(testGS.removeGroupFromGroup("ABC", "Group202"));
+    }
+
+    /**
+     *  Test get Invitations for Invitee when no record is found
+     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     */
+    @Test
+    public void testGetGroupsForModeratorNull() throws SQLException {
+        when(mockedRS.next()).thenReturn(false);
+        assertTrue(testGS.getGroupsByModerator("Moderator").isEmpty());
+    }
+
+    /**
+     * Test the getInvitationForInvitee method when match is found
+     * @throws SQLException - the exception thrown when a downstream database error occurs
+     */
+    @Test
+    public void testGetGroupsForModeratorNotNull() throws SQLException {
+        when(mockedRS.next()).thenReturn(true, true, false);
+        when(mockedRS.getString(anyString())).thenReturn("group1", "group2");
+
+        Set<String> groups = testGS.getGroupsByModerator("moderator");
+        assertTrue(groups.size() == 2);
     }
 
 

@@ -101,6 +101,9 @@ public interface InvitationDao {
     Set<Message> getInvitationsForGroup(String groupName) throws SQLException;
 
     /**
+     *
+     * Sets the is sent flag for the invitation when sent to intended invitee
+     *
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being sent
      * @return the set of messages which have to be delivered to the user
@@ -109,6 +112,8 @@ public interface InvitationDao {
     boolean setInvitationIsSentToInvitee(String invitee, String groupName) throws SQLException;
 
     /**
+     * Sets the is sent flag for the invitation when sent to intended moderator
+     *
      * @param invitee - the person who is receiving the invitation
      * @param groupName - the group for which the invite is being sent
      * @return the set of messages which have to be delivered to the user

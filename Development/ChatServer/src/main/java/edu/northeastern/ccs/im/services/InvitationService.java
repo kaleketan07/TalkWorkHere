@@ -245,7 +245,7 @@ public class InvitationService implements InvitationDao {
     }
 
     /**
-     * The method to retrieve all messages for an invitee which have not been sent
+     * The method to retrieve all invitations for a group which have not been sent to its moderator
      *
      * @param groupName - the group for which the invitation was sent
      * @return the set of invitations not sent to the user yet

@@ -573,7 +573,7 @@ public class TestGroupService {
     }
 
     /**
-     *  Test get Invitations for Invitee when no record is found
+     *  Test getGroupsByModerator when no record is found
      * @throws  SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
@@ -583,7 +583,7 @@ public class TestGroupService {
     }
 
     /**
-     * Test the getInvitationForInvitee method when match is found
+     * Test the getGroupsByModerator method when match is found
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test

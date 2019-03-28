@@ -223,23 +223,7 @@ public class InvitationService implements InvitationDao {
         preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee);
         result = preparedStatement.executeQuery();
-        Set<Message> messages = new HashSet<>();
-        while (result.next()) {
-            boolean isAccepted = result.getBoolean(IS_ACCEPTED);
-            boolean isDenied = result.getBoolean(IS_DENIED);
-            boolean isApproved = result.getBoolean(IS_APPROVED);
-            boolean isRejected = result.getBoolean(IS_REJECTED);
-            boolean isDeleted = result.getBoolean(IS_DELETED);
-            String inviter = result.getString(INVITER);
-            String groupName = result.getString(GROUP_NAME);
-            Message message = Message.makeCreateInvitationMessage(inviter, invitee, groupName);
-            message.setInvitationAccepted(isAccepted);
-            message.setInvitationDenied(isDenied);
-            message.setInvitationApproved(isApproved);
-            message.setInvitationRejected(isRejected);
-            message.setInvitationDeleted(isDeleted);
-            messages.add(message);
-        }
+        Set<Message> messages = extractInvitations();
         preparedStatement.close();
         return messages;
     }
@@ -257,23 +241,7 @@ public class InvitationService implements InvitationDao {
         preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, groupName);
         result = preparedStatement.executeQuery();
-        Set<Message> messages = new HashSet<>();
-        while (result.next()) {
-            boolean isAccepted = result.getBoolean(IS_ACCEPTED);
-            boolean isDenied = result.getBoolean(IS_DENIED);
-            boolean isApproved = result.getBoolean(IS_APPROVED);
-            boolean isRejected = result.getBoolean(IS_REJECTED);
-            boolean isDeleted = result.getBoolean(IS_DELETED);
-            String inviter = result.getString(INVITER);
-            String invitee = result.getString(INVITEE);
-            Message message = Message.makeCreateInvitationMessage(inviter, invitee, groupName);
-            message.setInvitationAccepted(isAccepted);
-            message.setInvitationDenied(isDenied);
-            message.setInvitationApproved(isApproved);
-            message.setInvitationRejected(isRejected);
-            message.setInvitationDeleted(isDeleted);
-            messages.add(message);
-        }
+        Set<Message> messages = extractInvitations();
         preparedStatement.close();
         return messages;
     }
@@ -310,5 +278,33 @@ public class InvitationService implements InvitationDao {
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
         return qResult > 0;
+    }
+
+    /**
+     * Method to extract invitations from a result set
+     *
+     * @return
+     * @throws SQLException
+     */
+    private Set<Message> extractInvitations() throws SQLException {
+        Set<Message> messages = new HashSet<>();
+        while (result.next()) {
+            boolean isAccepted = result.getBoolean(IS_ACCEPTED);
+            boolean isDenied = result.getBoolean(IS_DENIED);
+            boolean isApproved = result.getBoolean(IS_APPROVED);
+            boolean isRejected = result.getBoolean(IS_REJECTED);
+            boolean isDeleted = result.getBoolean(IS_DELETED);
+            String inviter = result.getString(INVITER);
+            String invitee = result.getString(INVITEE);
+            String groupName = result.getString(GROUP_NAME);
+            Message message = Message.makeCreateInvitationMessage(inviter, invitee, groupName);
+            message.setInvitationAccepted(isAccepted);
+            message.setInvitationDenied(isDenied);
+            message.setInvitationApproved(isApproved);
+            message.setInvitationRejected(isRejected);
+            message.setInvitationDeleted(isDeleted);
+            messages.add(message);
+        }
+        return messages;
     }
 }

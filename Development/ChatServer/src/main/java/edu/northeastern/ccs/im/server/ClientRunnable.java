@@ -629,7 +629,15 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
             return;
         }
-        userService.followUser(followeeUser, followerUser);
+        try {
+        	userService.followUser(followeeUser, followerUser); 
+        }
+        catch(SQLException e) {
+        	this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
+            return;	
+        }
+        this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
+        
     }
 
     /**
@@ -646,8 +654,12 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
             return;
         }
-        userService.unfollowUser(followeeUser, followerUser);
+        if(userService.unfollowUser(followeeUser, followerUser)) 
+        	this.enqueuePrattleResponseMessage("You have stopped following : " + followeeUser.getUserName());
+        else
+        	this.enqueuePrattleResponseMessage("Aborted ..! You were not following : " + followeeUser.getUserName());      
     }
+
 
     /**
      * Helper function to help map the attribute name

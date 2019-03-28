@@ -331,7 +331,7 @@ public class UserService implements UserDao {
     public Map<String, String> getOnlineUsers(User follower) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
         final String GET_FOLLOWERS =
-                "select username from user_profile where username in" +
+                "SELECT * from user_profile where username in" +
                         " (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?) and logged_in = 1";
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());

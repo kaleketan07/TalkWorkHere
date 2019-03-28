@@ -970,6 +970,19 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
+    
+    /**
+     * Verify unfollow user is handled properly for aborted condition
+     * @throws SQLException throws sql exception when trying to unfollow user who is not been followed
+     */
+    @Test
+    public void testUserUnfollowMessageAborted() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, UNFOLLOW_USER_MESSAGE));
+        when(mockedUserService.unfollowUser(Mockito.any(), Mockito.any())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
     /**
      * Verify follow user is handled properly for invalid followee
@@ -984,7 +997,23 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-
+    
+    /**
+     * Verify follow user is handled properly for SQL Exception
+     *
+     * @throws SQLException the sql exception thrown when following already following user
+     */
+    @Test
+    public void testUserFollowMessageSQLException() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, FOLLOW_USER_MESSAGE));
+        when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON);
+        when(mockedUserService.followUser(Mockito.any(), Mockito.any())).thenThrow(SQLException.class);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+   
     /**
      * Verify unfollow user is handled properly for invalid followee
      *
@@ -994,7 +1023,7 @@ public class TestClientRunnable {
     public void testUserUnfollowMessageInvalid() throws SQLException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, UNFOLLOW_USER_MESSAGE));
-        when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, null);
+        when(mockedUserService.getUserByUserName(Mockito.any())).thenReturn(USER_LOGGED_ON, (User)null);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }

@@ -403,7 +403,7 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException - thrown by the database queries and calls
      */
     private void sendMessagesToUser(User currentUser) throws SQLException {
-        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName());
+        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName(), true);
         Message resultMessage = null;
         for(ConversationalMessage m: unsentMessages) {
             resultMessage = createMessageFromConversationalMessage(m);

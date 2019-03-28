@@ -434,5 +434,22 @@ public class GroupService implements GroupDao {
         }
     }
 
-
+    /**
+     * The method to get groups based on moderator name
+     *
+     * @param  moderatorName - the moderator whose groups need to be found
+     * @return a set of groups which have the given user as the moderator
+     */
+    @Override
+    public Set<String> getGroupsByModerator(String moderatorName) throws SQLException{
+        final String QUERY = "SELECT group_name from prattle.groups where moderator_name = ?";
+        PreparedStatement preparedStatement = conn.getPreparedStatement(QUERY);
+        preparedStatement = utils.setPreparedStatementArgs(preparedStatement, moderatorName);
+        result = preparedStatement.executeQuery();
+        Set<String> groups = new HashSet<>();
+        while(result.next()) {
+            groups.add(result.getString(GROUP_NAME));
+        }
+        return groups;
+    }
 }

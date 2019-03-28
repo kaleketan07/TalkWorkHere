@@ -28,6 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -489,6 +490,33 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(false);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test login when unsent invitations are sent to the invitee
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLoginSendUnsentInvitationsToInvitee() throws SQLException {
+        clientRunnableObject.run();
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedInvitationService.getInvitationsForInvitee(SENDER_NAME)).thenReturn(new HashSet(Arrays.asList(CREATE_INVITATION_MESSAGE)));
+        when(mockedInvitationService.setInvitationIsSentToInvitee(SENDER_NAME, GROUP_NAME)).thenReturn(true);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
+        clientRunnableObject.run();
+    }
+
+    /**
+     * Test login when unsent invitations are sent to the moderator
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithLoginMessageForValidUserSuccessfulLoginSendUnsentInvitationsToModerator() throws SQLException {
+        clientRunnableObject.run();
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.getGroupsByModerator(SENDER_NAME)).thenReturn(new HashSet<>(Arrays.asList(GROUP_NAME)));
+        when(mockedInvitationService.getInvitationsForGroup(GROUP_NAME)).thenReturn(new HashSet(Arrays.asList(CREATE_INVITATION_MESSAGE)));
+        when(mockedInvitationService.setInvitationIsSentToModerator(SENDER_NAME, GROUP_NAME)).thenReturn(true);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LOGIN));
         clientRunnableObject.run();
     }
@@ -1688,17 +1716,76 @@ public class TestClientRunnable {
 
     /**
      * This test verifies create Invitation handle when create invitation successfully updates the database
+     * and does not send to invitee since they are offline
      *
      * @throws SQLException - thrown when a downstream database calls fails.
      */
     @Test
-    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessful() throws SQLException {
+    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessfulNotSent() throws SQLException, NoSuchFieldException,IllegalAccessException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
         when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
         when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
         when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
         when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
+        when(mockedInvitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME)).thenReturn(true);
+        Field hm = ClientRunnable.class.getDeclaredField("userClients");
+        hm.setAccessible(true);
+        Map<String, ClientRunnable> userClientsEmpty = new HashMap<>();
+        userClientsEmpty.clear();
+        hm.set(null, userClientsEmpty);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * This test verifies create Invitation handle when create invitation successfully updates the database
+     * and sends to the invitee since they are online
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessfulAndSentToInvitee() throws SQLException, NoSuchFieldException,IllegalAccessException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
+        when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
+        when(mockedInvitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME)).thenReturn(true);
+        Field hm = ClientRunnable.class.getDeclaredField("userClients");
+        hm.setAccessible(true);
+        ClientRunnable mockedClient = mock(ClientRunnable.class);
+        Map<String, ClientRunnable> userClients = new HashMap();
+        userClients.put(INVITEE, mockedClient);
+        hm.set(null, userClients);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * This test verifies create Invitation handle when create invitation successfully updates the database
+     * and sends to the moderator since they are online
+     *
+     * @throws SQLException - thrown when a downstream database calls fails.
+     */
+    @Test
+    public void testHandleIncomingMessageCreateInvitationMessageUpdateSuccessfulAndSentToModerator() throws SQLException, NoSuchFieldException,IllegalAccessException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, CREATE_INVITATION_MESSAGE));
+        when(mockedUserService.getUserByUserName(INVITEE)).thenReturn(INVITEE_USER);
+        when(mockedGroupService.getMemberUsers(GROUP_NAME)).thenReturn(new HashSet<>(Arrays.asList(USER_LOGGED_ON)));
+        when(mockedInvitationService.getInvitation(INVITEE, GROUP_NAME)).thenReturn(null);
+        when(mockedInvitationService.createInvitation(SENDER_NAME, INVITEE, GROUP_NAME)).thenReturn(true);
+        when(mockedInvitationService.setInvitationIsSentToInvitee(INVITEE, GROUP_NAME)).thenReturn(true);
+        Field hm = ClientRunnable.class.getDeclaredField("userClients");
+        hm.setAccessible(true);
+        ClientRunnable mockedClient = mock(ClientRunnable.class);
+        Map<String, ClientRunnable> userClients = new HashMap();
+        userClients.put(MODERATOR, mockedClient);
+        hm.set(null, userClients);
+        when(mockedGroupService.getGroup(GROUP_NAME).getModeratorName()).thenReturn(MODERATOR);
+        when(mockedInvitationService.setInvitationIsSentToModerator(INVITEE, GROUP_NAME)).thenReturn(true);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -2799,6 +2886,7 @@ public class TestClientRunnable {
     private static final String PASS = "some_p@$$worD";
     private static final String INVITEE = "invitee";
     private static final String INVITER = "inviter";
+    private static final String MODERATOR = "moderator";
     private static final String UNIQUE_MESSAGE_KEY = "johndoeunique234564T435654";
     private static final String GROUP_KEY = "Test::GroupName";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);

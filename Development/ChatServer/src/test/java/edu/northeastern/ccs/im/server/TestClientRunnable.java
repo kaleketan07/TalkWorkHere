@@ -284,7 +284,7 @@ public class TestClientRunnable {
         TEST_USER_MESSAGE2.setGroupUniqueKey(DUMMY_GROUP_MESSAGE_KEY);
         testMsgs.add(TEST_USER_MESSAGE2);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString())).thenReturn(testMsgs);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),true)).thenReturn(testMsgs);
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
         when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
@@ -2707,6 +2707,7 @@ public class TestClientRunnable {
     }
 
 
+
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
     private static final String HELLO = "hello";
@@ -2767,5 +2768,6 @@ public class TestClientRunnable {
     private static final String ANOTHER_MESSAGE_KEY = "another_test_key";
     private static final ConversationalMessage TEST_USER_MESSAGE = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, MESSAGE_KEY);
     private static final ConversationalMessage TEST_USER_MESSAGE2 = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, ANOTHER_MESSAGE_KEY);
+    private static final Message GET_PAST_MESSAGES = Message.makeGetPastMessages(SENDER_NAME);
     
 }

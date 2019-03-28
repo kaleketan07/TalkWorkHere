@@ -6,11 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
-import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -53,7 +49,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     /**
      * Getting the singleton instance of the class
      *
-     * @return
+     * @return the conversational message service
      * @throws SQLException           the sql exception
      * @throws ClassNotFoundException the class not found exception
      */

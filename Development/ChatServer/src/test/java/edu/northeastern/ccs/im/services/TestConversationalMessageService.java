@@ -317,7 +317,7 @@ public class TestConversationalMessageService {
      */
     @Test
     public void testGetUnsentMessagesForUser() throws SQLException {
-    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",true);
     	assertFalse(testMsgs.isEmpty());
     }
     
@@ -329,7 +329,7 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingGroupMessages() throws SQLException {
     	when(mockedRS.getString("group_unique_key")).thenReturn("hey::test_group_key");
-    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",true);
     	assertFalse(testMsgs.isEmpty());
     }
     
@@ -341,8 +341,19 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingNoUnsentMessages() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
-    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC");
+    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",true);
     	assertTrue(testMsgs.isEmpty());
     }
-    
+
+    /**
+     * Test get unsent messages for user having group messages when flag is false.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testGetUnsentMessagesForUserHavingGroupMessagesWhenFlagFalse() throws SQLException {
+        when(mockedRS.getString("group_unique_key")).thenReturn("hey::test_group_key");
+        List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",false);
+        assertFalse(testMsgs.isEmpty());
+    }
 }

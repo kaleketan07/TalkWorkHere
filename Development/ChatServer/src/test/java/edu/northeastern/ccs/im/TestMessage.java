@@ -980,6 +980,33 @@ public class TestMessage {
     }
 
     /**
+     * Test make get past messages.
+     */
+    @Test
+    public void testMakeGetPastMessages() {
+        Message message = Message.makeGetPastMessages(SENDER_NAME);
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+    }
+
+    /**
+     * Test make message for get past messages.
+     */
+    @Test
+    public void testMakeMessageForGetPastMessages() {
+        Message message = Message.makeMessage(GPM,SENDER_NAME,NULL_OUTPUT,NULL_OUTPUT);
+        Assertions.assertTrue(message.isGetPastMessages());
+    }
+
+    /**
+     * Test is get past messages for false condition.
+     */
+    @Test
+    public void testIsGetPastMessagesForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isGetPastMessages());
+    }
+
+    /**
      * CONSTANTS to be used as expected values or method arguments
      **/
     private static final String HLO = "HLO";
@@ -1015,6 +1042,7 @@ public class TestMessage {
     private static final String DIU = "DIU";
     private static final String AIM = "AIM";
     private static final String RIM = "RIM";
+    private static final String GPM = "GPM";
 
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";

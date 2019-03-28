@@ -159,7 +159,12 @@ public enum MessageType {
     /**
      * Message handle for a moderator to approve an invite.
      */
-    REJECT_INVITE_MODERATOR("RIM");
+    REJECT_INVITE_MODERATOR("RIM"),
+
+    /**
+     * Message handle for a user to retrieve all their messages
+     */
+    GET_PAST_MESSAGES("GPM");
 
     /**
      * Store the short name of this message type.

@@ -165,6 +165,11 @@ public enum MessageType {
      * Message handle for a user to retrieve all their messages
      */
     GET_PAST_MESSAGES("GPM");
+    
+    /**
+     * Message handle for a user to leave a group
+     */
+//    LEAVE_GROUP("LGP");
 
     /**
      * Store the short name of this message type.

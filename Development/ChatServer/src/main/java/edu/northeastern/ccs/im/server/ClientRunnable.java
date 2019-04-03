@@ -1252,6 +1252,35 @@ public class ClientRunnable implements Runnable {
     }
 
     /**
+     * Handle leave group message.
+     *
+     * @param msg the msg object of type Remove Group from Group
+     * @throws SQLException the SQL exception
+     */
+    private void handleLeaveGroupMessage(Message msg) throws SQLException {
+        User currentUser = userService.getUserByUserName(msg.getName());
+        Group guestGroup = groupService.getGroup(msg.getTextOrPassword());
+        try {
+	        if(guestGroup == null) {
+	        	this.enqueuePrattleResponseMessage("The group you are trying to leave does not exist");
+	        }
+	        else if (groupService.isModerator(guestGroup.getGroupName(), currentUser.getUserName())) {
+	        	this.enqueuePrattleResponseMessage("As you are the moderator of the group you cannot leave the group "
+	        			+ "Please transfer the ownership to someone else and then leave");
+	        }
+	        else if (groupService.checkMembershipInGroup(guestGroup.getGroupName(), currentUser.getUserName())){
+	        	groupService.removeUserFromGroup(guestGroup.getGroupName(), currentUser.getUserName());
+	        }
+	        else {
+	        	this.enqueuePrattleResponseMessage("You are not a member of the group you are trying to leave");
+	        }
+        }
+        catch (SQLException e) {
+        	this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE);
+		}
+    }
+
+    /**
      * This function retrieves all the messages that a user has received and formats a giant string to be sent to the
      * user having all these messages.
      * It generates two separate strings, one for the group messages and one for the private messages and sends the
@@ -1372,6 +1401,9 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isRemoveGroupFromGroupMessage()) {
             handleRemoveGroupFromGroupMessage(msg);
+            return true;
+        } else if (msg.isLeaveGroupMessage()) {
+            handleLeaveGroupMessage(msg);
             return true;
         }
         return false;

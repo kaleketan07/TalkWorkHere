@@ -184,6 +184,42 @@ public class TestGroupService {
         Assertions.assertEquals("TempGroup", testGS.getGroup("TempGroup").getGroupName());
 
     }
+    
+    /**
+     * Test check membership in group.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testCheckMembershipInGroupWithNegetiveCase() throws SQLException {   
+        when(mockedRS.first()).thenReturn(false);
+        Assertions.assertEquals(false, testGS.checkMembershipInGroup("TempGroup" , "ABC"));
+    }
+    
+    /**
+     * Test check membership in group.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testCheckMembershipInGroupWithPositiveCase() throws SQLException {   
+        when(mockedRS.first()).thenReturn(true);
+        when(mockedRS.getBoolean("is_removed")).thenReturn(false);
+        Assertions.assertEquals(true, testGS.checkMembershipInGroup("TempGroup" , "ABC"));
+    }
+    
+    /**
+     * Test check membership in group.
+     *
+     * @throws SQLException the SQL exception
+     */
+    @Test
+    public void testCheckMembershipInGroupWithNegativeCaseOfAlreadyRemoved() throws SQLException {   
+        when(mockedRS.first()).thenReturn(true);
+        when(mockedRS.getBoolean("is_removed")).thenReturn(true);
+        Assertions.assertEquals(false, testGS.checkMembershipInGroup("TempGroup" , "ABC"));
+    }
+    
 
     /**
      * Test get member groups. Should test getting member groups of a group

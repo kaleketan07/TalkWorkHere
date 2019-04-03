@@ -36,7 +36,8 @@ public class GroupService implements GroupDao {
     private static final String GUEST_GROUP_NAME = "guest_group_name";
     private static final String MODERATOR_NAME = "moderator_name";
     private static final String LOGGED_IN = "logged_in";
-
+    private static final String IS_REMOVED = "is_removed";
+    
 
     /**
      * Instantiates a new group service.
@@ -277,7 +278,34 @@ public class GroupService implements GroupDao {
         pstmt.close();
         return (qResult > 0);
     }
-
+    
+    
+    /**
+     * Check if users is a direct member of the group 
+     *
+     * @param hostGroupName
+     * @param guestUserName
+     * @return true, if user is a member of the group
+     * @throws SQLException
+     */
+    @Override
+    public boolean checkMembershipInGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+        final String CHECK_USER_MEMEBERSHIP = "SELECT * FROM membership_users where host_group_name = ? and guest_user_name = ?";
+        pstmt = conn.getPreparedStatement(CHECK_USER_MEMEBERSHIP);
+        pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
+        result = pstmt.executeQuery();
+        pstmt.close();
+        if(result.first()) {
+        	boolean removed = result.getBoolean(IS_REMOVED);
+        	if(!removed){
+        		return true;
+        	}
+        }
+        return false;
+        
+    }
+    	
+    
     /**
      * Gets the flat list of groups present in this group.
      *
@@ -378,7 +406,8 @@ public class GroupService implements GroupDao {
                 pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, groupName);
             } else
                 ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
-        } else {
+        }
+        else {
             pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, groupName);
         }
         int qResult = pstmt.executeUpdate();

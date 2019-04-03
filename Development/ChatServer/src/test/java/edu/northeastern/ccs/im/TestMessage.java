@@ -109,7 +109,7 @@ public class TestMessage {
         assertEquals(PASS, message.getTextOrPassword());
         assertTrue(message.isLoginMessage());
         assertFalse(message.isRegisterMessage());
-//        assertFalse(message.isLeaveGroupMessage());
+        assertFalse(message.isLeaveGroupMessage());
         
     }
 
@@ -133,12 +133,12 @@ public class TestMessage {
      * Test to check if makeMessage creates the correct object
      * based on the first parameter passed - Register.
      */
-//    @Test
-//    public void testMakeMessageForLeaveGroup() {
-//        Message message = Message.makeMessage(LGP, SENDER_NAME, GROUP_NAME, PASS);
-//        assertTrue(message.isLeaveGroupMessage());
-//        
-//    }
+    @Test
+    public void testMakeMessageForLeaveGroup() {
+        Message message = Message.makeMessage(LGP, SENDER_NAME, GROUP_NAME, PASS);
+        assertTrue(message.isLeaveGroupMessage());
+        
+    }
 
     /**
      * Test to check if makeMessage creates the correct object

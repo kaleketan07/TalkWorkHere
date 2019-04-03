@@ -248,8 +248,8 @@ public class Message {
             return makeAddGroupToGroupMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.REMOVE_GROUP_FROM_GROUP.toString()) == 0) {
             return makeRemoveGroupFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-//        } else if (handle.compareTo(MessageType.LEAVE_GROUP.toString()) == 0) {
-//            return makeLeaveGroupMessage(srcName, textOrPassword);
+        } else if (handle.compareTo(MessageType.LEAVE_GROUP.toString()) == 0) {
+            return makeLeaveGroupMessage(srcName, textOrPassword);
         }
         return null;
     }
@@ -686,9 +686,9 @@ public class Message {
      * @param grpName the group name which the user wants to leave
      * @return the message object of type leave group message
      */
-//    public static Message makeLeaveGroupMessage(String srcName, String grpName) {
-//        return new Message(MessageType.LEAVE_GROUP, srcName, grpName);
-//    }
+    public static Message makeLeaveGroupMessage(String srcName, String grpName) {
+        return new Message(MessageType.LEAVE_GROUP, srcName, grpName);
+    }
 
     /**
      * Make a message for deleting private message.
@@ -903,9 +903,9 @@ public class Message {
      *
      * @return true or false based on the comparison result
      */
-//    public boolean isLeaveGroupMessage() {
-//        return (msgType == MessageType.LEAVE_GROUP);
-//    }
+    public boolean isLeaveGroupMessage() {
+        return (msgType == MessageType.LEAVE_GROUP);
+    }
     
     /**
      * This method verifies if the current message has the handle DEG (is a delete_group message)

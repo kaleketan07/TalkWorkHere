@@ -1001,6 +1001,75 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
+    
+    /**
+     * Test leave group with invalid group
+     * @throws SQLException 
+     */
+    @Test
+    public void testLeaveGroupMessageWithInvalidGroup() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
+        when(mockedGroupService.getGroup(Mockito.anyString())).thenReturn(null);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test leave group with valid moderator
+     * @throws SQLException 
+     */
+    @Test
+    public void testLeaveGroupMessageWithValidModerator() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test leave group with invalid moderator
+     * @throws SQLException 
+     */
+    @Test
+    public void testLeaveGroupMessageWithInvalidModerator() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.removeUserFromGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test leave group with successful removal
+     * @throws SQLException 
+     */
+    @Test
+    public void testLeaveGroupMessageWithValidRemoveUser() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * test leave group message for SQL exception
+     * @throws SQLException 
+     */
+    @Test
+    public void testLeaveGroupMessageWithSQLException() throws SQLException {
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenThrow(SQLException.class);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
     /**
      * Verify unfollow user is handled properly for valid followee
@@ -2928,6 +2997,7 @@ public class TestClientRunnable {
     private static final Message GET_FOLLOWERS = Message.makeGetFollowersMessage(SENDER_NAME);
     private static final Message GET_FOLLOWEES = Message.makeGetFolloweesMessage(SENDER_NAME);
     private static final Message GET_ONLINE_USER = Message.makeGetOnlineUserMessage(SENDER_NAME);
+    private static final Message LEAVE_GROUP = Message.makeLeaveGroupMessage(SENDER_NAME, GROUP_NAME);
     private static final String DUMMY_GROUP_NAME = "dummy";
     private static final String ANOTHER_DUMMY_GROUP_NAME = "dummy2";
     private static final Message CREATE_GROUP = Message.makeCreateGroupMessage(SENDER_NAME, DUMMY_GROUP_NAME);

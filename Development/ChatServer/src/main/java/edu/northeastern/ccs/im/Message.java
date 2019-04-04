@@ -280,6 +280,8 @@ public class Message {
             return makeGetFolloweesMessage(srcName);
         } else if (handle.compareTo(MessageType.GET_ONLINE_USERS.toString()) == 0) {
             return makeGetOnlineUserMessage(srcName);
+        } else if (handle.compareTo(MessageType.TAP_USER.toString()) == 0) {
+            return makeTapUserMessage(srcName,textOrPassword);
         }
         return null;
     }
@@ -746,6 +748,17 @@ public class Message {
     }
 
     /**
+     * Make tap user message message.
+     *
+     * @param srcName        the src name
+     * @param userOfInterest the user of interest
+     * @return the message object of type TAP_USER
+     */
+    public static Message makeTapUserMessage(String srcName, String userOfInterest){
+        return new Message(MessageType.TAP_USER, srcName, userOfInterest);
+    }
+
+    /**
      * Return the name of the sender of this message.
      *
      * @return String specifying the name of the message originator.
@@ -1166,6 +1179,13 @@ public class Message {
     public boolean isGetPastMessages(){
         return (msgType == MessageType.GET_PAST_MESSAGES);
     }
+
+    /**
+     * Is tap user message boolean.
+     *
+     * @return true or false based on the condition evaluation for the handle
+     */
+    public boolean isTapUserMessage() { return (msgType == MessageType.TAP_USER); }
 
     /**
      * Representation of this message as a String. This begins with the message

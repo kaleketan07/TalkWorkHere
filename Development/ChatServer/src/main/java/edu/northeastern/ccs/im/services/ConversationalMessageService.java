@@ -246,9 +246,12 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         if(flag)
             GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";
         else
-            GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0;";
+            GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_src = ? OR msg_dest = ? AND msg_deleted = 0;";
         pstmt = conn.getPreparedStatement(GET_MESSAGES);
-        pstmt = utils.setPreparedStatementArgs(pstmt, userName);
+        if(flag)
+            pstmt = utils.setPreparedStatementArgs(pstmt, userName);
+        else
+            pstmt = utils.setPreparedStatementArgs(pstmt,userName,userName);
     	List<ConversationalMessage> msgs = new ArrayList<>();
         result = pstmt.executeQuery();
         while (result.next()) {

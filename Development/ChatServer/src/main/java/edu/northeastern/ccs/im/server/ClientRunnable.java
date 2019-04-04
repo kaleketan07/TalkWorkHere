@@ -1107,7 +1107,8 @@ public class ClientRunnable implements Runnable {
         		this.enqueuePrattleResponseMessage("The user you are trying to make a moderator is not a member of the group");
         		
         	}
-        	result = groupService.updateGroupSettings(groupName, attributeName, nextModerator.getUserName());
+        	else
+        		result = groupService.updateGroupSettings(groupName, attributeName, nextModerator.getUserName());
         	
         }
     	return result;

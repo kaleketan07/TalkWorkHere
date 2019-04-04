@@ -169,7 +169,12 @@ public enum MessageType {
     /**
      * Message handle for a user to leave a group
      */
-    LEAVE_GROUP("LGP");
+    LEAVE_GROUP("LGP"),
+
+    /**
+     * Message handle for government to get the conversation history for a user of interest
+     */
+    GET_CONVERSATION_HISTORY("GCH");
 
     /**
      * Store the short name of this message type.

@@ -1020,6 +1020,33 @@ public class TestMessage {
     }
 
     /**
+     * Test make get conversation history.
+     */
+    @Test
+    public void testMakeGetConversationHistory() {
+        Message message = Message.makeGetConversationHistory(SENDER_NAME,ANOTHER_USER);
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+    }
+
+    /**
+     * Test make message for get Conversation history.
+     */
+    @Test
+    public void testMakeMessageForGetConversationHistory() {
+        Message message = Message.makeMessage(GCH,SENDER_NAME,ANOTHER_USER,NULL_OUTPUT);
+        Assertions.assertTrue(message.isGetConversationHistory());
+    }
+
+    /**
+     * Test is get conversation history for false condition.
+     */
+    @Test
+    public void testIsGetConversationHistoryForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isGetConversationHistory());
+    }
+
+    /**
      * CONSTANTS to be used as expected values or method arguments
      **/
     private static final String HLO = "HLO";
@@ -1057,6 +1084,7 @@ public class TestMessage {
     private static final String RIM = "RIM";
     private static final String GPM = "GPM";
     private static final String LGP = "LGP";
+    private static final String GCH = "GCH";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

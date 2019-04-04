@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
+import java.util.regex.Pattern;
 
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
@@ -210,7 +211,7 @@ public class ClientRunnable implements Runnable {
     private boolean setUserName(String userName) {
         boolean result = false;
         // Now make sure this name is legal.
-        if (userName != null) {
+        if (isValidUserName(userName)) {
             if (userClients.getOrDefault(userName, null) == null) {
                 // Optimistically set this users ID number.
                 setName(userName);
@@ -351,8 +352,8 @@ public class ClientRunnable implements Runnable {
         if (currentUser != null) {
             this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
-            // since the user was not found, a new user with this name may be created
-            if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
+            // since the user was not found, a new user with this name may be created after password validation checks
+            if (isValidPassword(msg.getTextOrPassword()) && msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
                 userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
                 this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
             } else {
@@ -360,6 +361,28 @@ public class ClientRunnable implements Runnable {
             }
 
         }
+    }
+    
+    
+    /**
+     * Checks if passed userName is valid.
+     *
+     * @param userName the user name of the user
+     * @return true, if user name passes the checks of validity, else returns false
+     */
+    private boolean isValidUserName(String userName) {
+    	return (userName != null && userName.length() < 12);
+    }
+    
+    /**
+     * Checks if is valid password.
+     *
+     * @param password the password
+     * @return true, if the password satisfies all valid password checks
+     */
+    private boolean isValidPassword(String password) {
+    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{5,12}$";
+    	return password.matches(pattern);
     }
 
     /**

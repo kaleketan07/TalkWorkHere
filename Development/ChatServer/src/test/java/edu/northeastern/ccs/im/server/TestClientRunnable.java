@@ -2943,7 +2943,68 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test handle get conversation history for government.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetConversationHistoryForGovernment() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+        clientRunnableObject.run();
+        List<ConversationalMessage> testMsgs = new ArrayList<>();
+        testMsgs.add(mockedCM);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
+    /**
+     * Test handle get conversation history for normal user.
+     */
+    @Test
+    public void testHandleGetConversationHistoryForNormalUser(){
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_CONVERSATION_HISTORY_WRONG_USER));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle get conversation history for non existing user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetConversationHistoryForNonExistingUser() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+        clientRunnableObject.run();
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER,null);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle get conversation history when exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetConversationHistoryWhenException() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+        clientRunnableObject.run();
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenThrow(SQLException.class);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
 
     //Private fields to be used in tests
@@ -2958,6 +3019,7 @@ public class TestClientRunnable {
     private static final String MODERATOR = "moderator";
     private static final String UNIQUE_MESSAGE_KEY = "johndoeunique234564T435654";
     private static final String GROUP_KEY = "Test::GroupName";
+    private static final String GOVERNMENT = "government";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
@@ -2991,6 +3053,7 @@ public class TestClientRunnable {
     private static final User USER_LOGGED_ON = new User(null, null, SENDER_NAME, "QWERTY", true);
     private static final User INVITEE_USER = new User(null, null, INVITEE, "test", true);
     private static final User USER_LOGGED_OFF = new User(null, null, SENDER_NAME, "QWERTY", false);
+    private static final User GOVERNMENT_USER = new User(null,null,GOVERNMENT,PASS,true);
     private static final Group GROUP = new Group();
     private static final Message GROUP_MESSAGE = Message.makeGroupMessage(SENDER_NAME, MESSAGE_TEXT, DUMMY_GROUP_NAME);
     private static final String DUMMY_MSG_UNIQUE_KEY = "dummy_key";
@@ -3010,5 +3073,8 @@ public class TestClientRunnable {
     private static final ConversationalMessage TEST_USER_MESSAGE = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, MESSAGE_KEY);
     private static final ConversationalMessage TEST_USER_MESSAGE2 = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, ANOTHER_MESSAGE_KEY);
     private static final Message GET_PAST_MESSAGES = Message.makeGetPastMessages(SENDER_NAME);
+    private static final Message GET_CONVERSATION_HISTORY = Message.makeGetConversationHistory(GOVERNMENT,SENDER_NAME);
+    private static final Message GET_CONVERSATION_HISTORY_WRONG_USER = Message.makeGetConversationHistory(SENDER_NAME,SENDER_NAME);
+
 
 }

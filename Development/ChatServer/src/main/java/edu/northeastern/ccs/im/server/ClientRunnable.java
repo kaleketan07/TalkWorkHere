@@ -1285,6 +1285,7 @@ public class ClientRunnable implements Runnable {
      * user having all these messages.
      * It generates two separate strings, one for the group messages and one for the private messages and sends the
      * concatenated string to the user.
+     *
      * @param msg the message object sent by the user
      */
     private void handleGetPastMessages(Message msg){
@@ -1295,27 +1296,69 @@ public class ClientRunnable implements Runnable {
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
             return;
         }
-        // Create a string of all messages:
+        List<String> conversations = helperFormatMessagesString(msgs);
+        for(String s : conversations)
+            enqueuePrattleResponseMessage(s);
+    }
+
+
+    /**
+     * This function returns the conversation history of a user to the government, provided the request comes from the
+     * government
+     *
+     * @param msg The message object sent by the government
+     */
+    private void handleGetConversationHistory(Message msg){
+        try {
+            // Check if the message is from the government
+            if (!msg.getName().equalsIgnoreCase("government")) {
+                enqueuePrattleResponseMessage("Sorry, you are not allowed to perform this operation");
+            } else if (userService.getUserByUserName(msg.getTextOrPassword()) == null){
+                enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct username" +
+                        " with SRH");
+            } else {
+                List<ConversationalMessage> msgs = conversationalMessagesService.
+                        getUnsentMessagesForUser(msg.getTextOrPassword(), false);
+                List<String> conversations = helperFormatMessagesString(msgs);
+                for(String s : conversations)
+                    enqueuePrattleResponseMessage(s);
+            }
+        }catch(SQLException e){
+            ChatLogger.error(e.getMessage());
+            enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again." );
+        }
+    }
+
+    /**
+     * Helper method that will return all the formatted strings of a user's conversation history.
+     * The return list is an attempt to enqueue separate messages to the user to reduce the load on the network.
+     *
+     * @param msgs The list of conversational message objects
+     * @return This returns a list of two strings (one string contains the private chats, another string returns the
+     *         group messages for a user.
+     */
+    private List<String> helperFormatMessagesString(List<ConversationalMessage> msgs){
+        List<String> toSend = new ArrayList<>();
         StringBuilder workSpaceForPrivate = new StringBuilder();
-        workSpaceForPrivate.append("\nAll your private messages::\n");
-        workSpaceForPrivate.append(String.format("%n%-15s | %-30s | %-15s%n","Sender Username","Message","Message Key"));
+        workSpaceForPrivate.append("\nAll their private messages::\n");
+        workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s%n","Sender Username"
+                , "Destination Username", "Message","Message Key"));
         StringBuilder workSpaceForGroups = new StringBuilder();
-        workSpaceForGroups.append("\n\nAll your group messages::\n");
+        workSpaceForGroups.append("\n\nAll their group messages::\n");
         workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s%n","Group Name","Sender Username",
                 "Message","Message Key"));
         for(ConversationalMessage m : msgs){
             if(m.getGroupUniqueKey()==null)
-                workSpaceForPrivate.append(String.format("%n%-15s | %-30s | %-15s",m.getSourceName(),
+                workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s",m.getSourceName(), m.getDestinationName(),
                         m.getMessageText(),m.getMessageUniquekey()));
             else
                 workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s",m.getGroupUniqueKey().split("::")[1],
                         m.getSourceName(), m.getMessageText(),m.getMessageUniquekey()));
-
         }
-        this.enqueuePrattleResponseMessage(workSpaceForPrivate.toString());
-        this.enqueuePrattleResponseMessage(workSpaceForGroups.toString());
+        toSend.add(workSpaceForPrivate.toString());
+        toSend.add(workSpaceForGroups.toString());
+        return toSend;
     }
-
 
 
 
@@ -1363,6 +1406,9 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isGetPastMessages()) {
             handleGetPastMessages(msg);
+            return true;
+        } else if (msg.isGetConversationHistory()) {
+            handleGetConversationHistory(msg);
             return true;
         }
         return false;

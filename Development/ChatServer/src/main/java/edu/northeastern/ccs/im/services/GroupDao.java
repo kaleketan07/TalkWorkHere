@@ -162,4 +162,14 @@ public interface GroupDao {
      * @param  moderatorName - the moderator whose groups need to be found
      */
     Set<String> getGroupsByModerator(String moderatorName) throws SQLException;
+
+    /**
+     * Check if users is a direct member of the group 
+     *
+     * @param hostGroupName
+     * @param guestUserName
+     * @return true, if user is a member of the group
+     * @throws SQLException
+     */
+	boolean checkMembershipInGroup(String hostGroupName, String guestUserName) throws SQLException;
 }

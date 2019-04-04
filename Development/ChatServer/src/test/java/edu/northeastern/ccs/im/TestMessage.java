@@ -109,6 +109,8 @@ public class TestMessage {
         assertEquals(PASS, message.getTextOrPassword());
         assertTrue(message.isLoginMessage());
         assertFalse(message.isRegisterMessage());
+        assertFalse(message.isLeaveGroupMessage());
+        
     }
 
     /**
@@ -125,6 +127,17 @@ public class TestMessage {
         assertTrue(message.isRegisterMessage());
         assertFalse(message.isCreateGroupMessage());
         assertFalse(message.isPrivateUserMessage());
+    }
+
+    /**
+     * Test to check if makeMessage creates the correct object
+     * based on the first parameter passed - Register.
+     */
+    @Test
+    public void testMakeMessageForLeaveGroup() {
+        Message message = Message.makeMessage(LGP, SENDER_NAME, GROUP_NAME, PASS);
+        assertTrue(message.isLeaveGroupMessage());
+        
     }
 
     /**
@@ -368,9 +381,9 @@ public class TestMessage {
      */
     @Test
     public void testMakeDeleteGroupMessage() {
-        Message message = Message.makeMessage("DGM", SENDER_NAME, PASS, NULL_OUTPUT);
+        Message message = Message.makeMessage(DGM, SENDER_NAME, PASS, NULL_OUTPUT);
         StringBuilder strBuild = new StringBuilder();
-        strBuild.append("DGM");
+        strBuild.append(DGM);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(PASS));
         strBuild.append(toStringHelper(NULL_OUTPUT));
@@ -384,9 +397,9 @@ public class TestMessage {
      */
     @Test
     public void testMakeDeletePrivateMessage() {
-        Message message = Message.makeMessage("DPM", SENDER_NAME, PASS, NULL_OUTPUT);
+        Message message = Message.makeMessage(DPM, SENDER_NAME, PASS, NULL_OUTPUT);
         StringBuilder strBuild = new StringBuilder();
-        strBuild.append("DPM");
+        strBuild.append(DPM);
         strBuild.append(toStringHelper(SENDER_NAME));
         strBuild.append(toStringHelper(PASS));
         strBuild.append(toStringHelper(NULL_OUTPUT));
@@ -1043,7 +1056,7 @@ public class TestMessage {
     private static final String AIM = "AIM";
     private static final String RIM = "RIM";
     private static final String GPM = "GPM";
-
+    private static final String LGP = "LGP";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

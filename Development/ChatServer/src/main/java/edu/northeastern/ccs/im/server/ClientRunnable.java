@@ -1353,8 +1353,8 @@ public class ClientRunnable implements Runnable {
                         m.getSourceName(), m.getMessageText(),m.getMessageUniquekey()));
 
         }
-        String resultString = workSpaceForPrivate.append(workSpaceForGroups).toString();
-        this.enqueuePrattleResponseMessage(resultString);
+        this.enqueuePrattleResponseMessage(workSpaceForPrivate.toString());
+        this.enqueuePrattleResponseMessage(workSpaceForGroups.toString());
     }
 
 

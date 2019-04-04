@@ -351,11 +351,20 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
             // since the user was not found, a new user with this name may be created after password validation checks
-            if (isValidPassword(msg.getTextOrPassword()) && msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
-                userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            if (isValidPassword(msg.getTextOrPassword())) {
+            	if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
+	                userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
+	                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            	} else {
+            		this.enqueuePrattleResponseMessage("Password and confirm password do not match");
+            	}
             } else {
-                this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
+                this.enqueuePrattleResponseMessage("Password not strong enough. Make sure the password:\n"
+                		+ "1. is 5 to 12 characters long.\n"
+                		+ "2. contains atleast one uppercase and one lowercase characters.\n"
+                		+ "3. contains atleast one digit from 0-9.\n"
+                		+ "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
+                		+ "5. contains no spaces");
             }
 
         }

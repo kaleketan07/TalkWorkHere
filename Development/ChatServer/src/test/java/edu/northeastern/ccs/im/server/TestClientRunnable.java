@@ -133,6 +133,7 @@ public class TestClientRunnable {
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
         when(mockedUserService.deleteUser(Mockito.any())).thenReturn(true);
         when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedUserService.tapUser(Mockito.anyString())).thenReturn(true);
 
         //Define behavior for mocked Conversational Message Service
         when(mockedcms.getSender(Mockito.anyString())).thenReturn(SENDER_NAME);
@@ -2943,7 +2944,82 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test handle tap user for government for true.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleTapUserForGovernmentForTrue() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
+    /**
+     * Test handle tap user for government for false.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleTapUserForGovernmentForFalse() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        when(mockedUserService.tapUser(Mockito.anyString())).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle tap user for normal user.
+     */
+    @Test
+    public void testHandleTapUserForNormalUser(){
+        clientRunnableObject.run();
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,TAP_USER_MESSAGE_NORMAL_USER));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle tap user for non existing user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleTapUserForNonExistingUser() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER,null);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle tap user for exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleTapUserForException() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(mockedUserService.tapUser(Mockito.anyString())).thenThrow(SQLException.class);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
 
     //Private fields to be used in tests
@@ -2958,6 +3034,7 @@ public class TestClientRunnable {
     private static final String MODERATOR = "moderator";
     private static final String UNIQUE_MESSAGE_KEY = "johndoeunique234564T435654";
     private static final String GROUP_KEY = "Test::GroupName";
+    private static final String GOVERNMENT = "government";
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
@@ -2991,6 +3068,7 @@ public class TestClientRunnable {
     private static final User USER_LOGGED_ON = new User(null, null, SENDER_NAME, "QWERTY", true);
     private static final User INVITEE_USER = new User(null, null, INVITEE, "test", true);
     private static final User USER_LOGGED_OFF = new User(null, null, SENDER_NAME, "QWERTY", false);
+    private static final User GOVERNMENT_USER = new User(null,null,GOVERNMENT,PASS,true);
     private static final Group GROUP = new Group();
     private static final Message GROUP_MESSAGE = Message.makeGroupMessage(SENDER_NAME, MESSAGE_TEXT, DUMMY_GROUP_NAME);
     private static final String DUMMY_MSG_UNIQUE_KEY = "dummy_key";
@@ -3010,5 +3088,7 @@ public class TestClientRunnable {
     private static final ConversationalMessage TEST_USER_MESSAGE = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, MESSAGE_KEY);
     private static final ConversationalMessage TEST_USER_MESSAGE2 = new ConversationalMessage(SENDER_NAME, MESSAGE_TEXT, ANOTHER_USER, null, ANOTHER_MESSAGE_KEY);
     private static final Message GET_PAST_MESSAGES = Message.makeGetPastMessages(SENDER_NAME);
+    private static final Message TAP_USER_MESSAGE = Message.makeTapUserMessage(GOVERNMENT,SENDER_NAME);
+    private static final Message TAP_USER_MESSAGE_NORMAL_USER = Message.makeTapUserMessage(SENDER_NAME,SENDER_NAME);
 
 }

@@ -290,7 +290,7 @@ public class TestClientRunnable {
         TEST_USER_MESSAGE2.setGroupUniqueKey(DUMMY_GROUP_MESSAGE_KEY);
         testMsgs.add(TEST_USER_MESSAGE2);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
         when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
@@ -2906,7 +2906,7 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         List<ConversationalMessage> testMsgs = new ArrayList<>();
         testMsgs.add(mockedCM);
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_PAST_MESSAGES));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2923,7 +2923,7 @@ public class TestClientRunnable {
         List<ConversationalMessage> testMsgs = new ArrayList<>();
         testMsgs.add(mockedCM);
         when(mockedCM.getGroupUniqueKey()).thenReturn(GROUP_KEY);
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_PAST_MESSAGES));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2937,7 +2937,7 @@ public class TestClientRunnable {
     @Test
     public void testHandleGetPastMessagesWhenExceptionIsThrown() throws SQLException{
         clientRunnableObject.run();
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenThrow(SQLException.class);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenThrow(SQLException.class);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_PAST_MESSAGES));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -2955,7 +2955,7 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         List<ConversationalMessage> testMsgs = new ArrayList<>();
         testMsgs.add(mockedCM);
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
         clientRunnableObject.run();
@@ -3000,7 +3000,7 @@ public class TestClientRunnable {
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
         clientRunnableObject.run();
         when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER);
-        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenThrow(SQLException.class);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenThrow(SQLException.class);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());

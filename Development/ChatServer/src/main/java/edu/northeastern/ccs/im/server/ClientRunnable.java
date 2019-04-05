@@ -405,7 +405,7 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException - thrown by the database queries and calls
      */
     private void sendMessagesToUser(User currentUser) throws SQLException {
-        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName(), true);
+        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
         Message resultMessage = null;
         for(ConversationalMessage m: unsentMessages) {
             resultMessage = createMessageFromConversationalMessage(m);
@@ -1291,7 +1291,7 @@ public class ClientRunnable implements Runnable {
     private void handleGetPastMessages(Message msg){
         List<ConversationalMessage> msgs = new ArrayList<>();
         try {
-            msgs = conversationalMessagesService.getUnsentMessagesForUser(msg.getName(), false);
+            msgs = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
         }catch (Exception e){
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
             return;
@@ -1318,7 +1318,7 @@ public class ClientRunnable implements Runnable {
                         " with SRH");
             } else {
                 List<ConversationalMessage> msgs = conversationalMessagesService.
-                        getUnsentMessagesForUser(msg.getTextOrPassword(), false);
+                        getMessagesForUser(msg.getTextOrPassword(), false);
                 List<String> conversations = helperFormatMessagesString(msgs);
                 for(String s : conversations)
                     enqueuePrattleResponseMessage(s);

@@ -1094,7 +1094,7 @@ public class ClientRunnable implements Runnable {
                 //Split the string into key and value pair
                 String[] keyValuePair = msg.getReceiverOrPassword().split(":");
                 String attributeName = getGroupAttributeName(keyValuePair[0]);
-                if (groupService.updateGroupSettings(msg.getTextOrPassword(), attributeName, keyValuePair[1]))
+                if (this.handleGroupUpdate(group.getGroupName(), attributeName, keyValuePair[1]))
                     this.enqueuePrattleResponseMessage("Group setting updated successfully");
                 else
                     this.enqueuePrattleResponseMessage("Failed updating the group setting.");
@@ -1106,7 +1106,70 @@ public class ClientRunnable implements Runnable {
                     "group update syntax using HELP UPG");
         }
     }
-
+    
+    
+    /**
+     * Handles the updating of group setting based on particular attribute.
+     *
+     * @param groupName      the group name
+     * @param attributeName  the attribute name
+     * @param attributeValue the attribute value
+     * @return the boolean   True if the attribute was successfully updated, false otherwise
+     * @throws SQLException the sql exception
+     */
+    private boolean handleGroupUpdate(String groupName , String attributeName , String attributeValue) throws SQLException {
+    	boolean result = false;
+    	if (attributeName.compareTo("is_searchable") == 0) 
+    		result = handleGroupUpdateForIsSearchable(groupName, attributeName, attributeValue);
+    	if (attributeName.compareTo("moderator_name") == 0)   	
+    		result = handleGroupUpdateForModeratorChange(groupName, attributeName, attributeValue);
+    	return result;
+    }
+    
+    /**
+     * Handles the updating of group setting moderator_name attribute.
+     *
+     * @param groupName      the group name
+     * @param attributeName  the attribute name
+     * @param attributeValue the attribute value which can be a group member
+     * @return the boolean   True if the attribute was successfully updated, false otherwise
+     * @throws SQLException the sql exception
+     */
+    private boolean handleGroupUpdateForModeratorChange(String groupName , String attributeName , String attributeValue) throws SQLException {
+    	boolean result = false;
+    	User nextModerator = userService.getUserByUserName(attributeValue);
+    	if(nextModerator == null) {
+    		this.enqueuePrattleResponseMessage("The user you provided does not exist");
+    	}
+    	else if(!groupService.checkMembershipInGroup(groupName, nextModerator.getUserName())) {
+    		this.enqueuePrattleResponseMessage("The user you are trying to make a moderator is not a member of the group");
+    	}
+    	else
+    		result = groupService.updateGroupSettings(groupName, attributeName, nextModerator.getUserName());	
+    	return result;
+	}
+    
+    /**
+     * Handles the updating of group setting based on is_searchable attribute.
+     *
+     * @param groupName      the group name
+     * @param attributeName  the attribute name
+     * @param attributeValue the attribute value which can 0/1/true/false
+     * @return the boolean   True if the attribute was successfully updated, false otherwise
+     * @throws SQLException the sql exception
+     */
+    private boolean handleGroupUpdateForIsSearchable(String groupName , String attributeName , String attributeValue) throws SQLException {
+    	boolean result = false;
+    	if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {    
+            result = groupService.updateGroupSettings(groupName, attributeName, "0");
+        } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
+            result = groupService.updateGroupSettings(groupName, attributeName, "1");
+        } else
+            this.enqueuePrattleResponseMessage("Searchable values should be boolean (1/0 True/False)");
+    
+    	return result;
+	}
+    
     /**
      * This method is used for mapping the group setting number sent in the update group message
      * to the group setting name that is present in the database. This is a separate function since
@@ -1120,6 +1183,8 @@ public class ClientRunnable implements Runnable {
         String attributeName;
         if (attributeNumber.compareTo("1") == 0)
             attributeName = "is_searchable";
+        else if (attributeNumber.compareTo("2") == 0)
+            attributeName = "moderator_name";
         else
             throw new SQLException("Group setting number out of bounds");
         return attributeName;

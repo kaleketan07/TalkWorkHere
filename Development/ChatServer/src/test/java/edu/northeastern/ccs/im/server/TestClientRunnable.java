@@ -409,6 +409,20 @@ public class TestClientRunnable {
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REGISTER2));
         clientRunnableObject.run();
     }
+    
+    /**
+     * Test handleIncomingMessage() empty message Iterator from network connection
+     * which also tests the handleOutgoingMessage() with Register Message as the message type but invalid password
+     */
+    @Test
+    public void testHandleIncomingMessageWithIteratorWithRegisterMessageForValidUserRegisterPasswordFailInvalidPassword()
+            throws SQLException {
+        clientRunnableObject.run();
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(null);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, REGISTER3));
+        clientRunnableObject.run();
+    }
+    
 
     /**
      * Test handleIncomingMessage() empty message Iterator from network connection
@@ -3050,11 +3064,13 @@ public class TestClientRunnable {
 
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
+    static final String INVALID_USERNAME = "ThisUserNameCannotWork";
     private static final String HELLO = "hello";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final int USER_ID = 120000;
     private static final String GROUP_NAME = "FAMILY";
-    private static final String PASS = "some_p@$$worD";
+    private static final String PASS = "1e_p@$$worD";
+    private static final String PASS2 = "invalid_Pass";
     private static final String INVITEE = "invitee";
     private static final String INVITER = "inviter";
     private static final String MODERATOR = "moderator";
@@ -3063,6 +3079,7 @@ public class TestClientRunnable {
     private static final Message LOGIN = Message.makeLoginMessage(SENDER_NAME, PASS);
     private static final Message REGISTER = Message.makeRegisterMessage(SENDER_NAME, PASS, PASS);
     private static final Message REGISTER2 = Message.makeRegisterMessage(SENDER_NAME, PASS, "");
+    private static final Message REGISTER3 = Message.makeRegisterMessage(SENDER_NAME, PASS2, PASS2);
     private static final Message BROADCAST = Message.makeBroadcastMessage(SENDER_NAME, MESSAGE_TEXT);
     private static final Message CREATE_INVITATION_MESSAGE = Message.makeCreateInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);
     private static final Message DELETE_INVITATION_MESSAGE = Message.makeDeleteInvitationMessage(SENDER_NAME, INVITEE, GROUP_NAME);

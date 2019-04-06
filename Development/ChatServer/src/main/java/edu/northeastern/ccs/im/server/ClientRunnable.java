@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
-
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
@@ -210,7 +209,7 @@ public class ClientRunnable implements Runnable {
     private boolean setUserName(String userName) {
         boolean result = false;
         // Now make sure this name is legal.
-        if (userName != null) {
+        if (isValidUserName(userName)) {
             if (userClients.getOrDefault(userName, null) == null) {
                 // Optimistically set this users ID number.
                 setName(userName);
@@ -351,15 +350,48 @@ public class ClientRunnable implements Runnable {
         if (currentUser != null) {
             this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
-            // since the user was not found, a new user with this name may be created
-            if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
-                userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            // since the user was not found, a new user with this name may be created after password validation checks
+        	String password = msg.getTextOrPassword();
+        	String confirmPassword = msg.getReceiverOrPassword();
+            if (isValidPassword(password)) {
+            	if (password.equals(confirmPassword)) {
+	                userService.createUser(new User(null, null, msg.getName(), password, true));
+	                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            	} else {
+            		this.enqueuePrattleResponseMessage("Password and confirm password do not match");
+            	}
             } else {
-                this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
+                this.enqueuePrattleResponseMessage("Password not strong enough. Make sure the password:\n"
+                		+ "1. is 5 to 12 characters long.\n"
+                		+ "2. contains atleast one uppercase and one lowercase characters.\n"
+                		+ "3. contains atleast one digit from 0-9.\n"
+                		+ "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
+                		+ "5. contains no spaces");
             }
 
         }
+    }
+    
+    
+    /**
+     * Checks if passed userName is valid.
+     *
+     * @param userName the user name of the user
+     * @return true, if user name passes the checks of validity, else returns false
+     */
+    private boolean isValidUserName(String userName) {
+    	return (userName != null && userName.length() < 12);
+    }
+    
+    /**
+     * Checks if is valid password.
+     *
+     * @param password the password
+     * @return true, if the password satisfies all valid password checks
+     */
+    private boolean isValidPassword(String password) {
+    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{5,12}$";
+    	return password.matches(pattern);
     }
 
     /**

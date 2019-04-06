@@ -1379,6 +1379,58 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
+    
+    /**
+     * Test update group message when group is present but user is not moderator.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentAndUserIsNotModerator() throws SQLException {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "2:kp2");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test update group message when group is present and changing moderator.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentWithChangeInmoderator() throws SQLException {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "2:kp2");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON, USER_LOGGED_ON, null);
+        when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test update group message when group is present and changing moderator with valid moderator.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentWithChangeInmoderatorWithValidModerator() throws SQLException {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "2:kp2");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        USER_LOGGED_ON.setLoggedIn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(USER_LOGGED_ON);
+        when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
     /**
      * Test update group message when group is present but user is moderator for true.
@@ -1391,7 +1443,57 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
+    
+    
+    /**
+     * Test update group message when group is present but user is moderator for true.
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForFalseWithSearch() {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:false");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test update group message when group is present but user is moderator for true.
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForTrueSearchability() {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:1");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
+    /**
+     * Test update group message when group is present but user is moderator for true.
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForTrueSearchabilityTrue() {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:true");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
 
+    
+    /**
+     * Test update group message when group is present but user is moderator for true.
+     */
+    @Test
+    public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorForWrongSearchability() {
+        clientRunnableObject.run();
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "1:2");
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+    
     /**
      * Test update group message when group is present but user is moderator for false.
      *
@@ -1430,7 +1532,7 @@ public class TestClientRunnable {
     @Test
     public void testUpdateGroupMessageWhenGroupIsPresentButUserIsModeratorWhenAttributeNumberIsOutOfBounds() {
         clientRunnableObject.run();
-        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "2:0");
+        Message updateGroupMessage = Message.makeUpdateGroupMessage(SENDER_NAME, "PresentGroup", "3:0");
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, updateGroupMessage));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());

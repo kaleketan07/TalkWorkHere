@@ -1,13 +1,18 @@
 # CS5500-Prattle Server
 Prattle is a network server that communicates with IM clients that connect to it.  The capabilities of the server have been described below:
 
-##### Current Version
+## Current Version
 2.0
 
-##### Prerequisites/ Installations:
+## Prerequisites/ Installations:
 - `Java 8`
 
-##### Features
+## Status
+
+![Build Status](https://www.5500jenkins-2.cciscloud.com/job/team-201-SP19/job/master/badge/icon)
+
+
+## Features
 
 The following handles can be used to use the client jar to interact with other clients when the Prattle server is running:
 

@@ -38,8 +38,8 @@ The latest Client jar can be found [at this location](https://github.ccs.neu.edu
 |GFE|Get all the users you are following|`GFE`|Completed|
 |FWU|Follow a user|`FWU;{Username}`|Completed|
 |UFU|Unfollow a user|`UFU;{Username}`|Completed|
-|SRH|Search for a group or a user|`SRH;User;{Search String}`|Completed|
-|SRH|Search for a group or a group|`SRH;Group;{Search String}`|Completed|                                    
+|SRH|Search for a user|`SRH;User;{Search String}`|Completed|
+|SRH|Search for a group|`SRH;Group;{Search String}`|Completed|                                    
 |DLU|Delete a user account|`DLU`|Completed|
 |IUG|Invite a user to join a group that you are part of|`IUG;{Username};{Groupname}`|Completed|
 |DUI|Delete an invitation sent by you to a user|`DUI;{Username};{Groupname}`|Completed|
@@ -48,4 +48,5 @@ The latest Client jar can be found [at this location](https://github.ccs.neu.edu
 |AIM|Approve an invitation for a group, of which you are a moderator|`AIM;{Username};{Groupname}`|Completed|
 |RIM|Reject an invitation for a group, of which you are a moderator|`RIM;{Username};{Groupname}`|Completed|
 |GPM|Get all your past messages|`GPM`|Completed|
+|GOU|Get online users that you are following|`GOU`|Completed|
 |LGP|Leave group|`LGP;{GroupName}`|In Progress|

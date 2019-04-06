@@ -2962,7 +2962,7 @@ public class TestClientRunnable {
 
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";
-    static final String SENDER_NAME2 = "ThisUserNameCannotWork";
+    static final String INVALID_USERNAME = "ThisUserNameCannotWork";
     private static final String HELLO = "hello";
     private static final String MESSAGE_TEXT = "Hello, I am Alice";
     private static final int USER_ID = 120000;

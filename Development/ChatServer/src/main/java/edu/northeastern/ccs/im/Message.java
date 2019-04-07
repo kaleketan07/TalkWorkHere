@@ -280,6 +280,8 @@ public class Message {
             return makeGetFolloweesMessage(srcName);
         } else if (handle.compareTo(MessageType.GET_ONLINE_USERS.toString()) == 0) {
             return makeGetOnlineUserMessage(srcName);
+        } else if (handle.compareTo(MessageType.TAP_USER.toString()) == 0) {
+            return makeTapUserMessage(srcName,textOrPassword);
         }
         return null;
     }
@@ -755,8 +757,19 @@ public class Message {
      * @param userOfInterest the username of the person of interest
      * @return a new Message object of type Get Conversation History
      */
-    public static Message makeGetConversationHistory(String srcName, String userOfInterest){
+    public static Message makeGetConversationHistory(String srcName, String userOfInterest) {
         return new Message(MessageType.GET_CONVERSATION_HISTORY, srcName, userOfInterest);
+    }
+
+    /**
+     * Make tap user message message.
+     *
+     * @param srcName        the src name
+     * @param userOfInterest the user of interest
+     * @return the message object of type TAP_USER
+     */
+    public static Message makeTapUserMessage(String srcName, String userOfInterest){
+        return new Message(MessageType.TAP_USER, srcName, userOfInterest);
     }
 
     /**
@@ -1190,6 +1203,13 @@ public class Message {
      * @return - true if it is that message, false otherwise
      */
     public boolean isGetConversationHistory(){ return (msgType == MessageType.GET_CONVERSATION_HISTORY);}
+
+    /**
+     * Is tap user message boolean.
+     *
+     * @return true or false based on the condition evaluation for the handle
+     */
+    public boolean isTapUserMessage() { return (msgType == MessageType.TAP_USER); }
 
     /**
      * Representation of this message as a String. This begins with the message

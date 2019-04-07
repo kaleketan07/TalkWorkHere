@@ -1470,6 +1470,29 @@ public class ClientRunnable implements Runnable {
     }
 
 
+    /**
+     * Method to tap a user of interest, provided the operation is requested by the government and
+     * the user of interest is present in the system.
+     *
+     * @param msg the message object sent by the government.
+     */
+    private void handleTapUserMessage(Message msg){
+        try{
+            if(!msg.getName().equalsIgnoreCase(GOVERNMENT))
+                enqueuePrattleResponseMessage("Sorry, you are not allowed to do this operation");
+            else if(userService.getUserByUserName(msg.getTextOrPassword()) == null)
+                enqueuePrattleResponseMessage("This user does not exist, please check the username again.");
+            else{
+                if(userService.tapUser(msg.getTextOrPassword()))
+                    enqueuePrattleResponseMessage(msg.getTextOrPassword() + " is now being tapped.");
+                else
+                    enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
+            }
+        }catch (Exception e){
+            ChatLogger.error(e.getMessage());
+            enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, please try again.");
+        }
+    }
 
     /**
      * This method handles general messages
@@ -1591,6 +1614,9 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isGetOnlineUsersMessage()) {
             handleGetOnlineUserMessage(msg);
+            return true;
+        } else if (msg.isTapUserMessage()) {
+            handleTapUserMessage(msg);
             return true;
         }
         return false;

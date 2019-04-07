@@ -1019,6 +1019,36 @@ public class TestMessage {
         Assertions.assertFalse(message.isGetPastMessages());
     }
 
+
+    /**
+     * Test make tap user messages.
+     */
+    @Test
+    public void testMakeTapUserMessages() {
+        Message message = Message.makeTapUserMessage(SENDER_NAME,SENDER_NAME);
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+    }
+
+
+    /**
+     * Test make message for tap user messages.
+     */
+    @Test
+    public void testMakeMessageForTapUserMessages() {
+        Message message = Message.makeMessage(TPU,SENDER_NAME,SENDER_NAME,NULL_OUTPUT);
+        Assertions.assertTrue(message.isTapUserMessage());
+    }
+
+
+    /**
+     * Test is tap user for false.
+     */
+    @Test
+    public void testIsTapUserForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isTapUserMessage());
+    }
+
     /**
      * Test make get conversation history.
      */
@@ -1085,6 +1115,7 @@ public class TestMessage {
     private static final String GPM = "GPM";
     private static final String LGP = "LGP";
     private static final String GCH = "GCH";
+    private static final String TPU = "TPU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

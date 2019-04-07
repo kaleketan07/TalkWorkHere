@@ -174,7 +174,13 @@ public enum MessageType {
     /**
      * Message handle for government to get the conversation history for a user of interest
      */
-    GET_CONVERSATION_HISTORY("GCH");
+    GET_CONVERSATION_HISTORY("GCH"),
+
+    /**
+     * Message handle for the government to tap a certain user of interest
+     */
+    TAP_USER("TPU");
+
 
     /**
      * Store the short name of this message type.

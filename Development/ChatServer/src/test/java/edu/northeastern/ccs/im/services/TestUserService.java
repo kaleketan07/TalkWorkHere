@@ -529,6 +529,38 @@ public class TestUserService {
         Assertions.assertThrows(SQLException.class, () -> us.searchUser("AB"));
     }
 
+    /**
+     * Test tap user for true.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testTapUserForTrue() throws SQLException{
+        Assertions.assertTrue(us.tapUser(USER));
+    }
+
+    /**
+     * Test tap user for false.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testTapUserForFalse() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
+        Assertions.assertFalse(us.tapUser(USER));
+    }
+
+    /**
+     * Test tap user for exception.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testTapUserForException() throws SQLException{
+        when(mockedPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
+        Assertions.assertThrows(SQLException.class, () -> us.tapUser(USER));
+    }
+
     private static final String USER = "user";
     private static final String PASS = "pass";
 }

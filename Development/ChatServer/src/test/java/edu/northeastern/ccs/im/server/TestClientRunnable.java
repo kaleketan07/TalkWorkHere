@@ -3059,8 +3059,29 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
-
-
+    @Test
+    public void testHandleLoginMessageWhenTheUserIsTapped() throws SQLException{
+    	clientRunnableObject.run();
+        List<ConversationalMessage> testMsgs = new ArrayList<>();
+        testMsgs.add(TEST_USER_MESSAGE);
+        TEST_USER_MESSAGE2.setGroupUniqueKey(DUMMY_GROUP_MESSAGE_KEY);
+        testMsgs.add(TEST_USER_MESSAGE2);
+        User mockedGovtUser = Mockito.mock(User.class);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+        when(mockedUser.isTapped()).thenReturn(true);
+        when(mockedcms.getUnsentMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(mockedGovtUser);
+        clientRunnableObject.run();
+        Mockito.verify(mockedUser, Mockito.atLeastOnce()).enqueueMessageToUser(Mockito.any(), Mockito.anyString());
+        Mockito.verify(mockedcms, Mockito.atLeastOnce()).markMessageAsSent(Mockito.anyString());
+        Mockito.verify(mockedUserService, Mockito.atLeastOnce()).getUserByUserName(Mockito.anyString());
+        Mockito.verify(mockedGovtUser, Mockito.atLeastOnce()).userSendMessage(Mockito.any());
+        
+    }
+    
+    
 
     //Private fields to be used in tests
     static final String SENDER_NAME = "Alice";

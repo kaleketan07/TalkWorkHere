@@ -3059,6 +3059,11 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test handle login message when the user is tapped.
+     *
+     * @throws SQLException the SQL exception
+     */
     @Test
     public void testHandleLoginMessageWhenTheUserIsTapped() throws SQLException{
     	clientRunnableObject.run();

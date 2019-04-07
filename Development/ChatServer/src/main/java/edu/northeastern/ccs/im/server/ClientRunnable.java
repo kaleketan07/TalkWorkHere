@@ -50,6 +50,11 @@ public class ClientRunnable implements Runnable {
     private String name;
 
     /**
+     * private final string for a government user
+     */
+    private final String GOVERNMENT = "government";
+
+    /**
      * Whether this client has been initialized, set its user name, and is ready to
      * receive messages.
      */
@@ -1421,7 +1426,7 @@ public class ClientRunnable implements Runnable {
      */
     private void handleTapUserMessage(Message msg){
         try{
-            if(!msg.getName().equalsIgnoreCase("government"))
+            if(!msg.getName().equalsIgnoreCase(GOVERNMENT))
                 enqueuePrattleResponseMessage("Sorry, you are not allowed to do this operation");
             else if(userService.getUserByUserName(msg.getTextOrPassword()) == null)
                 enqueuePrattleResponseMessage("This user does not exist, please check the username again.");

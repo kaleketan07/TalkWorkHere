@@ -23,7 +23,7 @@ import edu.northeastern.ccs.im.services.UserService;
  * server. After instantiation, it is executed periodically on one of the
  * threads from the thread pool and will stop being run only when the client
  * signs off.
- *
+ * <p>
  * This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
  * International License. To view a copy of this license, visit
  * http://creativecommons.org/licenses/by-sa/4.0/. It is based on work
@@ -48,6 +48,11 @@ public class ClientRunnable implements Runnable {
      * Name that the client used when connecting to the server.
      */
     private String name;
+
+    /**
+     * private final string for a government user
+     */
+    private final String GOVERNMENT = "government";
 
     /**
      * Whether this client has been initialized, set its user name, and is ready to
@@ -1393,9 +1398,7 @@ public class ClientRunnable implements Runnable {
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
             return;
         }
-        List<String> conversations = helperFormatMessagesString(msgs);
-        for(String s : conversations)
-            enqueuePrattleResponseMessage(s);
+        this.helperFormatAndEnqueueMessages(msgs);
     }
 
 
@@ -1408,7 +1411,7 @@ public class ClientRunnable implements Runnable {
     private void handleGetConversationHistory(Message msg){
         try {
             // Check if the message is from the government
-            if (!msg.getName().equalsIgnoreCase("government")) {
+            if (!msg.getName().equalsIgnoreCase(GOVERNMENT)) {
                 enqueuePrattleResponseMessage("Sorry, you are not allowed to perform this operation");
             } else if (userService.getUserByUserName(msg.getTextOrPassword()) == null){
                 enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct username" +
@@ -1416,14 +1419,23 @@ public class ClientRunnable implements Runnable {
             } else {
                 List<ConversationalMessage> msgs = conversationalMessagesService.
                         getMessagesForUser(msg.getTextOrPassword(), false);
-                List<String> conversations = helperFormatMessagesString(msgs);
-                for(String s : conversations)
-                    enqueuePrattleResponseMessage(s);
+                this.helperFormatAndEnqueueMessages(msgs);
             }
         }catch(SQLException e){
             ChatLogger.error(e.getMessage());
             enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again." );
         }
+    }
+
+    /**
+     * Helper method for formatting the message history and sending it to the appropriate user (user or government)
+     *
+     * @param msgs the list of conversational messages
+     */
+    private void helperFormatAndEnqueueMessages(List<ConversationalMessage> msgs){
+        List<String> conversations = helperFormatMessagesString(msgs);
+        for(String s : conversations)
+            enqueuePrattleResponseMessage(s);
     }
 
     /**

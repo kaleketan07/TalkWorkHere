@@ -169,7 +169,12 @@ public enum MessageType {
     /**
      * Message handle for a user to leave a group
      */
-    LEAVE_GROUP("LGP");
+    LEAVE_GROUP("LGP"),
+
+    /**
+     * Message handle for the government to tap a certain user of interest
+     */
+    TAP_USER("TPU");
 
     /**
      * Store the short name of this message type.

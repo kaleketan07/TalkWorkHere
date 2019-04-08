@@ -2,6 +2,7 @@ package edu.northeastern.ccs.im.db;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public interface IDBConnection {
 
@@ -20,5 +21,10 @@ public interface IDBConnection {
      * @throws SQLException - when an error occurs during database interaction
      */
     public PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException;
+
+    /**
+     * @return the instance of queryProperties
+     */
+	Properties getQueryProperties();
 
 }

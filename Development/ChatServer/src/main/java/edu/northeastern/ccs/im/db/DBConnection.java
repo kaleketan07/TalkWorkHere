@@ -24,6 +24,9 @@ public class DBConnection implements IDBConnection {
         String username = properties.getProperty("jdbc.username");
         String password = properties.getProperty("jdbc.password");
         connection = DriverManager.getConnection(url, username, password);
+        queryProperties = new Properties();
+        input = cl.getResourceAsStream("queryConfig.properties");
+        queryProperties.load(input);
     }
 
     /**
@@ -31,6 +34,7 @@ public class DBConnection implements IDBConnection {
      *
      * @throws SQLException - when an error occurs while closing the connection
      */
+    @Override
     public void close() throws SQLException {
         connection.close();
     }
@@ -42,9 +46,21 @@ public class DBConnection implements IDBConnection {
      * @return the PreparedStatement
      * @throws SQLException - when an error occurs while generating create statement on the connection
      */
+    @Override
     public PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException {
         return connection.prepareStatement(sqlQuery);
     }
-
+    
+    /**
+     * @return the instance of queryProperties
+     */
+    @Override
+    public Properties getQueryProperties() {
+		return queryProperties;
+    }
+    
     private Connection connection;
+    private Properties queryProperties;
+	
+
 }

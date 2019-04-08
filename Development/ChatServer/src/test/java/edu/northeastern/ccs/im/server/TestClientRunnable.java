@@ -3087,20 +3087,13 @@ public class TestClientRunnable {
         
     } 
     
-    
-    /**
-     * Test handle get conversation history for government.
-     * Test handle tap user for government for true.
-     *
-     * @throws SQLException the sql exception
-     */
-    @Test
 
     /**
      * Test handle get conversation history for government.
      *
      * @throws SQLException the sql exception
      */
+    @Test
     public void testHandleGetConversationHistoryForGovernment() throws SQLException {
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
@@ -3114,6 +3107,11 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test handle tap user for government for true.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testHandleTapUserForGovernmentForTrue() throws SQLException{
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);

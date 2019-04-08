@@ -3088,12 +3088,6 @@ public class TestClientRunnable {
     } 
     
     
-    /**
-     * Test handle get conversation history for government.
-     * Test handle tap user for government for true.
-     *
-     * @throws SQLException the sql exception
-     */
     @Test
 
     /**
@@ -3113,7 +3107,12 @@ public class TestClientRunnable {
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
-
+    
+    /**
+     * Test handle tap user for government for true.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testHandleTapUserForGovernmentForTrue() throws SQLException{
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
@@ -3160,6 +3159,39 @@ public class TestClientRunnable {
     public void testHandleGetConversationHistoryForNormalUser(){
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,GET_CONVERSATION_HISTORY_WRONG_USER));
+        clientRunnableObject.run();
+        assertTrue(clientRunnableObject.isInitialized());
+    }
+
+    /**
+     * Test handle get conversation history for non existing user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleGetConversationHistoryForNonExistingUser() throws SQLException {
+            when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+            when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+            clientRunnableObject.run();
+            when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER, null);
+            when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
+            clientRunnableObject.run();
+            assertTrue(clientRunnableObject.isInitialized());
+        }
+
+
+    /**
+     * Test handle tap user for non existing user.
+     *
+     * @throws SQLException the sql exception
+     */
+    @Test
+    public void testHandleTapUserForNonExistingUser() throws SQLException{
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
+        clientRunnableObject.run();
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(GOVERNMENT_USER,null);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, TAP_USER_MESSAGE));
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }

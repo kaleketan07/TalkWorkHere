@@ -280,6 +280,8 @@ public class Message {
             return makeGetFolloweesMessage(srcName);
         } else if (handle.compareTo(MessageType.GET_ONLINE_USERS.toString()) == 0) {
             return makeGetOnlineUserMessage(srcName);
+        } else if (handle.compareTo(MessageType.TAP_USER.toString()) == 0) {
+            return makeTapUserMessage(srcName,textOrPassword);
         }
         return null;
     }
@@ -308,6 +310,8 @@ public class Message {
             return makeDeletePrivateMessageMessage(srcName, textOrPassword);
         } else if(handle.compareTo(MessageType.GET_PAST_MESSAGES.toString()) == 0){
             return makeGetPastMessages(srcName);
+        } else if(handle.compareTo(MessageType.GET_CONVERSATION_HISTORY.toString()) == 0){
+            return makeGetConversationHistory(srcName,textOrPassword);
         }
         return null;
     }
@@ -746,6 +750,29 @@ public class Message {
     }
 
     /**
+     * Make a message of the type GCH (Get conversation history), that will retrieve all the messages of a user of
+     * interest
+     *
+     * @param srcName the username, which will be the government's username (or the appropriate third party
+     * @param userOfInterest the username of the person of interest
+     * @return a new Message object of type Get Conversation History
+     */
+    public static Message makeGetConversationHistory(String srcName, String userOfInterest) {
+        return new Message(MessageType.GET_CONVERSATION_HISTORY, srcName, userOfInterest);
+    }
+
+    /**
+     * Make tap user message message.
+     *
+     * @param srcName        the src name
+     * @param userOfInterest the user of interest
+     * @return the message object of type TAP_USER
+     */
+    public static Message makeTapUserMessage(String srcName, String userOfInterest){
+        return new Message(MessageType.TAP_USER, srcName, userOfInterest);
+    }
+
+    /**
      * Return the name of the sender of this message.
      *
      * @return String specifying the name of the message originator.
@@ -1163,9 +1190,26 @@ public class Message {
         return (msgType == MessageType.REJECT_INVITE_MODERATOR);
     }
 
+    /**
+     * Checks if the current message is of type Get Past Messages
+     * @return - true if it is that message, false otherwise
+     */
     public boolean isGetPastMessages(){
         return (msgType == MessageType.GET_PAST_MESSAGES);
     }
+
+    /**
+     * Checks if the current message is a government's message for getting the conversation history
+     * @return - true if it is that message, false otherwise
+     */
+    public boolean isGetConversationHistory(){ return (msgType == MessageType.GET_CONVERSATION_HISTORY);}
+
+    /**
+     * Is tap user message boolean.
+     *
+     * @return true or false based on the condition evaluation for the handle
+     */
+    public boolean isTapUserMessage() { return (msgType == MessageType.TAP_USER); }
 
     /**
      * Representation of this message as a String. This begins with the message

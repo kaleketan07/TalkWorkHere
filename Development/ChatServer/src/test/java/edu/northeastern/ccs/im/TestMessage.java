@@ -1019,6 +1019,63 @@ public class TestMessage {
         Assertions.assertFalse(message.isGetPastMessages());
     }
 
+
+    /**
+     * Test make tap user messages.
+     */
+    @Test
+    public void testMakeTapUserMessages() {
+        Message message = Message.makeTapUserMessage(SENDER_NAME,SENDER_NAME);
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+    }
+
+
+    /**
+     * Test make message for tap user messages.
+     */
+    @Test
+    public void testMakeMessageForTapUserMessages() {
+        Message message = Message.makeMessage(TPU,SENDER_NAME,SENDER_NAME,NULL_OUTPUT);
+        Assertions.assertTrue(message.isTapUserMessage());
+    }
+
+
+    /**
+     * Test is tap user for false.
+     */
+    @Test
+    public void testIsTapUserForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isTapUserMessage());
+    }
+
+    /**
+     * Test make get conversation history.
+     */
+    @Test
+    public void testMakeGetConversationHistory() {
+        Message message = Message.makeGetConversationHistory(SENDER_NAME,ANOTHER_USER);
+        Assertions.assertEquals(SENDER_NAME,message.getName());
+    }
+
+    /**
+     * Test make message for get Conversation history.
+     */
+    @Test
+    public void testMakeMessageForGetConversationHistory() {
+        Message message = Message.makeMessage(GCH,SENDER_NAME,ANOTHER_USER,NULL_OUTPUT);
+        Assertions.assertTrue(message.isGetConversationHistory());
+    }
+
+    /**
+     * Test is get conversation history for false condition.
+     */
+    @Test
+    public void testIsGetConversationHistoryForFalse() {
+        Message message = Message.makeQuitMessage(SENDER_NAME);
+        Assertions.assertFalse(message.isGetConversationHistory());
+    }
+
     /**
      * CONSTANTS to be used as expected values or method arguments
      **/
@@ -1057,6 +1114,8 @@ public class TestMessage {
     private static final String RIM = "RIM";
     private static final String GPM = "GPM";
     private static final String LGP = "LGP";
+    private static final String GCH = "GCH";
+    private static final String TPU = "TPU";
     private static final String NULL_OUTPUT = "--";
     private static final String SENDER_NAME = "Alice";
     private static final String PRATTLE = "Prattle";

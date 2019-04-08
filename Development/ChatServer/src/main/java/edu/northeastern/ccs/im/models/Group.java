@@ -19,8 +19,6 @@ public class Group implements Member {
 
     /**
      * Instantiates a new group.
-     *
-     * @param name, the name of the group
      */
     public Group() {
         this.memberUsers = new HashSet<>();
@@ -74,7 +72,7 @@ public class Group implements Member {
     /**
      * Sets the group name.
      *
-     * @param name, the new group name
+     * @param name      the new group name
      */
     public void setGroupName(String name) {
         this.groupName = name;
@@ -83,7 +81,7 @@ public class Group implements Member {
     /**
      * Gets the moderator name.
      *
-     * @return the moderator name
+     * @return String   the moderator name
      */
     public String getModeratorName() {
         return this.moderatorName;
@@ -92,7 +90,7 @@ public class Group implements Member {
     /**
      * Sets the moderator name.
      *
-     * @param name, the new moderator name
+     * @param name      the new moderator name
      */
     public void setModeratorName(String name) {
         this.moderatorName = name;
@@ -101,7 +99,7 @@ public class Group implements Member {
     /**
      * Gets the member users.
      *
-     * @return the member users
+     * @return Set      the set of member users
      */
     public Set<User> getMemberUsers() {
         return this.memberUsers;
@@ -110,7 +108,7 @@ public class Group implements Member {
     /**
      * Gets the member groups.
      *
-     * @return the member groups
+     * @return Set      the set of member groups
      */
     public Set<Group> getMemberGroups() {
         return this.memberGroups;
@@ -119,7 +117,7 @@ public class Group implements Member {
     /**
      * Sets the member users.
      *
-     * @param users the new member users
+     * @param users     the set of new member users
      */
     public void setMemberUsers(Set<User> users) {
         this.memberUsers = users;
@@ -128,7 +126,7 @@ public class Group implements Member {
     /**
      * Sets the member groups.
      *
-     * @param groups the new member groups
+     * @param groups    the set of new member groups
      */
     public void setMemberGroups(Set<Group> groups) {
         this.memberGroups = groups;
@@ -137,8 +135,8 @@ public class Group implements Member {
     /**
      * Send message to members of this group
      *
-     * @param msg the message to be sent
-     * @throws SQLException the SQL exception
+     * @param msg           the message to be sent
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     public void groupSendMessage(Message msg, String uniqueGroupKey) throws SQLException {
         // send message to member users
@@ -157,6 +155,13 @@ public class Group implements Member {
         }
     }
 
+    /**
+     * The overriden equals method to check if the two group objects are equal, based on the group name of the given
+     * group objects
+     *
+     * @param obj       The object to be checked for equality with the current object
+     * @return boolean  true if the current and given objects have same group name, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Group) {
@@ -165,6 +170,11 @@ public class Group implements Member {
         return false;
     }
 
+    /**
+     * Overridden method to generate unique hashcode for every Group object
+     *
+     * @return  int     a unique integer for every Group object
+     */
     @Override
     public int hashCode() {
         return (this.groupName != null) ? 31 * groupName.hashCode() : 0;

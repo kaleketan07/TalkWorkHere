@@ -79,7 +79,24 @@ public class TestUser {
         ALICE.setLoggedIn(false);
         assertFalse(ALICE.isLoggedIn());
     }
-
+    
+    /**
+     * Test is tapped for false.
+     */
+    @Test
+    public void testIsTappedForFalse() {
+        ALICE.setTapped(false);
+        assertFalse(ALICE.isTapped());
+    }
+    
+    /**
+     * Test is tapped for true.
+     */
+    @Test
+    public void testIsTappedForTrue() {
+        ALICE.setTapped(true);
+        assertTrue(ALICE.isTapped());
+    }
 
     /**
      * Test user send message when ClientRunnable is Null and not initialized

@@ -22,6 +22,7 @@ public class User {
     private boolean loggedIn;
     private static ConversationalMessageService cms;
     private boolean searchable;
+    private boolean isTapped;
 
     static {
         try {
@@ -48,9 +49,25 @@ public class User {
         this.loggedIn = loggedInStatus;
         this.clientRunnable = null;
         this.searchable = true;
+        this.isTapped = false;
     }
 
     /**
+     * @return true, if the user that this object represents is tapped, else returns false
+     */
+    public boolean isTapped() {
+		return isTapped;
+	}
+
+	/**
+	 * Sets the tapped flag for the user that this object represents.
+	 * @param isTapped the value that denotes the user is tapped or not
+	 */
+	public void setTapped(boolean isTapped) {
+		this.isTapped = isTapped;
+	}
+
+	/**
      * @return firstName of the user
      */
     public String getFirstName() {

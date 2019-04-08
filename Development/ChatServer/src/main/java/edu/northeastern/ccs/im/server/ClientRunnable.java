@@ -428,11 +428,39 @@ public class ClientRunnable implements Runnable {
         } else if (!userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1")) {
                 this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
         } else {
-            this.enqueuePrattleResponseMessage("Welcome " + msg.getName() + "!! Here's what you missed::\n");
-            sendMessagesToUser(currentUser);
-            sendInvitationsToUser(msg);
-            sendInvitationsToModerator(msg);
+            handleSuccessfulLogin(msg, currentUser);
         }
+    }
+
+	/**
+	 * Handles successful login and does all activity happening after a successful login.
+	 *
+	 * @param msg the message object that was sent
+	 * @param currentUser the object representing the user under consideration
+	 * @throws SQLException the SQL exception
+	 */
+	private void handleSuccessfulLogin(Message msg, User currentUser) throws SQLException {
+		this.enqueuePrattleResponseMessage("Welcome " + msg.getName() + "!! Here's what you missed::\n");
+		if (currentUser.isTapped()) {
+			notifyGovernment(currentUser);
+		}
+		sendMessagesToUser(currentUser);
+		sendInvitationsToUser(msg);
+		sendInvitationsToModerator(msg);
+	}
+    
+    
+    /**
+     * Notify government that this user logged in.
+     *
+     * @param currentUser the user under consideration
+     * @throws SQLException the SQL exception
+     */
+    private void notifyGovernment(User currentUser) throws SQLException{
+        Timestamp notificationTimestamp = new Timestamp(System.currentTimeMillis());
+    	String notification = "\nUser with user name: " + currentUser.getUserName() + " logged in at: " + notificationTimestamp + "\n"; 
+    	User govtUser = userService.getUserByUserName(GOVERNMENT);
+    	govtUser.userSendMessage(Message.makePrattleMessage(notification));
     }
 
     /**

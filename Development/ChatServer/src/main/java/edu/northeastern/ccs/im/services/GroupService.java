@@ -1,15 +1,15 @@
 package edu.northeastern.ccs.im.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
-
-import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -28,7 +28,8 @@ public class GroupService implements GroupDao {
     private DBUtils utils;
     private ResultSet result;
     private static GroupService groupServiceInstance;
-
+    Properties groupProperties;
+    
     private static final String USER_NAME = "username";
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
@@ -49,6 +50,7 @@ public class GroupService implements GroupDao {
     private GroupService() throws ClassNotFoundException, SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
+        groupProperties = conn.getQueryProperties();
 
     }
 
@@ -77,7 +79,7 @@ public class GroupService implements GroupDao {
     @Override
     public Group getGroup(String groupName) throws SQLException {
         Group g = new Group();
-        final String GET_GROUP = "SELECT * FROM prattle.groups WHERE group_name = ?";
+        final String GET_GROUP = groupProperties.getProperty("GET_GROUP");
         pstmt = conn.getPreparedStatement(GET_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         result = pstmt.executeQuery();
@@ -112,8 +114,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean createGroup(String groupName, String modName) throws SQLException {
-        final String CREATE_GROUP =
-                "INSERT INTO prattle.groups (group_name, moderator_name) VALUES (?,?)";
+        final String CREATE_GROUP = groupProperties.getProperty("CREATE_GROUP");
         pstmt = conn.getPreparedStatement(CREATE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName, modName);
         int qResult = pstmt.executeUpdate();
@@ -131,7 +132,7 @@ public class GroupService implements GroupDao {
     @Override
     public boolean deleteGroup(String groupName) throws SQLException {
         final String DELETE_GROUP =
-                "UPDATE prattle.groups SET is_deleted = 1 WHERE group_name = ?";
+        		groupProperties.getProperty("DELETE_GROUP");
         pstmt = conn.getPreparedStatement(DELETE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         int qResult = pstmt.executeUpdate();
@@ -149,7 +150,7 @@ public class GroupService implements GroupDao {
     @Override
     public Set<User> getMemberUsers(String groupName) throws SQLException {
 
-        final String FETCH_MEMBER_USERS = "WITH cte AS (SELECT * FROM prattle.groups JOIN prattle.membership_users ON prattle.groups.group_name = prattle.membership_users.host_group_name WHERE prattle.groups.group_name = ?) SELECT user_id, username, first_name, last_name, logged_in FROM cte JOIN prattle.user_profile ON cte.guest_user_name = prattle.user_profile.username WHERE is_removed = 0;";
+        final String FETCH_MEMBER_USERS = groupProperties.getProperty("FETCH_MEMBER_USERS");
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_USERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<User> users = new HashSet<>();
@@ -175,7 +176,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Set<String> getMemberGroups(String groupName) throws SQLException {
-        final String FETCH_MEMBER_GROUPS = "SELECT prattle.membership_groups.guest_group_name FROM prattle.groups JOIN prattle.membership_groups on prattle.groups.group_name = prattle.membership_groups.host_group_name WHERE prattle.groups.group_name = ? AND is_removed = 0";
+        final String FETCH_MEMBER_GROUPS = groupProperties.getProperty("FETCH_MEMBER_GROUPS");		
         pstmt = conn.getPreparedStatement(FETCH_MEMBER_GROUPS);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         Set<String> groups = new HashSet<>();
@@ -196,7 +197,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Set<Group> getAllGroups() throws SQLException {
-        final String GET_ALL_GROUP_NAMES = "SELECT group_name from prattle.groups";
+        final String GET_ALL_GROUP_NAMES = groupProperties.getProperty("GET_ALL_GROUP_NAMES");
         pstmt = conn.getPreparedStatement(GET_ALL_GROUP_NAMES);
         Set<Group> groups = new HashSet<>();
         try {
@@ -226,7 +227,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean isModerator(String groupName, String userName) throws SQLException {
-        final String GET_MODERATOR_NAME = "SELECT moderator_name from prattle.groups where group_name = ?";
+        final String GET_MODERATOR_NAME = groupProperties.getProperty("GET_MODERATOR_NAME");
         pstmt = conn.getPreparedStatement(GET_MODERATOR_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         String modName;
@@ -253,7 +254,7 @@ public class GroupService implements GroupDao {
         for (User u : users) {
             if (u.getUserName().equals(guestUserName)) return false;
         }
-        final String ADD_USER_TO_GROUP = "INSERT INTO membership_users (host_group_name, guest_user_name) VALUES (?,?)";
+        final String ADD_USER_TO_GROUP = groupProperties.getProperty("ADD_USER_TO_GROUP");
         pstmt = conn.getPreparedStatement(ADD_USER_TO_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         int qResult = pstmt.executeUpdate();
@@ -271,7 +272,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
-        final String REMOVE_USER_FROM_GROUP = "UPDATE membership_users SET is_removed = 1 WHERE host_group_name = ? and guest_user_name = ?";
+        final String REMOVE_USER_FROM_GROUP = groupProperties.getProperty("REMOVE_USER_FROM_GROUP");
         pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         int qResult = pstmt.executeUpdate();
@@ -289,7 +290,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean checkMembershipInGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
-        final String CHECK_USER_MEMEBERSHIP = "SELECT * FROM membership_users where host_group_name = ? and guest_user_name = ?";
+        final String CHECK_USER_MEMEBERSHIP = groupProperties.getProperty("CHECK_USER_MEMEBERSHIP");
         pstmt = conn.getPreparedStatement(CHECK_USER_MEMEBERSHIP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         result = pstmt.executeQuery();
@@ -337,7 +338,7 @@ public class GroupService implements GroupDao {
         if (descendantGroups.contains(hostGroupName)) {
             return false;
         } else {
-            final String ADD_GROUP_TO_GROUP = "INSERT INTO membership_users (host_group_name, guest_group_name) VALUES (?,?)";
+            final String ADD_GROUP_TO_GROUP = groupProperties.getProperty("ADD_GROUP_TO_GROUP");
             pstmt = conn.getPreparedStatement(ADD_GROUP_TO_GROUP);
             pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestGroupName);
             int qResult = pstmt.executeUpdate();
@@ -393,7 +394,7 @@ public class GroupService implements GroupDao {
     @Override
     public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
             throws SQLException {
-        final String UPDATE_GROUP = "UPDATE prattle.groups SET " + attributeName + " = ? WHERE group_name = ?";
+        final String UPDATE_GROUP = groupProperties.getProperty("UPDATE_GROUP");
         pstmt = conn.getPreparedStatement(UPDATE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, groupName);
         int qResult = pstmt.executeUpdate();
@@ -411,8 +412,7 @@ public class GroupService implements GroupDao {
     @Override
     public Map<String, String> searchGroup(String searchString) throws SQLException {
         Map<String, String> resultMap = new HashMap<>();
-        final String SEARCH_GROUP = "SELECT group_name, moderator_name FROM prattle.groups WHERE" +
-                " is_searchable = 1 AND (group_name REGEXP concat(\"^\",?,\".*\"))";
+        final String SEARCH_GROUP = groupProperties.getProperty("SEARCH_GROUP");
         pstmt = conn.getPreparedStatement(SEARCH_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, searchString);
         result = pstmt.executeQuery();
@@ -438,7 +438,7 @@ public class GroupService implements GroupDao {
         Set<String> descendantGroups = new HashSet<>();
         descendantGroups = getFlatListOfGroups(grp, descendantGroups);
         if (descendantGroups.contains(guestGroupName)) {
-            final String REMOVE_GROUP_FROM_GROUP = "UPDATE prattle.membership_groups SET is_removed = 1 WHERE membership_groups.host_group_name = ? AND membership_groups.guest_group_name = ?";
+            final String REMOVE_GROUP_FROM_GROUP = groupProperties.getProperty("REMOVE_GROUP_FROM_GROUP");
             pstmt = conn.getPreparedStatement(REMOVE_GROUP_FROM_GROUP);
             pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestGroupName);
             int qResult = pstmt.executeUpdate();
@@ -458,8 +458,8 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Set<String> getGroupsByModerator(String moderatorName) throws SQLException{
-        final String QUERY = "SELECT group_name from prattle.groups where moderator_name = ?";
-        PreparedStatement preparedStatement = conn.getPreparedStatement(QUERY);
+        final String GROUPS_BY_MODERATOR_QUERY = groupProperties.getProperty("GROUPS_BY_MODERATOR_QUERY");
+        PreparedStatement preparedStatement = conn.getPreparedStatement(GROUPS_BY_MODERATOR_QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, moderatorName);
         result = preparedStatement.executeQuery();
         Set<String> groups = new HashSet<>();

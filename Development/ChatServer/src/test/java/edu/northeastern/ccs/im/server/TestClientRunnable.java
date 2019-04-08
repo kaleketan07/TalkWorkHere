@@ -3061,18 +3061,39 @@ public class TestClientRunnable {
     }
 
     /**
-     * Test handle get conversation history for government.
-     * Test handle tap user for government for true.
+     * Test handle login message when the user is tapped.
      *
-     * @throws SQLException the sql exception
+     * @throws SQLException the SQL exception
      */
     @Test
+    public void testHandleLoginMessageWhenTheUserIsTapped() throws SQLException{
+    	clientRunnableObject.run();
+        List<ConversationalMessage> testMsgs = new ArrayList<>();
+        testMsgs.add(TEST_USER_MESSAGE);
+        TEST_USER_MESSAGE2.setGroupUniqueKey(DUMMY_GROUP_MESSAGE_KEY);
+        testMsgs.add(TEST_USER_MESSAGE2);
+        User mockedGovtUser = Mockito.mock(User.class);
+        when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,LOGIN));
+        when(mockedUser.isTapped()).thenReturn(true);
+        when(mockedcms.getMessagesForUser(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(testMsgs);
+        when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(mockedUser);
+        when(mockedUserService.updateUserAttributes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedUserService.getUserByUserName(Mockito.anyString())).thenReturn(mockedGovtUser);
+        clientRunnableObject.run();
+        Mockito.verify(mockedUser, Mockito.atLeastOnce()).enqueueMessageToUser(Mockito.any(), Mockito.anyString());
+        Mockito.verify(mockedcms, Mockito.atLeastOnce()).markMessageAsSent(Mockito.anyString());
+        Mockito.verify(mockedUserService, Mockito.atLeastOnce()).getUserByUserName(Mockito.anyString());
+        Mockito.verify(mockedGovtUser, Mockito.atLeastOnce()).userSendMessage(Mockito.any());
+        
+    } 
+    
 
     /**
      * Test handle get conversation history for government.
      *
      * @throws SQLException the sql exception
      */
+    @Test
     public void testHandleGetConversationHistoryForGovernment() throws SQLException {
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, GET_CONVERSATION_HISTORY));
@@ -3086,6 +3107,11 @@ public class TestClientRunnable {
         assertTrue(clientRunnableObject.isInitialized());
     }
 
+    /**
+     * Test handle tap user for government for true.
+     *
+     * @throws SQLException the sql exception
+     */
     @Test
     public void testHandleTapUserForGovernmentForTrue() throws SQLException{
         when(mockedUserService.getUserByUserNameAndPassword(Mockito.anyString(), Mockito.anyString())).thenReturn(GOVERNMENT_USER);

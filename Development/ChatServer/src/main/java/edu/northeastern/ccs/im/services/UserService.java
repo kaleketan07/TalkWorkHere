@@ -7,10 +7,12 @@ import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.User;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -30,6 +32,7 @@ public class UserService implements UserDao {
     private DBUtils utils;
     private ResultSet result;
     private static UserService userServiceInstance;
+    Properties userProperties = new Properties();
 
     /**
      * Constants used in multiple methods of the service
@@ -39,6 +42,7 @@ public class UserService implements UserDao {
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
     private static final String LOGGED_IN = "logged_in";
+    private static final String IS_TAPPED = "is_tapped";
 
     /**
      * Instantiates an user object for UserServices. This constructor will initialize
@@ -52,6 +56,7 @@ public class UserService implements UserDao {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;
+        userProperties = conn.getQueryProperties();
     }
 
     /**
@@ -76,7 +81,7 @@ public class UserService implements UserDao {
      */
     @Override
     public Set<User> getAllUsers() throws SQLException {
-        final String GET_ALL_USERS = "SELECT * FROM user_profile";
+        final String GET_ALL_USERS = userProperties.getProperty("GET_ALL_USERS");
         pstmt = conn.getPreparedStatement(GET_ALL_USERS);
         result = pstmt.executeQuery();
         while (result.next()) {
@@ -105,7 +110,7 @@ public class UserService implements UserDao {
     public User getUserByUserNameAndPassword(String username, String password) throws SQLException {
         User user = null;
         final String GET_USER_USERNAME_PSWD =
-                "SELECT * FROM user_profile WHERE username = ? AND user_password = ?";
+        		userProperties.getProperty("GET_USER_USERNAME_PSWD");
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
         pstmt = utils.setPreparedStatementArgs(pstmt, username, password);
         result = pstmt.executeQuery();
@@ -113,7 +118,9 @@ public class UserService implements UserDao {
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             boolean loggedIn = result.getBoolean(LOGGED_IN);
+            boolean isTapped = result.getBoolean(IS_TAPPED);
             user = new User(fName, lName, username, password, loggedIn);
+            user.setTapped(isTapped);
         }
         pstmt.close();
         return user;
@@ -129,7 +136,7 @@ public class UserService implements UserDao {
     @Override
     public User getUserByUserName(String username) throws SQLException {
         User user = null;
-        final String GET_USER_BY_USER_NAME = "SELECT * FROM user_profile WHERE username = ?";
+        final String GET_USER_BY_USER_NAME = userProperties.getProperty("GET_USERS_BY_USERNAME");
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt, username);
         result = pstmt.executeQuery();
@@ -153,8 +160,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean createUser(User u) throws SQLException {
-        final String CREATE_USER =
-                "INSERT INTO user_profile (first_name, last_name, username, user_password, logged_in) VALUES (?,?,?,?,?)";
+        final String CREATE_USER = userProperties.getProperty("CREATE_USER");
         pstmt = conn.getPreparedStatement(CREATE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, u.getFirstName(), u.getLastName(),
                 u.getUserName(), u.getUserPassword(), u.isLoggedIn());
@@ -211,7 +217,7 @@ public class UserService implements UserDao {
     @Override
     public boolean deleteUser(User u) throws SQLException {
         final String DELETE_USER =
-                "UPDATE user_profile SET user_deleted = 1 WHERE username = ?";
+        		userProperties.getProperty("DELETE_USER");
         pstmt = conn.getPreparedStatement(DELETE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, u.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -231,7 +237,7 @@ public class UserService implements UserDao {
     @Override
     public boolean followUser(User followee, User follower) throws SQLException {
         final String FOLLOW_USER =
-                "INSERT INTO user_follows (followee_user, follower_user) VALUES (?,?)";
+        		userProperties.getProperty("FOLLOW_USER");
         pstmt = conn.getPreparedStatement(FOLLOW_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -249,9 +255,9 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean unfollowUser(User followee, User follower) throws SQLException {
-        final String FOLLOW_USER =
-                "DELETE FROM user_follows WHERE followee_user = ? and follower_user = ?";
-        pstmt = conn.getPreparedStatement(FOLLOW_USER);
+        final String UNFOLLOW_USER =
+        		userProperties.getProperty("UNFOLLOW_USER");
+        pstmt = conn.getPreparedStatement(UNFOLLOW_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
         pstmt.close();
@@ -270,8 +276,7 @@ public class UserService implements UserDao {
     @Override
     public Map<String, String> searchUser(String searchString) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
-        final String SEARCH_USER =
-                "SELECT first_name, last_name, username FROM prattle.user_profile WHERE user_searchable = 1 AND (username REGEXP concat(\"^\",?,\".*\") OR first_name REGEXP concat(\"^\",?,\".*\"))";
+        final String SEARCH_USER = userProperties.getProperty("SEARCH_USER");                
         pstmt = conn.getPreparedStatement(SEARCH_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, searchString, searchString);
         result = pstmt.executeQuery();
@@ -294,8 +299,7 @@ public class UserService implements UserDao {
     @Override
     public Map<String, String> getFollowers(User followee) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
-        final String GET_FOLLOWERS =
-                "select * from user_profile where username in (SELECT follower_user FROM prattle.user_follows WHERE followee_user  = ?)";
+        final String GET_FOLLOWERS = userProperties.getProperty("GET_FOLLOWERS");                
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName());
         result = pstmt.executeQuery();
@@ -318,9 +322,8 @@ public class UserService implements UserDao {
     @Override
     public Map<String, String> getFollowees(User follower) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
-        final String GET_FOLLOWERS =
-                "SELECT * from user_profile WHERE username in (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?)";
-        pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
+        final String GET_FOLLOWEES = userProperties.getProperty("GET_FOLLOWEES");
+        pstmt = conn.getPreparedStatement(GET_FOLLOWEES);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
         while (result.next()) {
@@ -345,10 +348,9 @@ public class UserService implements UserDao {
     @Override
     public Map<String, String> getOnlineUsers(User follower) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
-        final String GET_FOLLOWERS =
-                "SELECT * from user_profile where username in" +
-                        " (SELECT followee_user FROM prattle.user_follows WHERE follower_user  = ?) and logged_in = 1";
-        pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
+        final String GET_ONLINE_USER =
+        		userProperties.getProperty("GET_ONLINE_USER");
+        pstmt = conn.getPreparedStatement(GET_ONLINE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
         while (result.next()) {

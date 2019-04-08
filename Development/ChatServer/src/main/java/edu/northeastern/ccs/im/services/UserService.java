@@ -37,6 +37,7 @@ public class UserService implements UserDao {
     private static final String FIRST_NAME = "first_name";
     private static final String LAST_NAME = "last_name";
     private static final String LOGGED_IN = "logged_in";
+    private static final String IS_TAPPED = "is_tapped";
 
     /**
      * Instantiates an user object for UserServices. This constructor will initialize
@@ -104,7 +105,9 @@ public class UserService implements UserDao {
             String fName = result.getString(FIRST_NAME);
             String lName = result.getString(LAST_NAME);
             boolean loggedIn = result.getBoolean(LOGGED_IN);
+            boolean isTapped = result.getBoolean(IS_TAPPED);
             user = new User(fName, lName, username, password, loggedIn);
+            user.setTapped(isTapped);
         }
         pstmt.close();
         return user;

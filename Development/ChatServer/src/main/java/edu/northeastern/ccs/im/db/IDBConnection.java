@@ -7,20 +7,20 @@ import java.util.Properties;
 public interface IDBConnection {
 
     /**
-     * Closes the IDBConnection object
+     * Closes the existing connection
      *
-     * @throws SQLException - when an error occurs during database interaction
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    public void close() throws SQLException;
+    void close() throws SQLException;
 
     /**
-     * Get a prepared statement using the query provided.
+     * Create a PreparedStatement on the given connection.
      *
-     * @param sqlQuery - Query associated with the prepared statement.
-     * @return - the prepared statement generated
-     * @throws SQLException - when an error occurs during database interaction
+     * @param sqlQuery              Query to be executed
+     * @return PreparedStatement    the prepared statement used in executing database queries
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    public PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException;
+    PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException;
 
     /**
      * @return the instance of queryProperties

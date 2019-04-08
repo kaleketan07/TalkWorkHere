@@ -11,11 +11,12 @@ import java.util.Properties;
 public class DBConnection implements IDBConnection {
 
     /**
-     * getDBConnection - Method to create a new Database connection and return the
+     * Constructor to create a new Database connection
      *
-     * @return the connection instance created using the constants URL, Username and Password
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException      the io exception that can be thrown
      */
-    public DBConnection() throws ClassNotFoundException, SQLException, IOException {
+    public DBConnection() throws SQLException, IOException {
         Properties properties = new Properties();
         ClassLoader cl = this.getClass().getClassLoader();
         InputStream input = cl.getResourceAsStream("rdsConfig.properties");
@@ -32,7 +33,7 @@ public class DBConnection implements IDBConnection {
     /**
      * Closes the existing connection
      *
-     * @throws SQLException - when an error occurs while closing the connection
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public void close() throws SQLException {
@@ -42,9 +43,9 @@ public class DBConnection implements IDBConnection {
     /**
      * Create a PreparedStatement on the given connection.
      *
-     * @param sqlQuery - Query to be executed
-     * @return the PreparedStatement
-     * @throws SQLException - when an error occurs while generating create statement on the connection
+     * @param sqlQuery              Query to be executed
+     * @return PreparedStatement    the prepared statement used in executing database queries
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException {

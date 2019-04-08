@@ -34,6 +34,7 @@ public class DBConnection implements IDBConnection {
      *
      * @throws SQLException - when an error occurs while closing the connection
      */
+    @Override
     public void close() throws SQLException {
         connection.close();
     }
@@ -45,6 +46,7 @@ public class DBConnection implements IDBConnection {
      * @return the PreparedStatement
      * @throws SQLException - when an error occurs while generating create statement on the connection
      */
+    @Override
     public PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException {
         return connection.prepareStatement(sqlQuery);
     }
@@ -52,6 +54,7 @@ public class DBConnection implements IDBConnection {
     /**
      * @return the instance of queryProperties
      */
+    @Override
     public Properties getQueryProperties() {
 		return queryProperties;
     }

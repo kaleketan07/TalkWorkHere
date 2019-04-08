@@ -241,7 +241,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @return the unsent messages for user as Map with keys as the message objects and unique keys as the value
      * @throws SQLException the SQL exception
      */
-    public List<ConversationalMessage> getUnsentMessagesForUser(String userName, boolean flag) throws SQLException {
+    public List<ConversationalMessage> getMessagesForUser(String userName, boolean flag) throws SQLException {
     	final String GET_MESSAGES;
         if(flag)
             GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";

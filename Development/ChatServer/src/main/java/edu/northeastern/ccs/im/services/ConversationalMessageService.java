@@ -1,12 +1,15 @@
 package edu.northeastern.ccs.im.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -24,6 +27,8 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     private PreparedStatement pstmt = null;
     private DBUtils utils = null;
     private ResultSet result;
+    private Properties conversationalMessageProperties;
+    
     private static ConversationalMessageService conversationalMessageService;
     private static final String DB_COL_MSG_SRC = "msg_src";
     private static final String DB_COL_MSG_DEST = "msg_dest";
@@ -44,6 +49,10 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;
+        conversationalMessageProperties = new Properties();
+        ClassLoader cl = this.getClass().getClassLoader();
+        InputStream input = cl.getResourceAsStream("queryConfig.properties");
+        conversationalMessageProperties.load(input);
     }
 
     /**
@@ -71,9 +80,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      */
     public String insertConversationalMessage(String msgSource, String msgDestination, String msgText, boolean setFlag)
             throws SQLException {
-        final String CREATE_MESSAGE =
-                "INSERT INTO messages (msg_src, msg_dest, msg_text, msg_timestamp, msg_uniquekey, msg_sent) " +
-                        "VALUES (?,?,?,?,?,?)";
+        final String CREATE_MESSAGE = conversationalMessageProperties.getProperty("CREATE_MESSAGE");
         pstmt = conn.getPreparedStatement(CREATE_MESSAGE);
         long time = System.currentTimeMillis();
         Timestamp sqlTimestamp = new Timestamp(time);
@@ -92,7 +99,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the sql exception
      */
     public List<ConversationalMessage> getMessagebySourceAndDestination(String msgSource, String msgDestination) throws SQLException {
-        final String GET_MESSAGES_BETWEEN_SOURCE_DESTINATION = "SELECT * FROM messages WHERE msg_src = ? and msg_dest = ?";
+        final String GET_MESSAGES_BETWEEN_SOURCE_DESTINATION = conversationalMessageProperties.getProperty("GET_MESSAGES_BETWEEN_SOURCE_DESTINATION");
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BETWEEN_SOURCE_DESTINATION);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgSource, msgDestination);
         return getMessages(pstmt);
@@ -106,7 +113,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the sql exception
      */
     public List<ConversationalMessage> getMessagebySource(String msgSrc) throws SQLException {
-        final String GET_MESSAGES_BY_SOURCE = "SELECT * FROM messages WHERE msg_src = ? ";
+        final String GET_MESSAGES_BY_SOURCE = conversationalMessageProperties.getProperty("GET_MESSAGES_BY_SOURCE");
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BY_SOURCE);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgSrc);
         return getMessages(pstmt);
@@ -119,7 +126,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the sql exception
      */
     public List<ConversationalMessage> getMessagebyDestination(String msgDest) throws SQLException {
-        final String GET_MESSAGES_BY_DESTINATION = "SELECT * FROM messages WHERE msg_dest= ? ";
+        final String GET_MESSAGES_BY_DESTINATION = conversationalMessageProperties.getProperty("GET_MESSAGES_BY_DESTINATION");
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BY_DESTINATION);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgDest);
         return getMessages(pstmt);
@@ -132,7 +139,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the sql exception
      */
     public boolean deleteMessage(String msgUniqueKey) throws SQLException {
-        final String UPDATE_DELETE_FLAG = "UPDATE messages SET msg_deleted = 1 WHERE msg_uniquekey = ?";
+        final String UPDATE_DELETE_FLAG = conversationalMessageProperties.getProperty("UPDATE_DELETE_FLAG");
         pstmt = conn.getPreparedStatement(UPDATE_DELETE_FLAG);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
         int res = 0;
@@ -175,7 +182,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the sql exception
      */
     public String getSender(String msgUniqueKey) throws SQLException {
-        final String GET_SENDER = "SELECT * FROM messages WHERE msg_uniquekey = ?";
+        final String GET_SENDER = conversationalMessageProperties.getProperty("GET_SENDER");
         pstmt = conn.getPreparedStatement(GET_SENDER);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
         String msgSrc = null;
@@ -196,7 +203,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the SQL exception
      */
     public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException {
-        final String ADD_MAPPING = "INSERT into group_messages (group_unique_key, message_unique_key) VALUES (?,?)";
+        final String ADD_MAPPING = conversationalMessageProperties.getProperty("ADD_MAPPING");
         pstmt = conn.getPreparedStatement(ADD_MAPPING);
         pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey, uniqueMessageKey);
         int res = pstmt.executeUpdate();
@@ -214,7 +221,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      */
     public boolean deleteGroupMessage(String grpMsgUniqueKey) throws SQLException {
         // fetch all the message keys for this group key
-        final String FETCH_MESSAGE_KEYS = "SELECT message_unique_key FROM prattle.group_messages WHERE group_unique_key = ?";
+        final String FETCH_MESSAGE_KEYS = conversationalMessageProperties.getProperty("FETCH_MESSAGE_KEYS");
         pstmt = conn.getPreparedStatement(FETCH_MESSAGE_KEYS);
         pstmt = utils.setPreparedStatementArgs(pstmt, grpMsgUniqueKey);
         List<String> cm = new ArrayList<>();
@@ -244,9 +251,9 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     public List<ConversationalMessage> getUnsentMessagesForUser(String userName, boolean flag) throws SQLException {
     	final String GET_MESSAGES;
         if(flag)
-            GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_dest = ? AND msg_deleted = 0 AND msg_sent = 0;";
+            GET_MESSAGES = conversationalMessageProperties.getProperty("GET_DELETED_MESSAGES");
         else
-            GET_MESSAGES = "SELECT * FROM prattle.group_messages right outer join prattle.messages on prattle.group_messages.message_unique_key = prattle.messages.msg_uniquekey WHERE msg_src = ? OR msg_dest = ? AND msg_deleted = 0;";
+            GET_MESSAGES = conversationalMessageProperties.getProperty("GET_ALL_MESSAGES");
         pstmt = conn.getPreparedStatement(GET_MESSAGES);
         if(flag)
             pstmt = utils.setPreparedStatementArgs(pstmt, userName);
@@ -278,7 +285,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @throws SQLException the SQL exception
      */
     public boolean markMessageAsSent(String msgUniqueKey) throws SQLException {
-    	final String MARK_MSG_AS_SENT = "UPDATE prattle.messages set msg_sent = 1 WHERE msg_uniquekey = ?";
+    	final String MARK_MSG_AS_SENT = conversationalMessageProperties.getProperty("MARK_MSG_AS_SENT");
         pstmt = conn.getPreparedStatement(MARK_MSG_AS_SENT);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
         int res = pstmt.executeUpdate();

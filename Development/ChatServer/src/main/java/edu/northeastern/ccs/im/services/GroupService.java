@@ -52,10 +52,7 @@ public class GroupService implements GroupDao {
     private GroupService() throws ClassNotFoundException, SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
-        groupProperties = new Properties();
-        ClassLoader cl = this.getClass().getClassLoader();
-        InputStream input = cl.getResourceAsStream("queryConfig.properties");
-        groupProperties.load(input);
+        groupProperties = conn.getQueryProperties();
 
     }
 

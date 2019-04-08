@@ -49,10 +49,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;
-        conversationalMessageProperties = new Properties();
-        ClassLoader cl = this.getClass().getClassLoader();
-        InputStream input = cl.getResourceAsStream("queryConfig.properties");
-        conversationalMessageProperties.load(input);
+        conversationalMessageProperties = conn.getQueryProperties();
     }
 
     /**

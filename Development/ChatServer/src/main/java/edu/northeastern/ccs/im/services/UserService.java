@@ -50,9 +50,7 @@ public class UserService implements UserDao {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;
-        ClassLoader cl = this.getClass().getClassLoader();
-        InputStream input = cl.getResourceAsStream("queryConfig.properties");
-        userProperties.load(input);
+        userProperties = conn.getQueryProperties();
     }
 
     public static UserService getInstance() throws SQLException, IOException, ClassNotFoundException {

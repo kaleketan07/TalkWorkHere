@@ -317,7 +317,7 @@ public class TestConversationalMessageService {
      */
     @Test
     public void testGetUnsentMessagesForUser() throws SQLException {
-    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",true);
+    	List<ConversationalMessage> testMsgs = cs.getMessagesForUser("ABC",true);
     	assertFalse(testMsgs.isEmpty());
     }
     
@@ -329,7 +329,7 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingGroupMessages() throws SQLException {
     	when(mockedRS.getString("group_unique_key")).thenReturn("hey::test_group_key");
-    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",true);
+    	List<ConversationalMessage> testMsgs = cs.getMessagesForUser("ABC",true);
     	assertFalse(testMsgs.isEmpty());
     }
     
@@ -341,7 +341,7 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingNoUnsentMessages() throws SQLException {
     	when(mockedRS.next()).thenReturn(false);
-    	List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",true);
+    	List<ConversationalMessage> testMsgs = cs.getMessagesForUser("ABC",true);
     	assertTrue(testMsgs.isEmpty());
     }
 
@@ -353,7 +353,7 @@ public class TestConversationalMessageService {
     @Test
     public void testGetUnsentMessagesForUserHavingGroupMessagesWhenFlagFalse() throws SQLException {
         when(mockedRS.getString("group_unique_key")).thenReturn("hey::test_group_key");
-        List<ConversationalMessage> testMsgs = cs.getUnsentMessagesForUser("ABC",false);
+        List<ConversationalMessage> testMsgs = cs.getMessagesForUser("ABC",false);
         assertFalse(testMsgs.isEmpty());
     }
 }

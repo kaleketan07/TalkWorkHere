@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
-
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
@@ -24,7 +23,7 @@ import edu.northeastern.ccs.im.services.UserService;
  * server. After instantiation, it is executed periodically on one of the
  * threads from the thread pool and will stop being run only when the client
  * signs off.
- *
+ * <p>
  * This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
  * International License. To view a copy of this license, visit
  * http://creativecommons.org/licenses/by-sa/4.0/. It is based on work
@@ -49,6 +48,11 @@ public class ClientRunnable implements Runnable {
      * Name that the client used when connecting to the server.
      */
     private String name;
+
+    /**
+     * private final string for a government user
+     */
+    private final String GOVERNMENT = "government";
 
     /**
      * Whether this client has been initialized, set its user name, and is ready to
@@ -210,7 +214,7 @@ public class ClientRunnable implements Runnable {
     private boolean setUserName(String userName) {
         boolean result = false;
         // Now make sure this name is legal.
-        if (userName != null) {
+        if (isValidUserName(userName)) {
             if (userClients.getOrDefault(userName, null) == null) {
                 // Optimistically set this users ID number.
                 setName(userName);
@@ -351,15 +355,48 @@ public class ClientRunnable implements Runnable {
         if (currentUser != null) {
             this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
-            // since the user was not found, a new user with this name may be created
-            if (msg.getTextOrPassword().equals(msg.getReceiverOrPassword())) {
-                userService.createUser(new User(null, null, msg.getName(), msg.getTextOrPassword(), true));
-                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            // since the user was not found, a new user with this name may be created after password validation checks
+        	String password = msg.getTextOrPassword();
+        	String confirmPassword = msg.getReceiverOrPassword();
+            if (isValidPassword(password)) {
+            	if (password.equals(confirmPassword)) {
+	                userService.createUser(new User(null, null, msg.getName(), password, true));
+	                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            	} else {
+            		this.enqueuePrattleResponseMessage("Password and confirm password do not match");
+            	}
             } else {
-                this.enqueuePrattleResponseMessage("Password and confirm password do not match.");
+                this.enqueuePrattleResponseMessage("Password not strong enough. Make sure the password:\n"
+                		+ "1. is 5 to 12 characters long.\n"
+                		+ "2. contains atleast one uppercase and one lowercase characters.\n"
+                		+ "3. contains atleast one digit from 0-9.\n"
+                		+ "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
+                		+ "5. contains no spaces");
             }
 
         }
+    }
+    
+    
+    /**
+     * Checks if passed userName is valid.
+     *
+     * @param userName the user name of the user
+     * @return true, if user name passes the checks of validity, else returns false
+     */
+    private boolean isValidUserName(String userName) {
+    	return (userName != null && userName.length() < 12);
+    }
+    
+    /**
+     * Checks if is valid password.
+     *
+     * @param password the password
+     * @return true, if the password satisfies all valid password checks
+     */
+    private boolean isValidPassword(String password) {
+    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{5,12}$";
+    	return password.matches(pattern);
     }
 
     /**
@@ -405,7 +442,7 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException - thrown by the database queries and calls
      */
     private void sendMessagesToUser(User currentUser) throws SQLException {
-        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getUnsentMessagesForUser(currentUser.getUserName(), true);
+        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
         Message resultMessage = null;
         for(ConversationalMessage m: unsentMessages) {
             resultMessage = createMessageFromConversationalMessage(m);
@@ -1350,39 +1387,112 @@ public class ClientRunnable implements Runnable {
      * user having all these messages.
      * It generates two separate strings, one for the group messages and one for the private messages and sends the
      * concatenated string to the user.
+     *
      * @param msg the message object sent by the user
      */
     private void handleGetPastMessages(Message msg){
         List<ConversationalMessage> msgs = new ArrayList<>();
         try {
-            msgs = conversationalMessagesService.getUnsentMessagesForUser(msg.getName(), false);
+            msgs = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
         }catch (Exception e){
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
             return;
         }
-        // Create a string of all messages:
+        this.helperFormatAndEnqueueMessages(msgs);
+    }
+
+
+    /**
+     * This function returns the conversation history of a user to the government, provided the request comes from the
+     * government
+     *
+     * @param msg The message object sent by the government
+     */
+    private void handleGetConversationHistory(Message msg){
+        try {
+            // Check if the message is from the government
+            if (!msg.getName().equalsIgnoreCase(GOVERNMENT)) {
+                enqueuePrattleResponseMessage("Sorry, you are not allowed to perform this operation");
+            } else if (userService.getUserByUserName(msg.getTextOrPassword()) == null){
+                enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct username" +
+                        " with SRH");
+            } else {
+                List<ConversationalMessage> msgs = conversationalMessagesService.
+                        getMessagesForUser(msg.getTextOrPassword(), false);
+                this.helperFormatAndEnqueueMessages(msgs);
+            }
+        }catch(SQLException e){
+            ChatLogger.error(e.getMessage());
+            enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again." );
+        }
+    }
+
+    /**
+     * Helper method for formatting the message history and sending it to the appropriate user (user or government)
+     *
+     * @param msgs the list of conversational messages
+     */
+    private void helperFormatAndEnqueueMessages(List<ConversationalMessage> msgs){
+        List<String> conversations = helperFormatMessagesString(msgs);
+        for(String s : conversations)
+            enqueuePrattleResponseMessage(s);
+    }
+
+    /**
+     * Helper method that will return all the formatted strings of a user's conversation history.
+     * The return list is an attempt to enqueue separate messages to the user to reduce the load on the network.
+     *
+     * @param msgs The list of conversational message objects
+     * @return This returns a list of two strings (one string contains the private chats, another string returns the
+     *         group messages for a user.
+     */
+    private List<String> helperFormatMessagesString(List<ConversationalMessage> msgs){
+        List<String> toSend = new ArrayList<>();
         StringBuilder workSpaceForPrivate = new StringBuilder();
-        workSpaceForPrivate.append("\nAll your private messages::\n");
-        workSpaceForPrivate.append(String.format("%n%-15s | %-30s | %-15s%n","Sender Username","Message","Message Key"));
+        workSpaceForPrivate.append("\nAll their private messages::\n");
+        workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s%n","Sender Username"
+                , "Destination Username", "Message","Message Key"));
         StringBuilder workSpaceForGroups = new StringBuilder();
-        workSpaceForGroups.append("\n\nAll your group messages::\n");
+        workSpaceForGroups.append("\n\nAll their group messages::\n");
         workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s%n","Group Name","Sender Username",
                 "Message","Message Key"));
         for(ConversationalMessage m : msgs){
             if(m.getGroupUniqueKey()==null)
-                workSpaceForPrivate.append(String.format("%n%-15s | %-30s | %-15s",m.getSourceName(),
+                workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s",m.getSourceName(), m.getDestinationName(),
                         m.getMessageText(),m.getMessageUniquekey()));
             else
                 workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s",m.getGroupUniqueKey().split("::")[1],
                         m.getSourceName(), m.getMessageText(),m.getMessageUniquekey()));
-
         }
-        this.enqueuePrattleResponseMessage(workSpaceForPrivate.toString());
-        this.enqueuePrattleResponseMessage(workSpaceForGroups.toString());
+        toSend.add(workSpaceForPrivate.toString());
+        toSend.add(workSpaceForGroups.toString());
+        return toSend;
     }
 
 
-
+    /**
+     * Method to tap a user of interest, provided the operation is requested by the government and
+     * the user of interest is present in the system.
+     *
+     * @param msg the message object sent by the government.
+     */
+    private void handleTapUserMessage(Message msg){
+        try{
+            if(!msg.getName().equalsIgnoreCase(GOVERNMENT))
+                enqueuePrattleResponseMessage("Sorry, you are not allowed to do this operation");
+            else if(userService.getUserByUserName(msg.getTextOrPassword()) == null)
+                enqueuePrattleResponseMessage("This user does not exist, please check the username again.");
+            else{
+                if(userService.tapUser(msg.getTextOrPassword()))
+                    enqueuePrattleResponseMessage(msg.getTextOrPassword() + " is now being tapped.");
+                else
+                    enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
+            }
+        }catch (Exception e){
+            ChatLogger.error(e.getMessage());
+            enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, please try again.");
+        }
+    }
 
     /**
      * This method handles general messages
@@ -1428,6 +1538,9 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isGetPastMessages()) {
             handleGetPastMessages(msg);
+            return true;
+        } else if (msg.isGetConversationHistory()) {
+            handleGetConversationHistory(msg);
             return true;
         }
         return false;
@@ -1501,6 +1614,9 @@ public class ClientRunnable implements Runnable {
             return true;
         } else if (msg.isGetOnlineUsersMessage()) {
             handleGetOnlineUserMessage(msg);
+            return true;
+        } else if (msg.isTapUserMessage()) {
+            handleTapUserMessage(msg);
             return true;
         }
         return false;

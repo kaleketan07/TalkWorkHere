@@ -344,5 +344,18 @@ public class UserService implements UserDao {
         return resultUsers;
     }
 
+    /**
+     * Service for setting the is_tapped field in the user table to 1
+     *
+     * @param userOfInterest the user of interest that needs to be tapped
+     * @return the boolean, true if the update was successful, false otherwise
+     * @throws SQLException the sql exception thrown when the sql operation is unsuccessful
+     */
+    public boolean tapUser(String userOfInterest) throws SQLException{
+        final String TAP_USER = "UPDATE prattle.user_profile SET is_tapped = 1 WHERE username = ?";
+        pstmt = utils.setPreparedStatementArgs(conn.getPreparedStatement(TAP_USER), userOfInterest);
+        int qResult = pstmt.executeUpdate();
+        return qResult > 0;
+    }
 }
 

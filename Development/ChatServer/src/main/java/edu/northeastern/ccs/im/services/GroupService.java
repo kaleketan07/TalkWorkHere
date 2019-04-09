@@ -44,7 +44,7 @@ public class GroupService implements GroupDao {
      * Instantiates a new group service.
      *
      * @throws ClassNotFoundException the class not found exception
-     * @throws SQLException           the SQL exception
+     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
     private GroupService() throws ClassNotFoundException, SQLException, IOException {
@@ -57,9 +57,9 @@ public class GroupService implements GroupDao {
     /**
      * Gets the singleton group service instance.
      *
-     * @return the group service instance
+     * @return GroupService           the group service instance
      * @throws ClassNotFoundException the class not found exception
-     * @throws SQLException           the SQL exception
+     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
     public static GroupService getGroupServiceInstance() throws ClassNotFoundException, SQLException, IOException {
@@ -72,9 +72,9 @@ public class GroupService implements GroupDao {
     /**
      * Fetches the group from the database.
      *
-     * @param groupName the group name
-     * @return the group
-     * @throws SQLException the SQL exception
+     * @param groupName     the group name
+     * @return Group        the group object to be fetched
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Group getGroup(String groupName) throws SQLException {
@@ -107,10 +107,10 @@ public class GroupService implements GroupDao {
     /**
      * Creates the group in the database.
      *
-     * @param groupName the group name
-     * @param modName   the mod name
-     * @return true, if successful else return false
-     * @throws SQLException the SQL exception
+     * @param groupName     the group name
+     * @param modName       the moderator name of the group
+     * @return boolean      true, if successful else return false
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean createGroup(String groupName, String modName) throws SQLException {
@@ -125,9 +125,9 @@ public class GroupService implements GroupDao {
     /**
      * Delete group.
      *
-     * @param groupName the group name
-     * @return true, if successful else return false
-     * @throws SQLException the SQL exception
+     * @param groupName     the group name
+     * @return boolean      true, if successful else return false
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean deleteGroup(String groupName) throws SQLException {
@@ -143,9 +143,9 @@ public class GroupService implements GroupDao {
     /**
      * Gets the member users.
      *
-     * @param groupName the group name
-     * @return the member users in the group
-     * @throws SQLException the SQL exception
+     * @param groupName             the group name
+     * @return Set of User objects  the member users in the group
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Set<User> getMemberUsers(String groupName) throws SQLException {
@@ -168,11 +168,11 @@ public class GroupService implements GroupDao {
     }
 
     /**
-     * Gets the member groups of the given group.
+     * Gets the member groups.
      *
-     * @param groupName the group name
-     * @return the member groups
-     * @throws SQLException the SQL exception
+     * @param groupName             the group name
+     * @return Set of Group names   the member groups
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Set<String> getMemberGroups(String groupName) throws SQLException {
@@ -190,10 +190,10 @@ public class GroupService implements GroupDao {
     }
 
     /**
-     * Get all the groups.
+     * Gets all the groups.
      *
-     * @return the all groups
-     * @throws SQLException the SQL exception
+     * @return  Set of Group objects    all the groups present in the system
+     * @throws SQLException             the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Set<Group> getAllGroups() throws SQLException {
@@ -220,10 +220,10 @@ public class GroupService implements GroupDao {
      * Checks if the passed username matches the moderator name for the
      * group having the passed group name.
      *
-     * @param groupName the group name
-     * @param userName  the user name
-     * @return true, if is moderator
-     * @throws SQLException the SQL exception
+     * @param groupName     the group name
+     * @param userName      the user name
+     * @return boolean      true, if is moderator
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean isModerator(String groupName, String userName) throws SQLException {
@@ -246,8 +246,8 @@ public class GroupService implements GroupDao {
      *
      * @param hostGroupName the host group name
      * @param guestUserName the guest user name
-     * @return true, if successful
-     * @throws SQLException the SQL exception
+     * @return boolean      true, if user was added successfully, false otherwise
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     public boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
         Set<User> users = getMemberUsers(hostGroupName);
@@ -265,10 +265,10 @@ public class GroupService implements GroupDao {
     /**
      * Removes the user from the given group
      *
-     * @param hostGroupName
-     * @param guestUserName
-     * @return true, if successful
-     * @throws SQLException
+     * @param hostGroupName     the name of the host group
+     * @param guestUserName     the username of the guest user
+     * @return boolean          true, if successful
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
@@ -279,15 +279,14 @@ public class GroupService implements GroupDao {
         pstmt.close();
         return (qResult > 0);
     }
-    
-    
+
     /**
-     * Check if users is a direct member of the group 
+     * Check if users is a direct member of the group
      *
-     * @param hostGroupName
-     * @param guestUserName
-     * @return true, if user is a member of the group
-     * @throws SQLException
+     * @param hostGroupName     the host group name
+     * @param guestUserName     the username of the user to be checked for group membership
+     * @return boolean          true, if user is a member of the group
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean checkMembershipInGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
@@ -310,10 +309,10 @@ public class GroupService implements GroupDao {
     /**
      * Gets the flat list of groups present in this group.
      *
-     * @param group      the group in which we are searching for groups
-     * @param descGroups the set of descendant groups
-     * @return the flat list (set) of groups present in this group
-     * @throws SQLException the SQL exception
+     * @param group         the group in which we are searching for groups
+     * @param descGroups    the set of descendant groups
+     * @return Set          the flat list (set) of groups present in this group
+     * @throws SQLException the SQL exception thrown in case of an error with jdbc's interaction with the data source
      */
     private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) throws SQLException {
         descGroups.add(group.getGroupName());
@@ -328,8 +327,8 @@ public class GroupService implements GroupDao {
      *
      * @param hostGroupName  the host group name
      * @param guestGroupName the guest group name
-     * @return true, if successful
-     * @throws SQLException the SQL exception
+     * @return boolean       true, if successful
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean addGroupToGroup(String hostGroupName, String guestGroupName) throws SQLException {
@@ -352,10 +351,10 @@ public class GroupService implements GroupDao {
     /**
      * Checks if is user member of the group.
      *
-     * @param grpName  the name of the group in which the user name is to be checked
-     * @param userName the user name to be checked
-     * @return true, if is user is a member of the group
-     * @throws SQLException the SQL exception
+     * @param grpName       the name of the group in which the user name is to be checked
+     * @param userName      the user name to be checked
+     * @return boolean      true, if is user is a member of the group
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     public boolean isUserMemberOfTheGroup(String grpName, String userName) throws SQLException {
         Group group = getGroup(grpName);
@@ -370,7 +369,7 @@ public class GroupService implements GroupDao {
      *
      * @param grp       the group object of the group
      * @param userNames the set of user names of member users of the group
-     * @return the flat list of user names strings
+     * @return Set      the flat list of user names strings
      */
     private Set<String> getFlatListOfUsers(Group grp, Set<String> userNames) {
         for (User u : grp.getMemberUsers()) {
@@ -389,8 +388,8 @@ public class GroupService implements GroupDao {
      * @param groupName      the group name
      * @param attributeName  the attribute name
      * @param attributeValue the attribute value
-     * @return the boolean   True if the attribute was successfully updated, false otherwise
-     * @throws SQLException the sql exception
+     * @return the boolean   true if the attribute was successfully updated, false otherwise
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
@@ -404,11 +403,11 @@ public class GroupService implements GroupDao {
     }
 
     /**
-     * Searches and retrieves all the group that match the regular expression passed as a string.
+     * Retrieve all the searchable groups from the given string
      *
-     * @param searchString the search string
-     * @return the hash map containing the group names with their respective moderator names
-     * @throws SQLException the sql exception
+     * @param searchString   the string to be used in the regex to find all similar groups
+     * @return Map           A hashmap containing the group names as keys and their moderator usernames as corresponding values
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Map<String, String> searchGroup(String searchString) throws SQLException {
@@ -428,10 +427,10 @@ public class GroupService implements GroupDao {
     /**
      * Removes the group from the given group
      *
-     * @param hostGroupName
-     * @param guestGroupName
-     * @return true, if successfully removes the group else returns false
-     * @throws SQLException
+     * @param hostGroupName  the host group name
+     * @param guestGroupName the guest group name that needs to be removed
+     * @return boolean       true, if successfully removes the group else returns false
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean removeGroupFromGroup(String hostGroupName, String guestGroupName) throws SQLException {
@@ -451,10 +450,11 @@ public class GroupService implements GroupDao {
     }
 
     /**
-     * The method to get groups based on moderator name
+     * Get groups by moderator name
      *
-     * @param  moderatorName - the moderator whose groups need to be found
-     * @return a set of groups which have the given user as the moderator
+     * @param moderatorName  the moderator whose groups need to be found
+     * @return  Set          the set of group objects that the user is a moderator of
+     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Set<String> getGroupsByModerator(String moderatorName) throws SQLException{

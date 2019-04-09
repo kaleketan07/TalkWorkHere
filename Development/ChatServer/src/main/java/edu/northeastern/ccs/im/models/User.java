@@ -53,7 +53,7 @@ public class User {
     }
 
     /**
-     * @return true, if the user that this object represents is tapped, else returns false
+     * @return boolean      true, if the user that this object represents is tapped, else returns false
      */
     public boolean isTapped() {
 		return isTapped;
@@ -61,63 +61,64 @@ public class User {
 
 	/**
 	 * Sets the tapped flag for the user that this object represents.
-	 * @param isTapped the value that denotes the user is tapped or not
+     *
+	 * @param isTapped      the value that denotes the user is tapped or not
 	 */
 	public void setTapped(boolean isTapped) {
 		this.isTapped = isTapped;
 	}
 
 	/**
-     * @return firstName of the user
+     * @return String    first name of the user
      */
     public String getFirstName() {
         return firstName;
     }
 
     /**
-     * @param firstName value to set the firstName
+     * @param firstName   value to set for the first name
      */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
     /**
-     * @return lastName of the user
+     * @return String     lastName of the user
      */
     public String getLastName() {
         return lastName;
     }
 
     /**
-     * @param lastName value to set the firstName
+     * @param lastName     value to set fir the last name
      */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
     /**
-     * @return userName of the user
+     * @return String      userName of the user
      */
     public String getUserName() {
         return userName;
     }
 
     /**
-     * @param userName value to set the userName
+     * @param userName      value to set for the username
      */
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
     /**
-     * @return the userPassword of the user
+     * @return String       the userPassword of the user
      */
     public String getUserPassword() {
         return userPassword;
     }
 
     /**
-     * @param userPassword value to set the userPassword
+     * @param userPassword  value to set for the userPassword
      */
     public void setUserPassword(String userPassword) {
         this.userPassword = userPassword;
@@ -126,7 +127,7 @@ public class User {
     /**
      * set the loggedIn flag to the given parameter value
      *
-     * @param status - the true or false status of the user's loggedIn attribute
+     * @param status        the true or false status of the user's loggedIn attribute
      */
     public void setLoggedIn(boolean status) {
         loggedIn = status;
@@ -135,21 +136,21 @@ public class User {
     /**
      * Set the searchable flag of the user according to their preference
      *
-     * @param searchableStatus - true or false status of the user's searchable preference
+     * @param searchableStatus  true or false status of the user's searchable preference
      */
     public void setSearchable(boolean searchableStatus) {
         searchable = searchableStatus;
     }
 
     /**
-     * @return the loggedIn status of the user
+     * @return boolean      the loggedIn status of the user
      */
     public boolean isLoggedIn() {
         return loggedIn;
     }
 
     /**
-     * @return the searchable status of the user
+     * @return boolean      the searchable status of the user
      */
     public boolean isSearchable() {
         return searchable;
@@ -158,7 +159,7 @@ public class User {
     /**
      * Overrides the toString method for the User object.
      *
-     * @return - string representation of username, firstName and lastName.
+     * @return String       the string representation of username, firstName and lastName.
      */
     public String toString() {
         return getUserName() + " : " + getFirstName() + " " + getLastName();
@@ -169,7 +170,9 @@ public class User {
      * first check if the user is online by checking if there is a ClientRunnable present for
      * this instance and then enqueue the message if present accordingly.
      *
-     * @param msg The message to be sent to this user
+     * @param msg           The message to be sent to this user
+     * @return String       the unique key of the message sent
+     * @throws SQLException the sql exception thrown in case of error in jdbc's interaction with the data source
      */
     public String userSendMessage(Message msg) throws SQLException {
         String src = msg.getName();
@@ -188,8 +191,8 @@ public class User {
 	/**
 	 * Enqueue message to user depending on the type of the message when the user is logged in.
 	 *
-	 * @param msg the message object
-	 * @param uniqueKey the unique key of the message
+	 * @param msg           the message object
+	 * @param uniqueKey     the unique key of the message
 	 */
 	public void enqueueMessageToUser(Message msg, String uniqueKey) {
 		clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
@@ -201,8 +204,14 @@ public class User {
 		            System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
 		}
 	}
-    
 
+
+    /**
+     * The overriden equals method to check if the two user objects are equal, based on the username of the users
+     *
+     * @param obj       The object to be checked for equality with the current object
+     * @return boolean  true if the current and given objects have same username, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof User) {
@@ -211,6 +220,11 @@ public class User {
         return false;
     }
 
+    /**
+     * Overridden method to generate unique hashcode for every User object
+     *
+     * @return  int     a unique integer for every user object
+     */
     @Override
     public int hashCode() {
         return (this.userName != null) ? 31 * userName.hashCode() : 0;

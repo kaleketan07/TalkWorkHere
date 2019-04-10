@@ -1394,12 +1394,13 @@ public class ClientRunnable implements Runnable {
 	        if(guestGroup == null) {
 	        	this.enqueuePrattleResponseMessage("The group you are trying to leave does not exist");
 	        }
-	        else if (groupService.isModerator(guestGroup.getGroupName(), currentUser.getUserName())) {
+	        else if (guestGroup.getModeratorName().equalsIgnoreCase(currentUser.getUserName())) {
 	        	this.enqueuePrattleResponseMessage("As you are the moderator of the group you cannot leave the group "
 	        			+ "Please transfer the ownership to someone else and then leave");
 	        }
 	        else if (groupService.checkMembershipInGroup(guestGroup.getGroupName(), currentUser.getUserName())){
 	        	groupService.removeUserFromGroup(guestGroup.getGroupName(), currentUser.getUserName());
+	        	this.enqueuePrattleResponseMessage("You successfully left the group.");
 	        }
 	        else {
 	        	this.enqueuePrattleResponseMessage("You are not a member of the group you are trying to leave");

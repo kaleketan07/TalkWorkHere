@@ -41,7 +41,6 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will initialize
      * and establish the connection to the database for the message table
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private ConversationalMessageService() throws SQLException, IOException {
@@ -56,9 +55,8 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      *
      * @return                        the conversational message service
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws ClassNotFoundException the class not found exception
      */
-    public static ConversationalMessageService getInstance() throws SQLException, IOException, ClassNotFoundException {
+    public static ConversationalMessageService getInstance() throws SQLException, IOException {
         if (conversationalMessageService == null)
             conversationalMessageService = new ConversationalMessageService();
         return conversationalMessageService;

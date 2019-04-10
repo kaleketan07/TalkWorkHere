@@ -42,7 +42,6 @@ public class GroupService implements GroupDao {
     /**
      * Instantiates a new group service.
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
@@ -57,11 +56,10 @@ public class GroupService implements GroupDao {
      * Gets the singleton group service instance.
      *
      * @return GroupService           the group service instance
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    public static GroupService getGroupServiceInstance() throws ClassNotFoundException, SQLException, IOException {
+    public static GroupService getGroupServiceInstance() throws SQLException, IOException {
         if (groupServiceInstance == null) {
             groupServiceInstance = new GroupService();
         }

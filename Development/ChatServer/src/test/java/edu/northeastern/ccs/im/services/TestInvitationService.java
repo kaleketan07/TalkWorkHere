@@ -34,10 +34,9 @@ public class TestInvitationService {
      * @throws NoSuchFieldException   the no such field exception
      * @throws IllegalAccessException the illegal access exception
      * @throws IOException            Signals that an I/O exception has occurred.
-     * @throws ClassNotFoundException the class not found exception
      */
     @BeforeEach
-    public void setup() throws SQLException, NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException {
+    public void setup() throws SQLException, NoSuchFieldException, IllegalAccessException, IOException {
         invitationService = InvitationService.getInstance();
 
         dBConnectionMock = Mockito.mock(DBConnection.class);
@@ -65,11 +64,10 @@ public class TestInvitationService {
      * Tests the getInstance method if it returns an
      * InvitationService instance.
      * @throws SQLException - the exception thrown when a downstream database error occurs
-     * @throws ClassNotFoundException - Exception thrown when the class for get instance is not found
      * @throws IOException - thrown by the get Instance method
      */
     @Test
-    public void testGetInstance() throws ClassNotFoundException, IOException, SQLException {
+    public void testGetInstance() throws IOException, SQLException {
         Object instance = InvitationService.getInstance();
         assertTrue(instance instanceof InvitationService);
     }

@@ -149,7 +149,7 @@ public class ClientRunnable implements Runnable {
             groupService = GroupService.getGroupServiceInstance();
             conversationalMessagesService = ConversationalMessageService.getInstance();
             invitationService = InvitationService.getInstance();
-        } catch (ClassNotFoundException | SQLException | IOException e) {
+        } catch (SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
         }
     }

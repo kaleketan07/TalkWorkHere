@@ -48,7 +48,6 @@ public class UserService implements UserDao {
      * and establish the connection to the database for the user_profile table for each
      * user.
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException          the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private UserService() throws SQLException, IOException {
@@ -64,9 +63,8 @@ public class UserService implements UserDao {
      * @return the instance
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            the io exception
-     * @throws ClassNotFoundException the class not found exception
      */
-    public static UserService getInstance() throws SQLException, IOException, ClassNotFoundException {
+    public static UserService getInstance() throws SQLException, IOException {
         if (userServiceInstance == null)
             userServiceInstance = new UserService();
         return userServiceInstance;

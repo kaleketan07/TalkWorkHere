@@ -177,7 +177,7 @@ public class User {
     public String userSendMessage(Message msg) throws SQLException {
         String src = msg.getName();
         String msgText = msg.getTextOrPassword();
-        String uniqueKey = null;
+        String uniqueKey;
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
         if (clientRunnable != null && clientRunnable.isInitialized()) {
             uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);

@@ -27,7 +27,7 @@ public class GroupService implements GroupDao {
     private DBUtils utils;
     private ResultSet result;
     private static GroupService groupServiceInstance;
-    Properties groupProperties;
+    private Properties groupProperties;
     
     private static final String USER_NAME = "username";
     private static final String FIRST_NAME = "first_name";
@@ -293,10 +293,7 @@ public class GroupService implements GroupDao {
         result = pstmt.executeQuery();
         pstmt.close();
         if(result.first()) {
-        	boolean removed = result.getBoolean(IS_REMOVED);
-        	if(!removed){
-        		return true;
-        	}
+        	return !result.getBoolean(IS_REMOVED);
         }
         return false;
         
@@ -309,9 +306,8 @@ public class GroupService implements GroupDao {
      * @param group         the group in which we are searching for groups
      * @param descGroups    the set of descendant groups
      * @return Set          the flat list (set) of groups present in this group
-     * @throws SQLException the SQL exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) throws SQLException {
+    private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) {
         descGroups.add(group.getGroupName());
         for (Group g : group.getMemberGroups()) {
             descGroups = getFlatListOfGroups(g, descGroups);

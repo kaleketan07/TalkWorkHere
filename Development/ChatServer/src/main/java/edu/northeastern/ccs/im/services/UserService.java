@@ -136,7 +136,7 @@ public class UserService implements UserDao {
     @Override
     public User getUserByUserName(String username) throws SQLException {
         User user = null;
-        final String GET_USER_BY_USER_NAME = userProperties.getProperty("GET_USERS_BY_USERNAME");
+        final String GET_USER_BY_USER_NAME = userProperties.getProperty("GET_USER_BY_USER_NAME");
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt, username);
         result = pstmt.executeQuery();

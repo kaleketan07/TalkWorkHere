@@ -64,8 +64,7 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @BeforeEach
-    public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException,
-            IOException, ClassNotFoundException {
+    public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException, IOException {
         MockitoAnnotations.initMocks(this);
         us = UserService.getInstance();
         testUser = new User("ABC", "BCD", "AB", "QWERTY", false);

@@ -133,7 +133,7 @@ public class UserService implements UserDao {
     @Override
     public User getUserByUserName(String username) throws SQLException {
         User user = null;
-        final String GET_USER_BY_USER_NAME = userProperties.getProperty("GET_USERS_BY_USERNAME");
+        final String GET_USER_BY_USER_NAME = userProperties.getProperty("GET_USER_BY_USER_NAME");
         pstmt = conn.getPreparedStatement(GET_USER_BY_USER_NAME);
         pstmt = utils.setPreparedStatementArgs(pstmt, username);
         result = pstmt.executeQuery();
@@ -272,18 +272,13 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String, String> searchUser(String searchString) throws SQLException {
-        Map<String, String> resultUsers = new HashMap<>();
-        final String SEARCH_USER = userProperties.getProperty("SEARCH_USER");                
+        final String SEARCH_USER = userProperties.getProperty("SEARCH_USER");
         pstmt = conn.getPreparedStatement(SEARCH_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, searchString, searchString);
         result = pstmt.executeQuery();
-        while (result.next()) {
-            String username = result.getString(USER_NAME);
-            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
-            resultUsers.put(username, fullName);
-        }
+        Map<String, String> resultNames = populateMapWithNames(result);
         pstmt.close();
-        return resultUsers;
+        return resultNames;
     }
 
     /**
@@ -295,18 +290,13 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String, String> getFollowers(User followee) throws SQLException {
-        Map<String, String> resultUsers = new HashMap<>();
-        final String GET_FOLLOWERS = userProperties.getProperty("GET_FOLLOWERS");                
+        final String GET_FOLLOWERS = userProperties.getProperty("GET_FOLLOWERS");
         pstmt = conn.getPreparedStatement(GET_FOLLOWERS);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName());
         result = pstmt.executeQuery();
-        while (result.next()) {
-            String username = result.getString(USER_NAME);
-            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
-            resultUsers.put(username, fullName);
-        }
+        Map<String, String> resultNames = populateMapWithNames(result);
         pstmt.close();
-        return resultUsers;
+        return resultNames;
     }
 
     /**
@@ -318,18 +308,13 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String, String> getFollowees(User follower) throws SQLException {
-        Map<String, String> resultUsers = new HashMap<>();
         final String GET_FOLLOWEES = userProperties.getProperty("GET_FOLLOWEES");
         pstmt = conn.getPreparedStatement(GET_FOLLOWEES);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
-        while (result.next()) {
-            String username = result.getString(USER_NAME);
-            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
-            resultUsers.put(username, fullName);
-        }
+        Map<String, String> resultNames = populateMapWithNames(result);
         pstmt.close();
-        return resultUsers;
+        return resultNames;
     }
 
 
@@ -344,19 +329,14 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String, String> getOnlineUsers(User follower) throws SQLException {
-        Map<String, String> resultUsers = new HashMap<>();
         final String GET_ONLINE_USER =
         		userProperties.getProperty("GET_ONLINE_USER");
         pstmt = conn.getPreparedStatement(GET_ONLINE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
-        while (result.next()) {
-            String username = result.getString(USER_NAME);
-            String fullName = result.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
-            resultUsers.put(username, fullName);
-        }
+        Map<String, String> resultNames = populateMapWithNames(result);
         pstmt.close();
-        return resultUsers;
+        return resultNames;
     }
 
     /**
@@ -372,6 +352,24 @@ public class UserService implements UserDao {
         pstmt = utils.setPreparedStatementArgs(conn.getPreparedStatement(TAP_USER), userOfInterest);
         int qResult = pstmt.executeUpdate();
         return qResult > 0;
+    }
+
+    /**
+     * Helper method to populate a map with the usernames and their full names and return this map to the calling
+     * function
+     *
+     * @param resultSet     the ResultSet object that was returned from the database query
+     * @return Map          a map of the usernames and their respective full names
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
+     */
+    private Map<String, String> populateMapWithNames(ResultSet resultSet) throws SQLException{
+        Map<String, String> resultUsers = new HashMap<>();
+        while (resultSet.next()) {
+            String username = resultSet.getString(USER_NAME);
+            String fullName = resultSet.getString(FIRST_NAME) + " " + result.getString(LAST_NAME);
+            resultUsers.put(username, fullName);
+        }
+        return resultUsers;
     }
 }
 

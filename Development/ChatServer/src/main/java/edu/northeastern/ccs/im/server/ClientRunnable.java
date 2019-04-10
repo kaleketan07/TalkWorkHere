@@ -149,7 +149,7 @@ public class ClientRunnable implements Runnable {
             groupService = GroupService.getGroupServiceInstance();
             conversationalMessagesService = ConversationalMessageService.getInstance();
             invitationService = InvitationService.getInstance();
-        } catch (ClassNotFoundException | SQLException | IOException e) {
+        } catch (SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
         }
     }
@@ -395,7 +395,7 @@ public class ClientRunnable implements Runnable {
      * @return boolean      true, if the password satisfies all valid password checks
      */
     private boolean isValidPassword(String password) {
-    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{5,12}$";
+    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!_])(?=\\S+$).{5,12}$";
     	return password.matches(pattern);
     }
 

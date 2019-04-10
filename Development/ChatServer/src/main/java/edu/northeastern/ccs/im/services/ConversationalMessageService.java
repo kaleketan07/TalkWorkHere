@@ -25,7 +25,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
 
     private IDBConnection conn;
     private PreparedStatement pstmt = null;
-    private DBUtils utils = null;
+    private DBUtils utils;
     private ResultSet result;
     private Properties conversationalMessageProperties;
     
@@ -147,7 +147,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         final String UPDATE_DELETE_FLAG = conversationalMessageProperties.getProperty("UPDATE_DELETE_FLAG");
         pstmt = conn.getPreparedStatement(UPDATE_DELETE_FLAG);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
-        int res = 0;
+        int res;
         try {
             res = pstmt.executeUpdate();
         } catch (Exception e) {

@@ -32,7 +32,7 @@ public class UserService implements UserDao {
     private DBUtils utils;
     private ResultSet result;
     private static UserService userServiceInstance;
-    Properties userProperties = new Properties();
+    private Properties userProperties;
 
     /**
      * Constants used in multiple methods of the service

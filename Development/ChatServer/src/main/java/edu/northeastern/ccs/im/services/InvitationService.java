@@ -44,11 +44,10 @@ public class InvitationService implements InvitationDao {
     /**
      * Instantiates a new invitation service.
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    private InvitationService() throws ClassNotFoundException, SQLException, IOException {
+    private InvitationService() throws SQLException, IOException {
         connection = new DBConnection();
         utils = new DBUtils();
     }
@@ -57,11 +56,10 @@ public class InvitationService implements InvitationDao {
      * Gets the singleton invitation service instance.
      *
      * @return the invitation service instance
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    public static InvitationService getInstance() throws ClassNotFoundException, SQLException, IOException {
+    public static InvitationService getInstance() throws SQLException, IOException {
         if (invitationServiceInstance == null) {
             invitationServiceInstance = new InvitationService();
         }

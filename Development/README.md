@@ -49,7 +49,7 @@ The following handles can be used to use the client jar to interact with other c
 |RIM|Reject an invitation for a group, of which you are a moderator|`RIM;{Username};{Groupname}`|Completed|
 |GPM|Get all your past messages|`GPM`|Completed|
 |GOU|Get online users that you are following|`GOU`|Completed|
-|LGP|Leave group|`LGP;{GroupName}`|In Progress|
+|LGP|Leave group|`LGP;{GroupName}`|Completed|
 
 ## Tests
 

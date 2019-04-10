@@ -91,8 +91,6 @@ public class NetworkConnection implements Iterable<Message> {
      *
      * @param sockChan Non-blocking SocketChannel instance to which we will send all
      *                 communication.
-     * @throws IOException Exception thrown if we have trouble completing this
-     *                     connection
      */
     public NetworkConnection(SocketChannel sockChan) {
         // Create the queue that will hold the messages received from over the network
@@ -166,7 +164,7 @@ public class NetworkConnection implements Iterable<Message> {
         return new MessageIterator();
     }
 
-    /**
+    /*
      * Private class that helps iterate over a Network Connection.
      *
      * @author Riya Nadkarni
@@ -177,7 +175,7 @@ public class NetworkConnection implements Iterable<Message> {
         /**
          * Default constructor.
          */
-        public MessageIterator() { /*nothing to do here*/ }
+        MessageIterator() { /*nothing to do here*/ }
 
         @Override
         public boolean hasNext() {

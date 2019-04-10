@@ -45,7 +45,9 @@ public abstract class Prattle {
      */
     private static ConcurrentLinkedQueue<ClientRunnable> active;
 
-    /** All of the static initialization occurs in this "method" */
+    /**
+     *  All of the static initialization occurs in this "method"
+     */
     static {
         // Create the new queue of active threads.
         active = new ConcurrentLinkedQueue<>();
@@ -57,7 +59,7 @@ public abstract class Prattle {
      *
      * @param message Message that the client sent.
      */
-    public static void broadcastMessage(Message message) {
+    static void broadcastMessage(Message message) {
         // Loop through all of our active threads
         for (ClientRunnable tt : active) {
             // Do not send the message to any clients that are not ready to receive it.
@@ -73,7 +75,7 @@ public abstract class Prattle {
      * @param dead Thread which had been handling all the I/O for a client who has
      *             since quit.
      */
-    public static void removeClient(ClientRunnable dead) {
+    static void removeClient(ClientRunnable dead) {
         // Test and see if the thread was in our list of active clients so that we
         // can remove it.
         if (!active.remove(dead)) {
@@ -84,7 +86,7 @@ public abstract class Prattle {
     /**
      * Terminates the server.
      */
-    public static void stopServer() {
+    static void stopServer() {
         isReady = false;
     }
 
@@ -98,8 +100,6 @@ public abstract class Prattle {
      * @param args String arguments to the server from the command line. At present
      *             the only legal (and required) argument is the port on which this
      *             server should list.
-     * @throws IOException Exception thrown if the server cannot connect to the port
-     *                     to which it is supposed to listen.
      */
     public static void main(String[] args) {
         // Connect to the socket on the appropriate port to which this server connects.

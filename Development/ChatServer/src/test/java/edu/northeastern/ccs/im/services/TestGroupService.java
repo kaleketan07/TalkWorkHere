@@ -70,11 +70,10 @@ public class TestGroupService {
      * @throws NoSuchFieldException   the no such field exception
      * @throws IllegalAccessException the illegal access exception
      * @throws IOException            Signals that an I/O exception has occurred.
-     * @throws ClassNotFoundException the class not found exception
      */
     @BeforeEach
     public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException,
-            IOException, ClassNotFoundException {
+            IOException {
         MockitoAnnotations.initMocks(this);
         testGS = GroupService.getGroupServiceInstance();
         when(mockedDBConnection.getPreparedStatement(Mockito.anyString())).thenReturn(mockedPreparedStatement);

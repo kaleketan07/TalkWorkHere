@@ -70,7 +70,7 @@ public class TestConversationalMessageService {
      */
     @BeforeEach
     public void initMocks() throws SQLException, NoSuchFieldException, IllegalAccessException,
-            IOException, ClassNotFoundException {
+            IOException {
         MockitoAnnotations.initMocks(this);
         cs = ConversationalMessageService.getInstance();
         when(mockedDBConnection.getPreparedStatement(Mockito.anyString())).thenReturn(mockedPreparedStatement);

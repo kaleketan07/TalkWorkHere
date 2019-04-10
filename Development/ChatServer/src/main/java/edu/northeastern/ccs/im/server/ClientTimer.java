@@ -8,7 +8,7 @@ import java.util.GregorianCalendar;
  * @author Riya Nadkarni
  * @version 12-27-2018
  */
-public class ClientTimer {
+class ClientTimer {
     /**
      * Number of milliseconds after which we terminate a client due to inactivity.
      * This is currently equal to 5 hours.
@@ -29,7 +29,7 @@ public class ClientTimer {
     /**
      * Constructor for the timer.
      */
-    public ClientTimer() {
+    ClientTimer() {
         calendar = new GregorianCalendar();
         calendar.setTimeInMillis(calendar.getTimeInMillis() + TERMINATE_AFTER_INACTIVE_INITIAL_IN_MS);
     }
@@ -38,7 +38,7 @@ public class ClientTimer {
      * Once the client has been initialized, updates the time until the client is
      * terminated for inactivity.
      */
-    public void updateAfterInitialization() {
+    void updateAfterInitialization() {
         calendar.setTimeInMillis(
                 new GregorianCalendar().getTimeInMillis() + TERMINATE_AFTER_INACTIVE_INITIAL_IN_MS);
     }
@@ -47,7 +47,7 @@ public class ClientTimer {
      * Once the client receives messages, updates the time until the client is
      * terminated for inactivity.
      */
-    public void updateAfterActivity() {
+    void updateAfterActivity() {
         calendar.setTimeInMillis(
                 new GregorianCalendar().getTimeInMillis() + TERMINATE_AFTER_INACTIVE_BUT_LOGGEDIN_IN_MS);
     }
@@ -57,7 +57,7 @@ public class ClientTimer {
      *
      * @return true if the time passed in is later than the current value of calendar, false otherwise.
      */
-    public boolean isBehind() {
+    boolean isBehind() {
         return calendar.before(new GregorianCalendar());
     }
 }

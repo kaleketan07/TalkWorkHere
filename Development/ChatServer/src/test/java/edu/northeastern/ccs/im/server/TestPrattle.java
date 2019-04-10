@@ -42,10 +42,9 @@ public class TestPrattle {
      * @throws SecurityException        the security exception
      * @throws IllegalArgumentException the illegal argument exception
      * @throws IllegalAccessException   the illegal access exception
-     * @throws ClassNotFoundException   the class not found exception
      */
     @Test
-    public void testBroadcastMessage() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+    public void testBroadcastMessage() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
         Field activeField = Prattle.class.getDeclaredField("active");
         activeField.setAccessible(true);

@@ -7,7 +7,6 @@ import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.User;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,7 @@ public class UserService implements UserDao {
     private DBUtils utils;
     private ResultSet result;
     private static UserService userServiceInstance;
-    Properties userProperties = new Properties();
+    private Properties userProperties;
 
     /**
      * Constants used in multiple methods of the service
@@ -49,10 +48,9 @@ public class UserService implements UserDao {
      * and establish the connection to the database for the user_profile table for each
      * user.
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException          the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private UserService() throws ClassNotFoundException, SQLException, IOException {
+    private UserService() throws SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;
@@ -65,9 +63,8 @@ public class UserService implements UserDao {
      * @return the instance
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            the io exception
-     * @throws ClassNotFoundException the class not found exception
      */
-    public static UserService getInstance() throws SQLException, IOException, ClassNotFoundException {
+    public static UserService getInstance() throws SQLException, IOException {
         if (userServiceInstance == null)
             userServiceInstance = new UserService();
         return userServiceInstance;

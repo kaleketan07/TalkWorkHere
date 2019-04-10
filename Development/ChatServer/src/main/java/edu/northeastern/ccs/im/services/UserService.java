@@ -7,7 +7,6 @@ import edu.northeastern.ccs.im.db.IDBConnection;
 import edu.northeastern.ccs.im.models.User;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,7 +51,7 @@ public class UserService implements UserDao {
      * @throws ClassNotFoundException the class not found exception
      * @throws SQLException          the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private UserService() throws ClassNotFoundException, SQLException, IOException {
+    private UserService() throws SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;

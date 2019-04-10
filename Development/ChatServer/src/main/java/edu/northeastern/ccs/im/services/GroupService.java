@@ -1,7 +1,6 @@
 package edu.northeastern.ccs.im.services;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,7 +46,7 @@ public class GroupService implements GroupDao {
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    private GroupService() throws ClassNotFoundException, SQLException, IOException {
+    private GroupService() throws SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
         groupProperties = conn.getQueryProperties();

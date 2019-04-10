@@ -48,7 +48,7 @@ public class InvitationService implements InvitationDao {
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    private InvitationService() throws ClassNotFoundException, SQLException, IOException {
+    private InvitationService() throws SQLException, IOException {
         connection = new DBConnection();
         utils = new DBUtils();
     }

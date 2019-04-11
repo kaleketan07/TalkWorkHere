@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -296,10 +297,10 @@ public class GroupService implements GroupDao {
         pstmt = conn.getPreparedStatement(CHECK_USER_MEMEBERSHIP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         result = pstmt.executeQuery();
-        pstmt.close();
         if(result.first()) {
         	return !result.getBoolean(IS_REMOVED);
         }
+        pstmt.close();
         return false;
         
     }
@@ -393,7 +394,7 @@ public class GroupService implements GroupDao {
     public boolean updateGroupSettings(String groupName, String attributeName, String attributeValue)
             throws SQLException {
         final String UPDATE_GROUP = groupProperties.getProperty("UPDATE_GROUP");
-        pstmt = conn.getPreparedStatement(UPDATE_GROUP);
+        pstmt = conn.getPreparedStatement(MessageFormat.format(UPDATE_GROUP, attributeName));
         pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, groupName);
         int qResult = pstmt.executeUpdate();
         pstmt.close();

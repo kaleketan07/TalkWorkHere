@@ -1024,7 +1024,7 @@ public class TestClientRunnable {
     public void testLeaveGroupMessageWithValidModerator() throws SQLException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
-        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        when(mockedGroup.getModeratorName()).thenReturn(SENDER_NAME);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
     }
@@ -1037,7 +1037,7 @@ public class TestClientRunnable {
     public void testLeaveGroupMessageWithInvalidModerator() throws SQLException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
-        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
         when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         when(mockedGroupService.removeUserFromGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         clientRunnableObject.run();
@@ -1052,7 +1052,7 @@ public class TestClientRunnable {
     public void testLeaveGroupMessageWithValidRemoveUser() throws SQLException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
-        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
         when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1066,7 +1066,7 @@ public class TestClientRunnable {
     public void testLeaveGroupMessageWithSQLException() throws SQLException {
         clientRunnableObject.run();
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList, LEAVE_GROUP));
-        when(mockedGroupService.isModerator(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        when(mockedGroup.getModeratorName()).thenReturn(ANOTHER_USER);
         when(mockedGroupService.checkMembershipInGroup(Mockito.anyString(), Mockito.anyString())).thenThrow(SQLException.class);
         clientRunnableObject.run();
         assertTrue(clientRunnableObject.isInitialized());
@@ -1246,8 +1246,6 @@ public class TestClientRunnable {
     /**
      * Test handle user profile update message for an incorrect number. Should return false
      *
-     * @throws NoSuchFieldException   the no such field exception
-     * @throws IllegalAccessException the illegal access exception
      * @throws SQLException           the sql exception
      */
     @Test

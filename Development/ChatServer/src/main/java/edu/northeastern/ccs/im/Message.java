@@ -208,15 +208,15 @@ public class Message {
             String srcName,
             String textOrPassword,
             String receiverOrPassword) {
-        if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
+        if (handle.equals(MessageType.QUIT.toString())) {
             return makeQuitMessage(srcName);
-        } else if (handle.compareTo(MessageType.HELLO.toString()) == 0) {
+        } else if (handle.equals(MessageType.HELLO.toString())) {
             return makeSimpleLoginMessage(srcName);
-        } else if (handle.compareTo(MessageType.BROADCAST.toString()) == 0) {
+        } else if (handle.equals(MessageType.BROADCAST.toString())) {
             return makeBroadcastMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.LOGIN.toString()) == 0) {
+        } else if (handle.equals(MessageType.LOGIN.toString())) {
             return makeLoginMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.REGISTER.toString()) == 0) {
+        } else if (handle.equals(MessageType.REGISTER.toString())) {
             return makeRegisterMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return null;
@@ -238,25 +238,25 @@ public class Message {
             String srcName,
             String textOrPassword,
             String receiverOrPassword) {
-        if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
+        if (handle.equals(MessageType.DELETE_GROUP.toString())) {
             return makeDeleteGroupMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.CREATE_GROUP.toString())) {
             return makeCreateGroupMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.ADD_USER_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.ADD_USER_GROUP.toString())) {
             return makeAddUserToGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.GET_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.GET_GROUP.toString())) {
             return makeGetGroupMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.REMOVE_USER_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.REMOVE_USER_GROUP.toString())) {
             return makeRemoveUserFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.UPDATE_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.UPDATE_GROUP.toString())) {
             return makeUpdateGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.DELETE_GROUP_MESSAGE.toString()) == 0) {
+        } else if (handle.equals(MessageType.DELETE_GROUP_MESSAGE.toString())) {
             return makeDeleteGroupMessageMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.ADD_GROUP_TO_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.ADD_GROUP_TO_GROUP.toString())) {
             return makeAddGroupToGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.REMOVE_GROUP_FROM_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.REMOVE_GROUP_FROM_GROUP.toString())) {
             return makeRemoveGroupFromGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.LEAVE_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.LEAVE_GROUP.toString())) {
             return makeLeaveGroupMessage(srcName, textOrPassword);
         }
         return null;
@@ -278,21 +278,21 @@ public class Message {
             String srcName,
             String textOrPassword,
             String receiverOrPassword) {
-        if (handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0) {
+        if (handle.equals(MessageType.UPDATE_PROFILE_USER.toString())) {
             return makeUserProfileUpdateMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
+        } else if (handle.equals(MessageType.DELETE_USER.toString())) {
             return makeDeleteUserMessage(srcName);
-        } else if (handle.compareTo(MessageType.FOLLOW_USER.toString()) == 0) {
+        } else if (handle.equals(MessageType.FOLLOW_USER.toString())) {
             return makeFollowUserMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.UNFOLLOW_USER.toString()) == 0) {
+        } else if (handle.equals(MessageType.UNFOLLOW_USER.toString())) {
             return makeUnfollowUserMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.GET_FOLLOWERS.toString()) == 0) {
+        } else if (handle.equals(MessageType.GET_FOLLOWERS.toString())) {
             return makeGetFollowersMessage(srcName);
-        } else if (handle.compareTo(MessageType.GET_FOLLOWEES.toString()) == 0) {
+        } else if (handle.equals(MessageType.GET_FOLLOWEES.toString())) {
             return makeGetFolloweesMessage(srcName);
-        } else if (handle.compareTo(MessageType.GET_ONLINE_USERS.toString()) == 0) {
+        } else if (handle.equals(MessageType.GET_ONLINE_USERS.toString())) {
             return makeGetOnlineUserMessage(srcName);
-        } else if (handle.compareTo(MessageType.TAP_USER.toString()) == 0) {
+        } else if (handle.equals(MessageType.TAP_USER.toString())) {
             return makeTapUserMessage(srcName,textOrPassword);
         }
         return null;
@@ -314,19 +314,19 @@ public class Message {
             String srcName,
             String textOrPassword,
             String receiverOrPassword) {
-        if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
+        if (handle.equals(MessageType.MESSAGE_USER.toString())) {
             return makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
+        } else if (handle.equals(MessageType.PRIVATE_REPLY_MESSAGE.toString())) {
             return makePrivateReplyMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.MESSAGE_GROUP.toString()) == 0) {
+        } else if (handle.equals(MessageType.MESSAGE_GROUP.toString())) {
             return makeGroupMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.SEARCH_MESSAGE.toString()) == 0) {
+        } else if (handle.equals(MessageType.SEARCH_MESSAGE.toString())) {
             return makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.DELETE_PRIVATE_MESSAGE.toString()) == 0) {
+        } else if (handle.equals(MessageType.DELETE_PRIVATE_MESSAGE.toString())) {
             return makeDeletePrivateMessageMessage(srcName, textOrPassword);
-        } else if(handle.compareTo(MessageType.GET_PAST_MESSAGES.toString()) == 0){
+        } else if(handle.equals(MessageType.GET_PAST_MESSAGES.toString())){
             return makeGetPastMessages(srcName);
-        } else if(handle.compareTo(MessageType.GET_CONVERSATION_HISTORY.toString()) == 0){
+        } else if(handle.equals(MessageType.GET_CONVERSATION_HISTORY.toString())){
             return makeGetConversationHistory(srcName,textOrPassword);
         }
         return null;
@@ -348,17 +348,17 @@ public class Message {
             String srcName,
             String textOrPassword,
             String receiverOrPassword) {
-        if (handle.compareTo(MessageType.INVITE_USER_GROUP.toString()) == 0) {
+        if (handle.equals(MessageType.INVITE_USER_GROUP.toString())) {
             return makeCreateInvitationMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.ACCEPT_INVITE_USER.toString()) == 0) {
+        } else if (handle.equals(MessageType.ACCEPT_INVITE_USER.toString())) {
             return makeAcceptInviteUserMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.DELETE_USER_INVITATION.toString()) == 0) {
+        } else if (handle.equals(MessageType.DELETE_USER_INVITATION.toString())) {
             return makeDeleteInvitationMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.DENY_INVITE_USER.toString()) == 0) {
+        } else if (handle.equals(MessageType.DENY_INVITE_USER.toString())) {
             return makeDenyInviteUserMessage(srcName, textOrPassword);
-        } else if (handle.compareTo(MessageType.APPROVE_INVITE_MODERATOR.toString()) == 0) {
+        } else if (handle.equals(MessageType.APPROVE_INVITE_MODERATOR.toString())) {
             return makeApproveInviteModeratorMessage(srcName, textOrPassword, receiverOrPassword);
-        } else if (handle.compareTo(MessageType.REJECT_INVITE_MODERATOR.toString()) == 0) {
+        } else if (handle.equals(MessageType.REJECT_INVITE_MODERATOR.toString())) {
             return makeRejectInviteModeratorMessage(srcName, textOrPassword, receiverOrPassword);
         }
         return null;

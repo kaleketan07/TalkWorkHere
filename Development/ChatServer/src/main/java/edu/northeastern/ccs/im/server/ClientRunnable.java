@@ -195,7 +195,7 @@ public class ClientRunnable implements Runnable {
      */
     private boolean messageChecks(Message msg) {
         // Check that the message name matches.
-        return (msg.getName() != null) && (msg.getName().compareToIgnoreCase(getName()) == 0);
+        return (msg.getName() != null) && (msg.getName().equalsIgnoreCase(getName()));
     }
 
     /**
@@ -807,13 +807,13 @@ public class ClientRunnable implements Runnable {
      */
     private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException {
         String mappedAttribute;
-        if (attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.equals("1"))
             mappedAttribute = "first_name";
-        else if (attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.equals("2"))
             mappedAttribute = "last_name";
-        else if (attributeNumber.compareTo("3") == 0)
+        else if (attributeNumber.equals("3"))
             mappedAttribute = "user_password";
-        else if (attributeNumber.compareTo("4") == 0)
+        else if (attributeNumber.equals("4"))
             mappedAttribute = "user_searchable";
         else
             throw new SQLException("Number not in bounds");
@@ -1192,9 +1192,9 @@ public class ClientRunnable implements Runnable {
     private boolean handleGroupUpdate(String groupName , String attributeName , String attributeValue)
             throws SQLException {
     	boolean result = false;
-    	if (attributeName.compareTo("is_searchable") == 0) 
+    	if (attributeName.equals("is_searchable"))
     		result = handleGroupUpdateForIsSearchable(groupName, attributeName, attributeValue);
-    	if (attributeName.compareTo("moderator_name") == 0)   	
+    	if (attributeName.equals("moderator_name"))
     		result = handleGroupUpdateForModeratorChange(groupName, attributeName, attributeValue);
     	return result;
     }
@@ -1236,11 +1236,9 @@ public class ClientRunnable implements Runnable {
     private boolean handleGroupUpdateForIsSearchable(String groupName , String attributeName , String attributeValue)
             throws SQLException {
     	boolean result = false;
-    	if (attributeValue.compareTo(Integer.toString(0)) == 0 ||
-                attributeValue.equalsIgnoreCase("false"))
+    	if (attributeValue.equals(Integer.toString(0)) || attributeValue.equalsIgnoreCase("false"))
             result = groupService.updateGroupSettings(groupName, attributeName, "0");
-        else if (attributeValue.compareTo(Integer.toString(1)) == 0 ||
-                attributeValue.equalsIgnoreCase("true"))
+        else if (attributeValue.equals(Integer.toString(1)) || attributeValue.equalsIgnoreCase("true"))
             result = groupService.updateGroupSettings(groupName, attributeName, "1");
         else
             this.enqueuePrattleResponseMessage("Searchable values should be boolean (1/0 True/False)");
@@ -1259,9 +1257,9 @@ public class ClientRunnable implements Runnable {
      */
     private String getGroupAttributeName(String attributeNumber) throws SQLException {
         String attributeName;
-        if (attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.equals("1"))
             attributeName = "is_searchable";
-        else if (attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.equals("2"))
             attributeName = "moderator_name";
         else
             throw new SQLException("Group setting number out of bounds");

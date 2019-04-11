@@ -188,12 +188,10 @@ public class UserService implements UserDao {
     public boolean updateUserAttributes(String uname, String attributeName, String attributeValue) throws SQLException {
         final String UPDATE_USER = "UPDATE user_profile SET " + attributeName + "  = ? WHERE username = ?";
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        if (attributeName.compareTo("user_searchable") == 0) {
-            if (attributeValue.compareTo(Integer.toString(0)) == 0 ||
-                    attributeValue.equalsIgnoreCase("false"))
+        if (attributeName.equals("user_searchable")) {
+            if (attributeValue.equals(Integer.toString(0)) || attributeValue.equalsIgnoreCase("false"))
                 pstmt = utils.setPreparedStatementArgs(pstmt, "0", uname);
-            else if (attributeValue.compareTo(Integer.toString(1)) == 0 ||
-                    attributeValue.equalsIgnoreCase("true"))
+            else if (attributeValue.equals(Integer.toString(1)) || attributeValue.equalsIgnoreCase("true"))
                 pstmt = utils.setPreparedStatementArgs(pstmt, "1", uname);
             else
                 ChatLogger.error("Searchable values should be boolean (1/0 True/False)");

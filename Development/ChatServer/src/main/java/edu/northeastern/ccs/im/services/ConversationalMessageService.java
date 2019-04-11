@@ -153,6 +153,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         try {
             res = pstmt.executeUpdate();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new SQLException(e);
         }
         pstmt.close();

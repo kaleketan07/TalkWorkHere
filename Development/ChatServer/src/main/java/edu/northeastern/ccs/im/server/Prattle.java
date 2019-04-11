@@ -135,6 +135,7 @@ public abstract class Prattle {
             }
         } catch (IOException ex) {
             ChatLogger.error("Fatal error: " + ex.getMessage());
+            ex.printStackTrace();
             throw new IllegalStateException(ex.getMessage());
         }
     }
@@ -162,8 +163,10 @@ public abstract class Prattle {
             }
         } catch (AssertionError ae) {
             ChatLogger.error("Caught Assertion: " + ae.toString());
+            ae.printStackTrace();
         } catch (IOException e) {
             ChatLogger.error("Caught Exception: " + e.toString());
+            e.printStackTrace();
         }
     }
 }

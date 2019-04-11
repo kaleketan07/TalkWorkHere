@@ -109,6 +109,7 @@ public class NetworkConnection implements Iterable<Message> {
         } catch (IOException e) {
             // For the moment we are going to simply cover up that there was a problem.
             ChatLogger.error(e.toString());
+            e.printStackTrace();
             throw new AssertionError();
         }
     }
@@ -155,6 +156,7 @@ public class NetworkConnection implements Iterable<Message> {
             channel.close();
         } catch (IOException e) {
             ChatLogger.error("Caught exception: " + e.toString());
+            e.printStackTrace();
             throw new AssertionError();
         }
     }
@@ -235,6 +237,7 @@ public class NetworkConnection implements Iterable<Message> {
                 }
             } catch (IOException ioe) {
                 // For the moment, we will cover up this exception and hope it never occurs.
+                ioe.printStackTrace();
                 throw new AssertionError();
             }
             // Do we now have any messages?

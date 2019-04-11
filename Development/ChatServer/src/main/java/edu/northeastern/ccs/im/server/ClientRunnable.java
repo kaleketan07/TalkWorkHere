@@ -151,6 +151,7 @@ public class ClientRunnable implements Runnable {
             invitationService = InvitationService.getInstance();
         } catch (SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
+            e.printStackTrace();
         }
     }
 
@@ -309,6 +310,7 @@ public class ClientRunnable implements Runnable {
             }
         } catch (SQLException e) {
             ChatLogger.error("SQL Exception occurred - run() : " + e);
+            e.printStackTrace();
         }
     }
 
@@ -720,6 +722,7 @@ public class ClientRunnable implements Runnable {
             else
                 this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
         } catch (SQLException e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages " +
                     "using HELP UPU");
         }
@@ -743,7 +746,8 @@ public class ClientRunnable implements Runnable {
         	userService.followUser(followeeUser, followerUser); 
         }
         catch(SQLException e) {
-        	this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
+            e.printStackTrace();
+            this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
             return;	
         }
         this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
@@ -810,6 +814,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFR.");
         }
@@ -832,6 +837,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GOU.");
         }
@@ -855,6 +861,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFE.");
         }
@@ -1135,6 +1142,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     "group update syntax using HELP UPG");
         }
@@ -1256,6 +1264,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
@@ -1276,6 +1285,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "Group");
         } catch (Exception e) {
+            e.printStackTrace();
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
@@ -1408,7 +1418,8 @@ public class ClientRunnable implements Runnable {
 	        }
         }
         catch (SQLException e) {
-        	this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE);
+            e.printStackTrace();
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE);
 		}
     }
 
@@ -1426,6 +1437,7 @@ public class ClientRunnable implements Runnable {
             msgs = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
         }catch (Exception e){
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
+            e.printStackTrace();
             return;
         }
         this.helperFormatAndEnqueueMessages(msgs);
@@ -1453,6 +1465,7 @@ public class ClientRunnable implements Runnable {
             }
         }catch(SQLException e){
             ChatLogger.error(e.getMessage());
+            e.printStackTrace();
             enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again." );
         }
     }
@@ -1520,6 +1533,7 @@ public class ClientRunnable implements Runnable {
             }
         }catch (Exception e){
             ChatLogger.error(e.getMessage());
+            e.printStackTrace();
             enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, please try again.");
         }
     }

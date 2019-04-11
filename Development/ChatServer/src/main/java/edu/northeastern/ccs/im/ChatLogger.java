@@ -126,6 +126,7 @@ public class ChatLogger {
             fileHandler.setLevel(Level.ALL);
             LOGGER.addHandler(fileHandler);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new IllegalStateException(e.getMessage());
         }
     }

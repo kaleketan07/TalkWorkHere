@@ -211,7 +211,8 @@ public class GroupService implements GroupDao {
             }
 
         } catch (Exception e) {
-            throw new SQLException();
+            e.printStackTrace();
+            throw new SQLException("Exception occurred in getAllGroups");
         }
         pstmt.close();
 

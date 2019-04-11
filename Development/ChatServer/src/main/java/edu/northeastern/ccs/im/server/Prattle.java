@@ -134,8 +134,7 @@ public abstract class Prattle {
                 }
             }
         } catch (IOException ex) {
-            ChatLogger.error("Fatal error: " + ex.getMessage());
-            ex.printStackTrace();
+            ChatLogger.error("IOException occurred - Prattle.java - main() : " + ex.getStackTrace());
             throw new IllegalStateException(ex.getMessage());
         }
     }
@@ -162,11 +161,9 @@ public abstract class Prattle {
                 tt.setFuture(clientFuture);
             }
         } catch (AssertionError ae) {
-            ChatLogger.error("Caught Assertion: " + ae.toString());
-            ae.printStackTrace();
+            ChatLogger.error("Caught AssertionError - Prattle.java - createClientThread() : " + ae.getStackTrace());
         } catch (IOException e) {
-            ChatLogger.error("Caught Exception: " + e.toString());
-            e.printStackTrace();
+            ChatLogger.error("IOException occurred - Prattle.java - createClientThread(): " + e.getStackTrace());
         }
     }
 }

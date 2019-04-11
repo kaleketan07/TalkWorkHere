@@ -34,7 +34,6 @@ public class User {
             cms = ConversationalMessageService.getInstance();
         } catch (IOException | SQLException e) {
             ChatLogger.error("Conversational Message Service failed to initialize " + e.toString());
-            e.printStackTrace();
         }
     }
 

@@ -1,3 +1,8 @@
+/****************************************************************************************
+ * Copyright (c) 2019 Team 201 - Ketan Kale, Kunal Patil, Rahul Bhat, Sachin Haldavanekar.
+ * All rights reserved.
+ ****************************************************************************************/
+
 package edu.northeastern.ccs.im.services;
 
 import edu.northeastern.ccs.im.ChatLogger;

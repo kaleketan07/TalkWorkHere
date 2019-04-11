@@ -49,8 +49,8 @@ public class InvitationService implements InvitationDao {
     /**
      * Instantiates a new invitation service.
      *
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException            Signals that an I/O exception has occurred.
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException      Signals that an I/O exception has occurred.
      */
     private InvitationService() throws SQLException, IOException {
         connection = new DBConnection();
@@ -61,8 +61,8 @@ public class InvitationService implements InvitationDao {
      * Gets the singleton invitation service instance.
      *
      * @return the invitation service instance
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException            Signals that an I/O exception has occurred.
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException      Signals that an I/O exception has occurred.
      */
     public static InvitationService getInstance() throws SQLException, IOException {
         if (invitationServiceInstance == null) {

@@ -192,7 +192,7 @@ public enum MessageType {
      *
      * @param abbrev Short name of this message type, as a String.
      */
-    private MessageType(String abbrev) {
+    MessageType(String abbrev) {
         abbreviation = abbrev;
     }
 

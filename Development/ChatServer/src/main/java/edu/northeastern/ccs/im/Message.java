@@ -203,7 +203,11 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
      */
-    private static Message handleMakeGeneralMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+    private static Message handleMakeGeneralMessages(
+            String handle,
+            String srcName,
+            String textOrPassword,
+            String receiverOrPassword) {
         if (handle.compareTo(MessageType.QUIT.toString()) == 0) {
             return makeQuitMessage(srcName);
         } else if (handle.compareTo(MessageType.HELLO.toString()) == 0) {
@@ -229,7 +233,11 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
      */
-    private static Message handleMakeGroupMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+    private static Message handleMakeGroupMessages(
+            String handle,
+            String srcName,
+            String textOrPassword,
+            String receiverOrPassword) {
         if (handle.compareTo(MessageType.DELETE_GROUP.toString()) == 0) {
             return makeDeleteGroupMessage(srcName, textOrPassword);
         } else if (handle.compareTo(MessageType.CREATE_GROUP.toString()) == 0) {
@@ -265,7 +273,11 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
      */
-    private static Message handleMakeUserMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+    private static Message handleMakeUserMessages(
+            String handle,
+            String srcName,
+            String textOrPassword,
+            String receiverOrPassword) {
         if (handle.compareTo(MessageType.UPDATE_PROFILE_USER.toString()) == 0) {
             return makeUserProfileUpdateMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.DELETE_USER.toString()) == 0) {
@@ -297,7 +309,11 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
      */
-    private static Message handleMakeCommunicationMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+    private static Message handleMakeCommunicationMessages(
+            String handle,
+            String srcName,
+            String textOrPassword,
+            String receiverOrPassword) {
         if (handle.compareTo(MessageType.MESSAGE_USER.toString()) == 0) {
             return makePrivateUserMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.PRIVATE_REPLY_MESSAGE.toString()) == 0) {
@@ -327,7 +343,11 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword. Null if none of the handles match.
      */
-    private static Message handleMakeInvitationMessages(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
+    private static Message handleMakeInvitationMessages(
+            String handle,
+            String srcName,
+            String textOrPassword,
+            String receiverOrPassword) {
         if (handle.compareTo(MessageType.INVITE_USER_GROUP.toString()) == 0) {
             return makeCreateInvitationMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.compareTo(MessageType.ACCEPT_INVITE_USER.toString()) == 0) {
@@ -354,8 +374,12 @@ public class Message {
      * @return Instance of Message (or its subclasses) representing the handle,
      * name, & textOrPassword.
      */
-    protected static Message makeMessage(String handle, String srcName, String textOrPassword, String receiverOrPassword) {
-        Message result = null;
+    protected static Message makeMessage(
+            String handle,
+            String srcName,
+            String textOrPassword,
+            String receiverOrPassword) {
+        Message result;
         result = handleMakeGeneralMessages(handle, srcName, textOrPassword, receiverOrPassword);
         result = (result == null) ? handleMakeGroupMessages(handle, srcName, textOrPassword, receiverOrPassword) : result;
         result = (result == null) ? handleMakeUserMessages(handle, srcName, textOrPassword, receiverOrPassword) : result;
@@ -1221,21 +1245,21 @@ public class Message {
     @Override
     public String toString() {
         String result = msgType.toString();
-        if (msgSender != null) {
+        if (msgSender != null)
             result += " " + msgSender.length() + " " + msgSender;
-        } else {
+        else
             result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
-        }
-        if (msgTextOrPassword != null) {
+
+        if (msgTextOrPassword != null)
             result += " " + msgTextOrPassword.length() + " " + msgTextOrPassword;
-        } else {
+        else
             result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
-        }
-        if (msgReceiverOrPassword != null) {
+
+        if (msgReceiverOrPassword != null)
             result += " " + msgReceiverOrPassword.length() + " " + msgReceiverOrPassword;
-        } else {
+        else
             result += " " + NULL_OUTPUT.length() + " " + NULL_OUTPUT;
-        }
+
         return result;
     }
 }

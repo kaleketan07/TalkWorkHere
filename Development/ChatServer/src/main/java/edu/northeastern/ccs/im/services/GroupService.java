@@ -1,7 +1,6 @@
 package edu.northeastern.ccs.im.services;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +28,7 @@ public class GroupService implements GroupDao {
     private DBUtils utils;
     private ResultSet result;
     private static GroupService groupServiceInstance;
-    Properties groupProperties;
+    private Properties groupProperties;
     
     private static final String USER_NAME = "username";
     private static final String FIRST_NAME = "first_name";
@@ -44,11 +43,10 @@ public class GroupService implements GroupDao {
     /**
      * Instantiates a new group service.
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    private GroupService() throws ClassNotFoundException, SQLException, IOException {
+    private GroupService() throws SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
         groupProperties = conn.getQueryProperties();
@@ -59,11 +57,10 @@ public class GroupService implements GroupDao {
      * Gets the singleton group service instance.
      *
      * @return GroupService           the group service instance
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      * @throws IOException            Signals that an I/O exception has occurred.
      */
-    public static GroupService getGroupServiceInstance() throws ClassNotFoundException, SQLException, IOException {
+    public static GroupService getGroupServiceInstance() throws SQLException, IOException {
         if (groupServiceInstance == null) {
             groupServiceInstance = new GroupService();
         }
@@ -296,10 +293,7 @@ public class GroupService implements GroupDao {
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
         result = pstmt.executeQuery();
         if(result.first()) {
-        	boolean removed = result.getBoolean(IS_REMOVED);
-        	if(!removed){
-        		return true;
-        	}
+        	return !result.getBoolean(IS_REMOVED);
         }
         pstmt.close();
         return false;
@@ -313,9 +307,8 @@ public class GroupService implements GroupDao {
      * @param group         the group in which we are searching for groups
      * @param descGroups    the set of descendant groups
      * @return Set          the flat list (set) of groups present in this group
-     * @throws SQLException the SQL exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) throws SQLException {
+    private Set<String> getFlatListOfGroups(Group group, Set<String> descGroups) {
         descGroups.add(group.getGroupName());
         for (Group g : group.getMemberGroups()) {
             descGroups = getFlatListOfGroups(g, descGroups);

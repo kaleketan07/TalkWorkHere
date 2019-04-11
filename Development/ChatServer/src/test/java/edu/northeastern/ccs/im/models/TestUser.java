@@ -102,10 +102,7 @@ public class TestUser {
      * Test user send message when ClientRunnable is Null and not initialized
      *
      * @throws SQLException           the sql exception
-     * @throws ClassNotFoundException the class not found exception
-     * @throws IOException            the io exception
      * @throws NoSuchFieldException   the no such field exception
-     * @throws IllegalAccessException the illegal access exception
      */
     @Test
     public void testUserSendMessageWhenClientRunnableIsNull() throws SQLException, NoSuchFieldException,
@@ -153,13 +150,11 @@ public class TestUser {
      * Test user send message when clientRunnable is not null and initialized.
      *
      * @throws SQLException           the sql exception
-     * @throws ClassNotFoundException the class not found exception
-     * @throws IOException            the io exception
      * @throws NoSuchFieldException   the no such field exception
      * @throws IllegalAccessException the illegal access exception
      */
     @Test
-    public void testUserSendMessageWhenClientRunnableNotNull() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
+    public void testUserSendMessageWhenClientRunnableNotNull() throws SQLException, NoSuchFieldException,
             IllegalAccessException {
         ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
         Field fieldCMS = User.class.getDeclaredField("cms");
@@ -185,13 +180,11 @@ public class TestUser {
      * Test user send message when client runnable not null but not initialized.
      *
      * @throws SQLException           the sql exception
-     * @throws ClassNotFoundException the class not found exception
-     * @throws IOException            the io exception
      * @throws NoSuchFieldException   the no such field exception
      * @throws IllegalAccessException the illegal access exception
      */
     @Test
-    public void testUserSendMessageWhenClientRunnableNotNullButNotInitialized() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
+    public void testUserSendMessageWhenClientRunnableNotNullButNotInitialized() throws SQLException, NoSuchFieldException,
             IllegalAccessException {
         ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
         Field fieldCMS = User.class.getDeclaredField("cms");
@@ -232,7 +225,7 @@ public class TestUser {
     }
 
     @Test
-    public void testUserSendMessageWhenClientRunnableNotNullWithGroupMessage() throws SQLException, ClassNotFoundException, IOException, NoSuchFieldException,
+    public void testUserSendMessageWhenClientRunnableNotNullWithGroupMessage() throws SQLException, IOException, NoSuchFieldException,
             IllegalAccessException {
         ConversationalMessageService mockedCMS = mock(ConversationalMessageService.class);
         Field fieldCMS = User.class.getDeclaredField("cms");

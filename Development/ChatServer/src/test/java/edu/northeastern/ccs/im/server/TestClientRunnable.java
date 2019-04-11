@@ -318,7 +318,7 @@ public class TestClientRunnable {
      */
     @Test
     public void testHandleIncomingMessageWithIteratorWithPrivateWithValidDestAddress()
-            throws SQLException, ClassNotFoundException, IllegalAccessException, IllegalArgumentException, NoSuchFieldException{
+            throws SQLException, IllegalAccessException, IllegalArgumentException, NoSuchFieldException{
         clientRunnableObject.run();
         mockedUser.setLoggedIn(true);
         when(networkConnectionMock.iterator()).thenReturn(resetAndAddMessages(messageList,PRIVATE_MESSAGE));

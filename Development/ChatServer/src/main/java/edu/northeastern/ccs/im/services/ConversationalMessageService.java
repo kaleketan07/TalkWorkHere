@@ -1,7 +1,6 @@
 package edu.northeastern.ccs.im.services;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +24,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
 
     private IDBConnection conn;
     private PreparedStatement pstmt = null;
-    private DBUtils utils = null;
+    private DBUtils utils;
     private ResultSet result;
     private Properties conversationalMessageProperties;
     
@@ -42,10 +41,9 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will initialize
      * and establish the connection to the database for the message table
      *
-     * @throws ClassNotFoundException the class not found exception
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private ConversationalMessageService() throws ClassNotFoundException, SQLException, IOException {
+    private ConversationalMessageService() throws SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
         result = null;
@@ -57,9 +55,8 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      *
      * @return                        the conversational message service
      * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws ClassNotFoundException the class not found exception
      */
-    public static ConversationalMessageService getInstance() throws SQLException, IOException, ClassNotFoundException {
+    public static ConversationalMessageService getInstance() throws SQLException, IOException {
         if (conversationalMessageService == null)
             conversationalMessageService = new ConversationalMessageService();
         return conversationalMessageService;
@@ -147,7 +144,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         final String UPDATE_DELETE_FLAG = conversationalMessageProperties.getProperty("UPDATE_DELETE_FLAG");
         pstmt = conn.getPreparedStatement(UPDATE_DELETE_FLAG);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
-        int res = 0;
+        int res;
         try {
             res = pstmt.executeUpdate();
         } catch (Exception e) {

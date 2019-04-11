@@ -130,7 +130,7 @@ public class ClientRunnable implements Runnable {
      *
      * @param network NetworkConnection used by this new client
      */
-    public ClientRunnable(NetworkConnection network) {
+    ClientRunnable(NetworkConnection network) {
         // Create the class we will use to send and receive communication
         connection = network;
         // Mark that we are not initialized
@@ -149,7 +149,7 @@ public class ClientRunnable implements Runnable {
             groupService = GroupService.getGroupServiceInstance();
             conversationalMessagesService = ConversationalMessageService.getInstance();
             invitationService = InvitationService.getInstance();
-        } catch (ClassNotFoundException | SQLException | IOException e) {
+        } catch (SQLException | IOException e) {
             ChatLogger.error("Exception occurred : " + e);
         }
     }
@@ -189,7 +189,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Sending response message from prattle to client
      */
-    public void enqueuePrattleResponseMessage(String responseMessage) {
+    private void enqueuePrattleResponseMessage(String responseMessage) {
         this.enqueueMessage(Message.makePrattleMessage(responseMessage));
     }
 
@@ -269,7 +269,7 @@ public class ClientRunnable implements Runnable {
      *
      * @return int      Returns the current value of userName.
      */
-    public int getUserId() {
+    int getUserId() {
         return userId;
     }
 
@@ -316,7 +316,7 @@ public class ClientRunnable implements Runnable {
      * Checks incoming messages and performs appropriate actions based on the type
      * of message.
      */
-    protected void handleIncomingMessages() throws SQLException {
+    private void handleIncomingMessages() throws SQLException {
         // Client has already been initialized, so we should first check
         // if there are any input
         // messages.
@@ -395,7 +395,7 @@ public class ClientRunnable implements Runnable {
      * @return boolean      true, if the password satisfies all valid password checks
      */
     private boolean isValidPassword(String password) {
-    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{5,12}$";
+    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!_])(?=\\S+$).{5,12}$";
     	return password.matches(pattern);
     }
 
@@ -471,7 +471,7 @@ public class ClientRunnable implements Runnable {
      */
     private void sendMessagesToUser(User currentUser) throws SQLException {
         List<ConversationalMessage> unsentMessages = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
-        Message resultMessage = null;
+        Message resultMessage;
         for(ConversationalMessage m: unsentMessages) {
             resultMessage = createMessageFromConversationalMessage(m);
             currentUser.enqueueMessageToUser(resultMessage, m.getMessageUniquekey());
@@ -521,7 +521,7 @@ public class ClientRunnable implements Runnable {
      *                  group message of a private user message
      */
     private Message createMessageFromConversationalMessage (ConversationalMessage m) {
-    	Message resultMessage = null;
+    	Message resultMessage;
     	if (m.getGroupUniqueKey() == null) {
     		resultMessage = Message.makePrivateUserMessage(m.getSourceName(), m.getMessageText(), m.getDestinationName());
     	} else {
@@ -779,7 +779,7 @@ public class ClientRunnable implements Runnable {
      * @return String           the mapped attribute name to be updated
      */
     private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException {
-        String mappedAttribute = null;
+        String mappedAttribute;
         if (attributeNumber.compareTo("1") == 0)
             mappedAttribute = "first_name";
         else if (attributeNumber.compareTo("2") == 0)
@@ -1296,7 +1296,8 @@ public class ClientRunnable implements Runnable {
             workString.append(String.format("%n%-15s | %-15s %n", "Group Name::", "Moderator Name::"));
         for (Map.Entry<String, String> pair : resultantSet.entrySet())
             workString.append(String.format("%-15s | %-15s %n", pair.getKey(), pair.getValue()));
-        workString.append("Number of results : " + resultantSet.size());
+        workString.append("Number of results : ");
+        workString.append(resultantSet.size());
         String answerString = workString.toString();
 
         this.enqueuePrattleResponseMessage(answerString);
@@ -1420,7 +1421,7 @@ public class ClientRunnable implements Runnable {
      * @param msg   the message object sent by the user
      */
     private void handleGetPastMessages(Message msg){
-        List<ConversationalMessage> msgs = new ArrayList<>();
+        List<ConversationalMessage> msgs;
         try {
             msgs = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
         }catch (Exception e){
@@ -1690,10 +1691,10 @@ public class ClientRunnable implements Runnable {
         // Check for our "special messages"
         boolean result;
         result = handleGeneralMessages(msg);
-        result = result ? result : handleGroupMessages(msg);
-        result = result ? result : handleUserMessages(msg);
-        result = result ? result : handleCommunicationMessages(msg);
-        result = result ? result : handleInvitationMessages(msg);
+        result = result || handleGroupMessages(msg);
+        result = result || handleUserMessages(msg);
+        result = result || handleCommunicationMessages(msg);
+        result = result || handleInvitationMessages(msg);
 
         if (!result) {
             ChatLogger.warning("Message not one of the required types " + msg);
@@ -1746,7 +1747,7 @@ public class ClientRunnable implements Runnable {
      * @param future Instance controlling when the runnable is executed from within
      *               the thread pool.
      */
-    public void setFuture(ScheduledFuture<?> future) {
+    void setFuture(ScheduledFuture<?> future) {
         runnableMe = future;
     }
 
@@ -1754,7 +1755,7 @@ public class ClientRunnable implements Runnable {
      * Terminate a client that we wish to remove. This termination could happen at
      * the client's request or due to system need.
      */
-    public void terminateClient() throws SQLException {
+    private void terminateClient() throws SQLException {
         // Once the communication is done, close this connection.
         connection.close();
 

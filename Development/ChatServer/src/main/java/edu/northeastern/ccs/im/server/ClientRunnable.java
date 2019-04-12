@@ -1401,7 +1401,6 @@ public class ClientRunnable implements Runnable {
         }
     }
 
-
     /**
      * Handle add group to group message.
      *

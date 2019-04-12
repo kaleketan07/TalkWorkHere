@@ -9,7 +9,6 @@ package edu.northeastern.ccs.im.services;
 
 import java.sql.SQLException;
 import java.util.List;
-
 import edu.northeastern.ccs.im.models.ConversationalMessage;
 
 public interface ConversationalMessageDAO {

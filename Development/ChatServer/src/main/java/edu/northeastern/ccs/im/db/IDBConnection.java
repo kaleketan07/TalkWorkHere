@@ -14,22 +14,22 @@ public interface IDBConnection {
     /**
      * Closes the existing connection
      *
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     void close() throws SQLException;
 
     /**
      * Create a PreparedStatement on the given connection.
      *
-     * @param sqlQuery              Query to be executed
+     * @param sqlQuery Query to be executed
      * @return PreparedStatement    the prepared statement used in executing database queries
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException;
 
     /**
      * @return the instance of queryProperties
      */
-	Properties getQueryProperties();
+    Properties getQueryProperties();
 
 }

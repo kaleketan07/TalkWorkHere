@@ -68,8 +68,9 @@ public class TestInvitationService {
     /**
      * Tests the getInstance method if it returns an
      * InvitationService instance.
+     *
      * @throws SQLException - the exception thrown when a downstream database error occurs
-     * @throws IOException - thrown by the get Instance method
+     * @throws IOException  - thrown by the get Instance method
      */
     @Test
     public void testGetInstance() throws IOException, SQLException {
@@ -90,6 +91,7 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitation method when match is found for two input overloaded version
+     *
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
@@ -110,8 +112,9 @@ public class TestInvitationService {
     }
 
     /**
-     *  Test get Invitations for Invitee when no record is found
-     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     * Test get Invitations for Invitee when no record is found
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationsForInviteeNull() throws SQLException {
@@ -121,6 +124,7 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitationForInvitee method when match is found
+     *
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
@@ -134,8 +138,9 @@ public class TestInvitationService {
     }
 
     /**
-     *  Test get Invitations for Groups when no record is found
-     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     * Test get Invitations for Groups when no record is found
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationsForGroupNull() throws SQLException {
@@ -145,6 +150,7 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitationForGroups method when match is found
+     *
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
@@ -159,7 +165,8 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitation method when no match is found for three input overloaded version
-     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationThreeParamsNoMatchFound() throws SQLException {
@@ -169,7 +176,8 @@ public class TestInvitationService {
 
     /**
      * Test the getInvitation method when match is found for three input overloaded version
-     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetInvitationThreeParamsMatchFound() throws SQLException {

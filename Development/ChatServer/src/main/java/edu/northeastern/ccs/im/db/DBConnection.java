@@ -18,8 +18,8 @@ public class DBConnection implements IDBConnection {
     /**
      * Constructor to create a new Database connection
      *
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException      the io exception that can be thrown
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException  the io exception that can be thrown
      */
     public DBConnection() throws SQLException, IOException {
         Properties properties = new Properties();
@@ -38,7 +38,7 @@ public class DBConnection implements IDBConnection {
     /**
      * Closes the existing connection
      *
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public void close() throws SQLException {
@@ -48,25 +48,25 @@ public class DBConnection implements IDBConnection {
     /**
      * Create a PreparedStatement on the given connection.
      *
-     * @param sqlQuery              Query to be executed
+     * @param sqlQuery Query to be executed
      * @return PreparedStatement    the prepared statement used in executing database queries
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public PreparedStatement getPreparedStatement(String sqlQuery) throws SQLException {
         return connection.prepareStatement(sqlQuery);
     }
-    
+
     /**
      * @return the instance of queryProperties
      */
     @Override
     public Properties getQueryProperties() {
-		return queryProperties;
+        return queryProperties;
     }
-    
+
     private Connection connection;
     private Properties queryProperties;
-	
+
 
 }

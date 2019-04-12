@@ -43,19 +43,19 @@ public class ConversationalMessage {
      * @return the group unique key
      */
     public String getGroupUniqueKey() {
-		return groupUniqueKey;
-	}
+        return groupUniqueKey;
+    }
 
-	/**
-	 * Sets the group unique key.
-	 *
-	 * @param groupUniqueKey the new group unique key
-	 */
-	public void setGroupUniqueKey(String groupUniqueKey) {
-		this.groupUniqueKey = groupUniqueKey;
-	}
+    /**
+     * Sets the group unique key.
+     *
+     * @param groupUniqueKey the new group unique key
+     */
+    public void setGroupUniqueKey(String groupUniqueKey) {
+        this.groupUniqueKey = groupUniqueKey;
+    }
 
-	/**
+    /**
      * @return username of the sender of the message
      */
     public String getSourceName() {
@@ -96,5 +96,5 @@ public class ConversationalMessage {
     public String toString() {
         return this.getMessageUniquekey();
     }
-    
+
 }

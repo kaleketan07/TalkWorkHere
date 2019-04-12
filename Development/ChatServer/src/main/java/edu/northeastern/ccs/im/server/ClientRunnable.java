@@ -170,7 +170,7 @@ public class ClientRunnable implements Runnable {
             conversationalMessagesService = ConversationalMessageService.getInstance();
             invitationService = InvitationService.getInstance();
         } catch (SQLException | IOException e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - ClientRunnable() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - ClientRunnable() : " + ChatLogger.getTrace(e));
         }
     }
 
@@ -328,7 +328,7 @@ public class ClientRunnable implements Runnable {
                 terminateClient();
             }
         } catch (SQLException e) {
-            ChatLogger.error("SQL Exception occurred - ClientRunnable.java - run() : " + e.getStackTrace());
+            ChatLogger.error("SQL Exception occurred - ClientRunnable.java - run() : " + ChatLogger.getTrace(e));
         }
     }
 
@@ -760,7 +760,7 @@ public class ClientRunnable implements Runnable {
             else
                 this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
         } catch (SQLException e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserProfileUpdateMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserProfileUpdateMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU " +
                     "messages using HELP UPU");
         }
@@ -783,7 +783,7 @@ public class ClientRunnable implements Runnable {
                 userService.followUser(followeeUser, followerUser);
                 this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
             } catch (SQLException e) {
-                ChatLogger.error("Exception occurred - ClientRunnable.java - handleFollowUserMessage() : " + e.getStackTrace());
+                ChatLogger.error("Exception occurred - ClientRunnable.java - handleFollowUserMessage() : " + ChatLogger.getTrace(e));
                 this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
             }
         }
@@ -846,7 +846,7 @@ public class ClientRunnable implements Runnable {
             else
                 helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFollowersMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFollowersMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFR.");
         }
@@ -868,7 +868,7 @@ public class ClientRunnable implements Runnable {
             else
                 helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetOnlineUserMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetOnlineUserMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GOU.");
         }
@@ -891,7 +891,7 @@ public class ClientRunnable implements Runnable {
             else
                 helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFolloweesMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFolloweesMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE + " using HELP GFE.");
         }
     }
@@ -1186,7 +1186,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUpdateGroupMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUpdateGroupMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     "group update syntax using HELP UPG");
         }
@@ -1310,7 +1310,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserSearchMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserSearchMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
@@ -1331,7 +1331,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "Group");
         } catch (Exception e) {
-            ChatLogger.error("Error occurred - ClientRunnable.java - handleGroupSearchMessage() : " + e.getStackTrace());
+            ChatLogger.error("Error occurred - ClientRunnable.java - handleGroupSearchMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
@@ -1463,7 +1463,7 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("You are not a member of the group you are trying to leave");
             }
         } catch (SQLException e) {
-            ChatLogger.error("SQLException occurred - ClientRunnable.java - handleLeaveGroupMessage() : " + e.getStackTrace());
+            ChatLogger.error("SQLException occurred - ClientRunnable.java - handleLeaveGroupMessage() : " + ChatLogger.getTrace(e));
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE);
         }
     }
@@ -1483,7 +1483,7 @@ public class ClientRunnable implements Runnable {
             this.helperFormatAndEnqueueMessages(msgs);
         } catch (Exception e) {
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + ChatLogger.getTrace(e));
         }
     }
 
@@ -1508,7 +1508,7 @@ public class ClientRunnable implements Runnable {
                 this.helperFormatAndEnqueueMessages(msgs);
             }
         } catch (SQLException e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + ChatLogger.getTrace(e));
             enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again.");
         }
     }
@@ -1583,7 +1583,7 @@ public class ClientRunnable implements Runnable {
             else
                 enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleTapUserMessage() : " + e.getStackTrace());
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleTapUserMessage() : " + ChatLogger.getTrace(e));
             enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, " +
                     "please try again.");
         }

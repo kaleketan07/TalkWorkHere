@@ -167,9 +167,9 @@ public abstract class Prattle {
                 tt.setFuture(clientFuture);
             }
         } catch (AssertionError ae) {
-            ChatLogger.error("Caught AssertionError - Prattle.java - createClientThread() : " + ae.getStackTrace());
+            ChatLogger.error("Caught AssertionError - Prattle.java - createClientThread() : " + ChatLogger.getTrace(ae));
         } catch (IOException e) {
-            ChatLogger.error("IOException occurred - Prattle.java - createClientThread(): " + e.getStackTrace());
+            ChatLogger.error("IOException occurred - Prattle.java - createClientThread(): " + ChatLogger.getTrace(e));
         }
     }
 }

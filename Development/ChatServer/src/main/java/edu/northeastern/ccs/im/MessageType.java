@@ -4,7 +4,6 @@ package edu.northeastern.ccs.im;
  * Enumeration for the different types of messages.
  *
  * @author Maria Jump
- *
  */
 public enum MessageType {
     /**
@@ -166,7 +165,7 @@ public enum MessageType {
      * Message handle for a user to retrieve all their messages
      */
     GET_PAST_MESSAGES("GPM"),
-    
+
     /**
      * Message handle for a user to leave a group
      */

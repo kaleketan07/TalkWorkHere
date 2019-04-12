@@ -20,10 +20,10 @@ public class DBUtils {
      * Sets prepared statement arguments. This is used to prepare any preparedStatement with
      * any no. of arguments, this replaces the tedious use of preparedStmt.set() methods.
      *
-     * @param stmt                  the PreparedStatement to set
-     * @param args                  the arguments that need to be set in the statement
+     * @param stmt the PreparedStatement to set
+     * @param args the arguments that need to be set in the statement
      * @return PreparedStatement    the prepared statement with its arguments set according to the parameter data type
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     public PreparedStatement setPreparedStatementArgs(PreparedStatement stmt, Object... args) throws SQLException {
         int i = 1;

@@ -8,7 +8,7 @@ import edu.northeastern.ccs.im.models.User;
 /**
  * Each instance of this class represents a single transmission by our IM
  * clients.
- *
+ * <p>
  * This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
  * International License. To view a copy of this license, visit
  * http://creativecommons.org/licenses/by-sa/4.0/. It is based on work
@@ -293,7 +293,7 @@ public class Message {
         } else if (handle.equals(MessageType.GET_ONLINE_USERS.toString())) {
             return makeGetOnlineUserMessage(srcName);
         } else if (handle.equals(MessageType.TAP_USER.toString())) {
-            return makeTapUserMessage(srcName,textOrPassword);
+            return makeTapUserMessage(srcName, textOrPassword);
         }
         return null;
     }
@@ -324,10 +324,10 @@ public class Message {
             return makeSearchMessage(srcName, textOrPassword, receiverOrPassword);
         } else if (handle.equals(MessageType.DELETE_PRIVATE_MESSAGE.toString())) {
             return makeDeletePrivateMessageMessage(srcName, textOrPassword);
-        } else if(handle.equals(MessageType.GET_PAST_MESSAGES.toString())){
+        } else if (handle.equals(MessageType.GET_PAST_MESSAGES.toString())) {
             return makeGetPastMessages(srcName);
-        } else if(handle.equals(MessageType.GET_CONVERSATION_HISTORY.toString())){
-            return makeGetConversationHistory(srcName,textOrPassword);
+        } else if (handle.equals(MessageType.GET_CONVERSATION_HISTORY.toString())) {
+            return makeGetConversationHistory(srcName, textOrPassword);
         }
         return null;
     }
@@ -706,7 +706,7 @@ public class Message {
     public static Message makeGroupMessage(String srcName, String text, String grpName) {
         return new Message(MessageType.MESSAGE_GROUP, srcName, text, grpName);
     }
-    
+
     /**
      * This method creates a leave group message for user
      *
@@ -766,10 +766,11 @@ public class Message {
 
     /**
      * Make a message of the type GPM (Get Past Messages), that will retrieve all the messages for the user
+     *
      * @param srcName the username of the user requesting to see all messages
      * @return a new Message object of type GET_PAST_MESSAGES
      */
-    public static Message makeGetPastMessages(String srcName){
+    public static Message makeGetPastMessages(String srcName) {
         return new Message(MessageType.GET_PAST_MESSAGES, srcName);
     }
 
@@ -777,7 +778,7 @@ public class Message {
      * Make a message of the type GCH (Get conversation history), that will retrieve all the messages of a user of
      * interest
      *
-     * @param srcName the username, which will be the government's username (or the appropriate third party
+     * @param srcName        the username, which will be the government's username (or the appropriate third party
      * @param userOfInterest the username of the person of interest
      * @return a new Message object of type Get Conversation History
      */
@@ -792,7 +793,7 @@ public class Message {
      * @param userOfInterest the user of interest
      * @return the message object of type TAP_USER
      */
-    public static Message makeTapUserMessage(String srcName, String userOfInterest){
+    public static Message makeTapUserMessage(String srcName, String userOfInterest) {
         return new Message(MessageType.TAP_USER, srcName, userOfInterest);
     }
 
@@ -948,7 +949,7 @@ public class Message {
     public boolean isRegisterMessage() {
         return (msgType == MessageType.REGISTER);
     }
-    
+
     /**
      * This method verifies if the current message has the handle LGP (is a Leave Group message)
      *
@@ -957,7 +958,7 @@ public class Message {
     public boolean isLeaveGroupMessage() {
         return (msgType == MessageType.LEAVE_GROUP);
     }
-    
+
     /**
      * This method verifies if the current message has the handle DEG (is a delete_group message)
      *
@@ -1216,24 +1217,30 @@ public class Message {
 
     /**
      * Checks if the current message is of type Get Past Messages
+     *
      * @return - true if it is that message, false otherwise
      */
-    public boolean isGetPastMessages(){
+    public boolean isGetPastMessages() {
         return (msgType == MessageType.GET_PAST_MESSAGES);
     }
 
     /**
      * Checks if the current message is a government's message for getting the conversation history
+     *
      * @return - true if it is that message, false otherwise
      */
-    public boolean isGetConversationHistory(){ return (msgType == MessageType.GET_CONVERSATION_HISTORY);}
+    public boolean isGetConversationHistory() {
+        return (msgType == MessageType.GET_CONVERSATION_HISTORY);
+    }
 
     /**
      * Is tap user message boolean.
      *
      * @return true or false based on the condition evaluation for the handle
      */
-    public boolean isTapUserMessage() { return (msgType == MessageType.TAP_USER); }
+    public boolean isTapUserMessage() {
+        return (msgType == MessageType.TAP_USER);
+    }
 
     /**
      * Representation of this message as a String. This begins with the message

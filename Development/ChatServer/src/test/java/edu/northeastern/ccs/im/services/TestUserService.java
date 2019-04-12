@@ -539,7 +539,7 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testTapUserForTrue() throws SQLException{
+    public void testTapUserForTrue() throws SQLException {
         Assertions.assertTrue(us.tapUser(USER));
     }
 
@@ -549,7 +549,7 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testTapUserForFalse() throws SQLException{
+    public void testTapUserForFalse() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenReturn(0);
         Assertions.assertFalse(us.tapUser(USER));
     }
@@ -560,7 +560,7 @@ public class TestUserService {
      * @throws SQLException the sql exception
      */
     @Test
-    public void testTapUserForException() throws SQLException{
+    public void testTapUserForException() throws SQLException {
         when(mockedPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         Assertions.assertThrows(SQLException.class, () -> us.tapUser(USER));
     }

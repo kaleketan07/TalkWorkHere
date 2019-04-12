@@ -35,7 +35,7 @@ public class InvitationService implements InvitationDao {
     private ResultSet result;
     private static InvitationService invitationServiceInstance;
     private Properties invitationProperties;
-    
+
     /**
      * Constants used in multiple methods of the service
      */
@@ -51,8 +51,8 @@ public class InvitationService implements InvitationDao {
     /**
      * Instantiates a new invitation service.
      *
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException      Signals that an I/O exception has occurred.
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException  Signals that an I/O exception has occurred.
      */
     private InvitationService() throws SQLException, IOException {
         connection = new DBConnection();
@@ -64,8 +64,8 @@ public class InvitationService implements InvitationDao {
      * Gets the singleton invitation service instance.
      *
      * @return the invitation service instance
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException      Signals that an I/O exception has occurred.
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException  Signals that an I/O exception has occurred.
      */
     public static InvitationService getInstance() throws SQLException, IOException {
         if (invitationServiceInstance == null) {
@@ -77,11 +77,11 @@ public class InvitationService implements InvitationDao {
     /**
      * The method to get an invitation based on the three inputs provided
      *
-     * @param inviter       the person who is the sender of the invitation
-     * @param invitee       the person who is receiving the invitation
-     * @param groupName     the group for which the invite is being send
+     * @param inviter   the person who is the sender of the invitation
+     * @param invitee   the person who is receiving the invitation
+     * @param groupName the group for which the invite is being send
      * @return Message      returns null or a Message based on whether a record was found in the database for the
-     *                      given search criteria
+     * given search criteria
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
@@ -111,16 +111,16 @@ public class InvitationService implements InvitationDao {
     /**
      * The method to get an invitation based on the two inputs provided
      *
-     * @param invitee       the person who is receiving the invitation
-     * @param groupName     the group for which the invite is being send
+     * @param invitee   the person who is receiving the invitation
+     * @param groupName the group for which the invite is being send
      * @return Message      returns null or a Message based on whether a record was found in the database for the
-     *                      given search criteria
+     * given search criteria
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Message getInvitation(String invitee, String groupName) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("GET_INVITATION");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("GET_INVITATION");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         result = preparedStatement.executeQuery();
         Message message = null;
@@ -146,16 +146,16 @@ public class InvitationService implements InvitationDao {
      * The method for accepting or denying an invitation. This method will be used by moderators
      * of the group for which the invite was sent.
      *
-     * @param invitee       The person who is invited
-     * @param groupName     The group for which the invite is sent
-     * @param approved      The flag denoting true for approval and false for rejection
+     * @param invitee   The person who is invited
+     * @param groupName The group for which the invite is sent
+     * @param approved  The flag denoting true for approval and false for rejection
      * @return boolean      Returns true or false based on whether the update to the database was successful.
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean approveRejectInvitation(String invitee, String groupName, boolean approved) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("APPROVE_REJECT_INVITATION");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("APPROVE_REJECT_INVITATION");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, approved, !approved, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -166,16 +166,16 @@ public class InvitationService implements InvitationDao {
      * The method for accepting or denying an invitation. This method will be used by users
      * who have received an invite
      *
-     * @param invitee       The person who is invited
-     * @param groupName     The group for which the invite is sent
-     * @param accepted      The flag denoting true for acceptance and false for denial
+     * @param invitee   The person who is invited
+     * @param groupName The group for which the invite is sent
+     * @param accepted  The flag denoting true for acceptance and false for denial
      * @return boolean      Returns true or false based on whether the update to the database was successful.
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean acceptDenyInvitation(String invitee, String groupName, boolean accepted) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("ACCEPT_DENY_INVITATION");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("ACCEPT_DENY_INVITATION");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, accepted, !accepted, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -185,16 +185,16 @@ public class InvitationService implements InvitationDao {
     /**
      * The method create a new invitation
      *
-     * @param inviter       the person who is the sender of the invitation
-     * @param invitee       the person who is receiving the invitation
-     * @param groupName     the group for which the invite is being sent
+     * @param inviter   the person who is the sender of the invitation
+     * @param invitee   the person who is receiving the invitation
+     * @param groupName the group for which the invite is being sent
      * @return boolean      returns true if the record was entered in the database else false
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean createInvitation(String inviter, String invitee, String groupName) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("CREATE_INVITATION");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("CREATE_INVITATION");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, inviter, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -204,16 +204,16 @@ public class InvitationService implements InvitationDao {
     /**
      * The method delete an invitation.
      *
-     * @param inviter       the person who is the sender of the invitation
-     * @param invitee       the person who is receiving the invitation
-     * @param groupName     the group for which the invite is being sent
+     * @param inviter   the person who is the sender of the invitation
+     * @param invitee   the person who is receiving the invitation
+     * @param groupName the group for which the invite is being sent
      * @return boolean      returns true if the invite was deleted, false if there was any issue that occurred.
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean deleteInvitation(String inviter, String invitee, String groupName) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("DELETE_INVITATION");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("DELETE_INVITATION");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, true, inviter, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -223,14 +223,14 @@ public class InvitationService implements InvitationDao {
     /**
      * The method gets invitations that need to be sent to an invitee
      *
-     * @param invitee       the person who is receiving the invitation
+     * @param invitee the person who is receiving the invitation
      * @return Set          the set of messages which have to be delivered to the user
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Set<Message> getInvitationsForInvitee(String invitee) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("GET_INVITATION_FOR_INVITEE");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("GET_INVITATION_FOR_INVITEE");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee);
         result = preparedStatement.executeQuery();
         Set<Message> messages = extractInvitations();
@@ -239,16 +239,16 @@ public class InvitationService implements InvitationDao {
     }
 
     /**
-     *  The method that gets invitations that need to be sent to a group moderator
+     * The method that gets invitations that need to be sent to a group moderator
      *
-     * @param groupName     the group for which the invitations need to be fetched
+     * @param groupName the group for which the invitations need to be fetched
      * @return Set          the set of messages which have to be delivered to the user
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Set<Message> getInvitationsForGroup(String groupName) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("GET_INVITATION_FOR_GROUP");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("GET_INVITATION_FOR_GROUP");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, groupName);
         result = preparedStatement.executeQuery();
         Set<Message> messages = extractInvitations();
@@ -258,35 +258,35 @@ public class InvitationService implements InvitationDao {
 
 
     /**
-     *
      * Sets the is sent flag for the invitation when sent to intended invitee
      *
-     * @param invitee       the person who is receiving the invitation
-     * @param groupName     the group for which the invite is being sent
+     * @param invitee   the person who is receiving the invitation
+     * @param groupName the group for which the invite is being sent
      * @return boolean      true if the invite is successfully set, false otherwise
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean setInvitationIsSentToInvitee(String invitee, String groupName) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("INVITATION_SENT_TO_INVITEE");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("INVITATION_SENT_TO_INVITEE");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
         return qResult > 0;
     }
+
     /**
      * Sets the is sent flag for the invitation when sent to intended moderator
      *
-     * @param invitee       the person who is receiving the invitation
-     * @param groupName     the group for which the invite is being sent
+     * @param invitee   the person who is receiving the invitation
+     * @param groupName the group for which the invite is being sent
      * @return boolean      true if the invite is successfully set, false otherwise
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean setInvitationIsSentToModerator(String invitee, String groupName) throws SQLException {
-    	final String QUERY = invitationProperties.getProperty("INVITATION_SENT_TO_MODERATOR");
-    	preparedStatement = connection.getPreparedStatement(QUERY);
+        final String QUERY = invitationProperties.getProperty("INVITATION_SENT_TO_MODERATOR");
+        preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -296,7 +296,7 @@ public class InvitationService implements InvitationDao {
     /**
      * Method to extract invitations from a result set
      *
-     * @return  Set         the set of Message objects extracted from the database query results
+     * @return Set         the set of Message objects extracted from the database query results
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private Set<Message> extractInvitations() throws SQLException {

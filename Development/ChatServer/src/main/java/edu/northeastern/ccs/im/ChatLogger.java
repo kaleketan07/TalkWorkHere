@@ -8,6 +8,8 @@
 package edu.northeastern.ccs.im;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -81,6 +83,29 @@ public class ChatLogger {
         write(Level.INFO, msg);
     }
 
+
+    /**
+     * Gets the stack trace of the given exception
+     * @param e the exception whose stack trace needs to be updated
+     * @return the stack trace extracted from the exception
+     */
+    public static final String getTrace(Exception e) {
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
+        return errors.toString();
+    }
+
+    /**
+     * Gets the stack trace of the given error
+     * @param e the error whose stack trace needs to be updated
+     * @return the stack trace extracted from the error
+     */
+    public static final String getTrace(Error e) {
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
+        return errors.toString();
+    }
+
     /**
      * Toggles between the handler types.
      *
@@ -133,7 +158,7 @@ public class ChatLogger {
             fileHandler.setLevel(Level.ALL);
             LOGGER.addHandler(fileHandler);
         } catch (IOException e) {
-            throw new IllegalStateException("Exception occurred - ChatLogger.java - switchToFile() : " + e.getStackTrace());
+            throw new IllegalStateException("Exception occurred - ChatLogger.java - switchToFile() : " + ChatLogger.getTrace(e));
         }
     }
 

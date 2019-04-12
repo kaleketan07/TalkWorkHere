@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -34,7 +35,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     private DBUtils utils;
     private ResultSet result;
     private Properties conversationalMessageProperties;
-    
+
     private static ConversationalMessageService conversationalMessageService;
     private static final String DB_COL_MSG_SRC = "msg_src";
     private static final String DB_COL_MSG_DEST = "msg_dest";
@@ -45,10 +46,10 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     private static final String GRP_COL_GRP_KEY = "group_unique_key";
 
     /**
-     * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will initialize
-     * and establish the connection to the database for the message table
+     * Instantiates an conversationalMessageService object for ConversationalMessageService. This constructor will
+     * initialize and establish the connection to the database for the message table
      *
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private ConversationalMessageService() throws SQLException, IOException {
         conn = new DBConnection();
@@ -60,8 +61,8 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     /**
      * Getting the singleton instance of the class
      *
-     * @return                        the conversational message service
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @return the conversational message service
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     public static ConversationalMessageService getInstance() throws SQLException, IOException {
         if (conversationalMessageService == null)
@@ -77,7 +78,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @param msgText        Text in the message
      * @param setFlag        Marks if this message has been sent to the user or queued
      * @return String        UniqueKey for the particular message (msgSource + msgDestination + sqlTimestamp)
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public String insertConversationalMessage(String msgSource, String msgDestination, String msgText, boolean setFlag)
@@ -87,7 +88,15 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         long time = System.currentTimeMillis();
         Timestamp sqlTimestamp = new Timestamp(time);
         String uniqueKey = msgSource + msgDestination + sqlTimestamp;
-        pstmt = utils.setPreparedStatementArgs(pstmt, msgSource, msgDestination, msgText, sqlTimestamp, uniqueKey, setFlag);
+        pstmt = utils.setPreparedStatementArgs(
+                pstmt,
+                msgSource,
+                msgDestination,
+                msgText,
+                sqlTimestamp,
+                uniqueKey,
+                setFlag
+        );
         pstmt.executeUpdate();
         pstmt.close();
         return uniqueKey;
@@ -98,11 +107,13 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      *
      * @param msgSource      Username of the source of the message
      * @param msgDestination Username of the Destination of the message
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
-    public List<ConversationalMessage> getMessagebySourceAndDestination(String msgSource, String msgDestination) throws SQLException {
-        final String GET_MESSAGES_BETWEEN_SOURCE_DESTINATION = conversationalMessageProperties.getProperty("GET_MESSAGES_BETWEEN_SOURCE_DESTINATION");
+    public List<ConversationalMessage> getMessagebySourceAndDestination(String msgSource, String msgDestination)
+            throws SQLException {
+        final String GET_MESSAGES_BETWEEN_SOURCE_DESTINATION
+                = conversationalMessageProperties.getProperty("GET_MESSAGES_BETWEEN_SOURCE_DESTINATION");
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BETWEEN_SOURCE_DESTINATION);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgSource, msgDestination);
         return getMessages(pstmt);
@@ -112,7 +123,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     /**
      * Retrieving a list of messages from a given source
      *
-     * @param msgSrc        Username of the source of the message
+     * @param msgSrc Username of the source of the message
      * @return List         List of conversational message objects
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -127,13 +138,14 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     /**
      * Retrieving a list of messages from a given destination
      *
-     * @param msgDest       Username of the destination of the message
+     * @param msgDest Username of the destination of the message
      * @return List         List of conversational message objects
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public List<ConversationalMessage> getMessagebyDestination(String msgDest) throws SQLException {
-        final String GET_MESSAGES_BY_DESTINATION = conversationalMessageProperties.getProperty("GET_MESSAGES_BY_DESTINATION");
+        final String GET_MESSAGES_BY_DESTINATION
+                = conversationalMessageProperties.getProperty("GET_MESSAGES_BY_DESTINATION");
         pstmt = conn.getPreparedStatement(GET_MESSAGES_BY_DESTINATION);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgDest);
         return getMessages(pstmt);
@@ -155,6 +167,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         try {
             res = pstmt.executeUpdate();
         } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ConversationalMessageService.java - deleteMessage() : " + e.getStackTrace());
             throw new SQLException(e);
         }
         pstmt.close();
@@ -209,10 +222,11 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
      * @param uniqueGroupKey   the unique group key
      * @param uniqueMessageKey the unique message key
      * @return boolean         true, if the message was inserted successfully else return false
-     * @throws SQLException    the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
-    public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey) throws SQLException {
+    public boolean insertGroupConversationalMessage(String uniqueGroupKey, String uniqueMessageKey)
+            throws SQLException {
         final String ADD_MAPPING = conversationalMessageProperties.getProperty("ADD_MAPPING");
         pstmt = conn.getPreparedStatement(ADD_MAPPING);
         pstmt = utils.setPreparedStatementArgs(pstmt, uniqueGroupKey, uniqueMessageKey);
@@ -225,9 +239,9 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
     /**
      * Delete group message and the mappings from the group message table and all the messages from the .
      *
-     * @param grpMsgUniqueKey       the group message unique key
-     * @return boolean              true, if successfully deleted else return false
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param grpMsgUniqueKey the group message unique key
+     * @return boolean          true, if successfully deleted else return false
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean deleteGroupMessage(String grpMsgUniqueKey) throws SQLException {
@@ -248,57 +262,58 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         }
         return true;
     }
-    
+
     /**
      * Gets all the messages for the user.
      *
-     * @param userName      the user name for whom the messages are to be fetched
-     * @param flag          for deciding whether this function should retrieve all unsent messages or all past messages
-     *                      if true - then retrieve all messages that are not sent to the user
-     *                      if false - then retrieve all past messages for the user
-     * @return List         the unsent messages for user as Map with keys as the message objects and unique keys as the value
+     * @param userName the user name for whom the messages are to be fetched
+     * @param flag     for deciding whether this function should retrieve all unsent messages or all past messages
+     *                 if true - then retrieve all messages that are not sent to the user
+     *                 if false - then retrieve all past messages for the user
+     * @return List         the unsent messages for user as Map with keys as the message objects and unique keys as
+     * the value
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public List<ConversationalMessage> getMessagesForUser(String userName, boolean flag) throws SQLException {
-    	final String GET_MESSAGES;
-        if(flag)
+        final String GET_MESSAGES;
+        if (flag)
             GET_MESSAGES = conversationalMessageProperties.getProperty("GET_DELETED_MESSAGES");
         else
             GET_MESSAGES = conversationalMessageProperties.getProperty("GET_ALL_MESSAGES");
         pstmt = conn.getPreparedStatement(GET_MESSAGES);
-        if(flag)
+        if (flag)
             pstmt = utils.setPreparedStatementArgs(pstmt, userName);
         else
-            pstmt = utils.setPreparedStatementArgs(pstmt,userName,userName);
-    	List<ConversationalMessage> msgs = new ArrayList<>();
+            pstmt = utils.setPreparedStatementArgs(pstmt, userName, userName);
+        List<ConversationalMessage> msgs = new ArrayList<>();
         result = pstmt.executeQuery();
         while (result.next()) {
-        	String msgSrc = result.getString(DB_COL_MSG_SRC);
+            String msgSrc = result.getString(DB_COL_MSG_SRC);
             String msgDest = result.getString(DB_COL_MSG_DEST);
             String msgText = result.getString(DB_COL_MSG_TEXT);
             String msgKey = result.getString(DB_COL_MSG_UNIQUEKEY);
             String grpMsgKey = result.getString(GRP_COL_GRP_KEY);
             ConversationalMessage msg = new ConversationalMessage(msgSrc, msgDest, msgText, null, msgKey);
-        	if (grpMsgKey != null) {
-            	msg.setGroupUniqueKey(grpMsgKey);
+            if (grpMsgKey != null) {
+                msg.setGroupUniqueKey(grpMsgKey);
             }
-        	msgs.add(msg);
-         }
+            msgs.add(msg);
+        }
         pstmt.close();
-    	return msgs;
+        return msgs;
     }
-    
+
     /**
      * Marks a message with the provided uniqueKey as sent.
      *
-     * @param msgUniqueKey     the unique key of the message to be marked sent
+     * @param msgUniqueKey the unique key of the message to be marked sent
      * @return boolean         true, if successfully marked the message to be sent else return false
-     * @throws SQLException    the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean markMessageAsSent(String msgUniqueKey) throws SQLException {
-    	final String MARK_MSG_AS_SENT = conversationalMessageProperties.getProperty("MARK_MSG_AS_SENT");
+        final String MARK_MSG_AS_SENT = conversationalMessageProperties.getProperty("MARK_MSG_AS_SENT");
         pstmt = conn.getPreparedStatement(MARK_MSG_AS_SENT);
         pstmt = utils.setPreparedStatementArgs(pstmt, msgUniqueKey);
         int res = pstmt.executeUpdate();

@@ -117,7 +117,7 @@ public class TestMessage {
         assertTrue(message.isLoginMessage());
         assertFalse(message.isRegisterMessage());
         assertFalse(message.isLeaveGroupMessage());
-        
+
     }
 
     /**
@@ -144,7 +144,7 @@ public class TestMessage {
     public void testMakeMessageForLeaveGroup() {
         Message message = Message.makeMessage(LGP, SENDER_NAME, GROUP_NAME, PASS);
         assertTrue(message.isLeaveGroupMessage());
-        
+
     }
 
     /**
@@ -1005,7 +1005,7 @@ public class TestMessage {
     @Test
     public void testMakeGetPastMessages() {
         Message message = Message.makeGetPastMessages(SENDER_NAME);
-        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Assertions.assertEquals(SENDER_NAME, message.getName());
     }
 
     /**
@@ -1013,7 +1013,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForGetPastMessages() {
-        Message message = Message.makeMessage(GPM,SENDER_NAME,NULL_OUTPUT,NULL_OUTPUT);
+        Message message = Message.makeMessage(GPM, SENDER_NAME, NULL_OUTPUT, NULL_OUTPUT);
         Assertions.assertTrue(message.isGetPastMessages());
     }
 
@@ -1032,8 +1032,8 @@ public class TestMessage {
      */
     @Test
     public void testMakeTapUserMessages() {
-        Message message = Message.makeTapUserMessage(SENDER_NAME,SENDER_NAME);
-        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Message message = Message.makeTapUserMessage(SENDER_NAME, SENDER_NAME);
+        Assertions.assertEquals(SENDER_NAME, message.getName());
     }
 
 
@@ -1042,7 +1042,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForTapUserMessages() {
-        Message message = Message.makeMessage(TPU,SENDER_NAME,SENDER_NAME,NULL_OUTPUT);
+        Message message = Message.makeMessage(TPU, SENDER_NAME, SENDER_NAME, NULL_OUTPUT);
         Assertions.assertTrue(message.isTapUserMessage());
     }
 
@@ -1061,8 +1061,8 @@ public class TestMessage {
      */
     @Test
     public void testMakeGetConversationHistory() {
-        Message message = Message.makeGetConversationHistory(SENDER_NAME,ANOTHER_USER);
-        Assertions.assertEquals(SENDER_NAME,message.getName());
+        Message message = Message.makeGetConversationHistory(SENDER_NAME, ANOTHER_USER);
+        Assertions.assertEquals(SENDER_NAME, message.getName());
     }
 
     /**
@@ -1070,7 +1070,7 @@ public class TestMessage {
      */
     @Test
     public void testMakeMessageForGetConversationHistory() {
-        Message message = Message.makeMessage(GCH,SENDER_NAME,ANOTHER_USER,NULL_OUTPUT);
+        Message message = Message.makeMessage(GCH, SENDER_NAME, ANOTHER_USER, NULL_OUTPUT);
         Assertions.assertTrue(message.isGetConversationHistory());
     }
 

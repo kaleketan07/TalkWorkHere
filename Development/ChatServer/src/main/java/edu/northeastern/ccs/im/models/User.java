@@ -35,7 +35,7 @@ public class User {
         try {
             cms = ConversationalMessageService.getInstance();
         } catch (IOException | SQLException e) {
-            ChatLogger.error("Conversational Message Service failed to initialize: " + e);
+            ChatLogger.error("Conversational Message Service failed to initialize " + e.toString());
         }
     }
 
@@ -63,19 +63,19 @@ public class User {
      * @return boolean      true, if the user that this object represents is tapped, else returns false
      */
     public boolean isTapped() {
-		return isTapped;
-	}
+        return isTapped;
+    }
 
-	/**
-	 * Sets the tapped flag for the user that this object represents.
+    /**
+     * Sets the tapped flag for the user that this object represents.
      *
-	 * @param isTapped      the value that denotes the user is tapped or not
-	 */
-	public void setTapped(boolean isTapped) {
-		this.isTapped = isTapped;
-	}
+     * @param isTapped the value that denotes the user is tapped or not
+     */
+    public void setTapped(boolean isTapped) {
+        this.isTapped = isTapped;
+    }
 
-	/**
+    /**
      * @return String    first name of the user
      */
     public String getFirstName() {
@@ -83,7 +83,7 @@ public class User {
     }
 
     /**
-     * @param firstName   value to set for the first name
+     * @param firstName value to set for the first name
      */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -97,7 +97,7 @@ public class User {
     }
 
     /**
-     * @param lastName     value to set fir the last name
+     * @param lastName value to set fir the last name
      */
     public void setLastName(String lastName) {
         this.lastName = lastName;
@@ -111,7 +111,7 @@ public class User {
     }
 
     /**
-     * @param userName      value to set for the username
+     * @param userName value to set for the username
      */
     public void setUserName(String userName) {
         this.userName = userName;
@@ -125,7 +125,7 @@ public class User {
     }
 
     /**
-     * @param userPassword  value to set for the userPassword
+     * @param userPassword value to set for the userPassword
      */
     public void setUserPassword(String userPassword) {
         this.userPassword = userPassword;
@@ -134,7 +134,7 @@ public class User {
     /**
      * set the loggedIn flag to the given parameter value
      *
-     * @param status        the true or false status of the user's loggedIn attribute
+     * @param status the true or false status of the user's loggedIn attribute
      */
     public void setLoggedIn(boolean status) {
         loggedIn = status;
@@ -143,7 +143,7 @@ public class User {
     /**
      * Set the searchable flag of the user according to their preference
      *
-     * @param searchableStatus  true or false status of the user's searchable preference
+     * @param searchableStatus true or false status of the user's searchable preference
      */
     public void setSearchable(boolean searchableStatus) {
         searchable = searchableStatus;
@@ -177,17 +177,16 @@ public class User {
      * first check if the user is online by checking if there is a ClientRunnable present for
      * this instance and then enqueue the message if present accordingly.
      *
-     * @param msg           The message to be sent to this user
+     * @param msg The message to be sent to this user
      * @return String       the unique key of the message sent
      * @throws SQLException the sql exception thrown in case of error in jdbc's interaction with the data source
      */
     public String userSendMessage(Message msg) throws SQLException {
         String src = msg.getName();
         String msgText = msg.getTextOrPassword();
-        String uniqueKey;
         clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
         if (clientRunnable != null && clientRunnable.isInitialized()) {
-            uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
+            String uniqueKey = cms.insertConversationalMessage(src, this.getUserName(), msgText, true);
             enqueueMessageToUser(msg, uniqueKey);
             return uniqueKey;
         }
@@ -195,28 +194,28 @@ public class User {
         return cms.insertConversationalMessage(src, this.getUserName(), msgText, false);
     }
 
-	/**
-	 * Enqueue message to user depending on the type of the message when the user is logged in.
-	 *
-	 * @param msg           the message object
-	 * @param uniqueKey     the unique key of the message
-	 */
-	public void enqueueMessageToUser(Message msg, String uniqueKey) {
-		clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
-		if (msg.isGroupMessage()) {
-			clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
-		            System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator()));
-		} else {
-			clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
-		            System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
-		}
-	}
+    /**
+     * Enqueue message to user depending on the type of the message when the user is logged in.
+     *
+     * @param msg       the message object
+     * @param uniqueKey the unique key of the message
+     */
+    public void enqueueMessageToUser(Message msg, String uniqueKey) {
+        clientRunnable = ClientRunnable.getClientByUsername(this.getUserName());
+        if (msg.isGroupMessage()) {
+            clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, "Sent on group: " + msg.getReceiverOrPassword() + ": \n" + msg.getTextOrPassword() +
+                    System.lineSeparator() + "MessageKey of above message is : " + uniqueKey + System.lineSeparator()));
+        } else {
+            clientRunnable.enqueueMessage(Message.addUniqueKeyToMsg(msg, msg.getTextOrPassword() +
+                    System.lineSeparator() + "MessageKey of above message is : " + uniqueKey));
+        }
+    }
 
 
     /**
      * The overriden equals method to check if the two user objects are equal, based on the username of the users
      *
-     * @param obj       The object to be checked for equality with the current object
+     * @param obj The object to be checked for equality with the current object
      * @return boolean  true if the current and given objects have same username, false otherwise
      */
     @Override
@@ -230,7 +229,7 @@ public class User {
     /**
      * Overridden method to generate unique hashcode for every User object
      *
-     * @return  int     a unique integer for every user object
+     * @return int     a unique integer for every user object
      */
     @Override
     public int hashCode() {

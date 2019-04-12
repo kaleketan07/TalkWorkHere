@@ -55,7 +55,7 @@ public class UserService implements UserDao {
      * and establish the connection to the database for the user_profile table for each
      * user.
      *
-     * @throws SQLException          the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private UserService() throws SQLException, IOException {
         conn = new DBConnection();
@@ -68,8 +68,8 @@ public class UserService implements UserDao {
      * Gets instance of the user service class
      *
      * @return the instance
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException            the io exception
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException  the io exception
      */
     public static UserService getInstance() throws SQLException, IOException {
         if (userServiceInstance == null)
@@ -105,8 +105,8 @@ public class UserService implements UserDao {
      * This function returns the user details of a particular user when given their username
      * and password.
      *
-     * @param username      username of the User
-     * @param password      password of the User
+     * @param username username of the User
+     * @param password password of the User
      * @return User         the User object with all the details of the user
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -114,7 +114,7 @@ public class UserService implements UserDao {
     public User getUserByUserNameAndPassword(String username, String password) throws SQLException {
         User user = null;
         final String GET_USER_USERNAME_PSWD =
-        		userProperties.getProperty("GET_USER_USERNAME_PSWD");
+                userProperties.getProperty("GET_USER_USERNAME_PSWD");
         pstmt = conn.getPreparedStatement(GET_USER_USERNAME_PSWD);
         pstmt = utils.setPreparedStatementArgs(pstmt, username, password);
         result = pstmt.executeQuery();
@@ -133,7 +133,7 @@ public class UserService implements UserDao {
     /**
      * Gets all the user details of the user, given the username
      *
-     * @param username      the username of the user used for logging in
+     * @param username the username of the user used for logging in
      * @return User         A new user object with all the required details initialized.
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -158,7 +158,7 @@ public class UserService implements UserDao {
     /**
      * Creates a new user and inserts these user details in the database
      *
-     * @param u             is the User object with all the required fields initialized
+     * @param u is the User object with all the required fields initialized
      * @return boolean      True if the mysql query is successfully run and user is added to the database
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -184,21 +184,18 @@ public class UserService implements UserDao {
      * @param attributeName  the attribute to be updated
      * @param attributeValue the value of the attribute that is to be set
      * @return the boolean   true if the attributes were successfully updated, false otherwise
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean updateUserAttributes(String uname, String attributeName, String attributeValue) throws SQLException {
         final String UPDATE_USER = "UPDATE user_profile SET " + attributeName + "  = ? WHERE username = ?";
-        String trueOrFalse;
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        if (attributeName.compareTo("user_searchable") == 0) {
-            if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {
-                trueOrFalse = "0";
-                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, uname);
-            } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
-                trueOrFalse = "1";
-                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, uname);
-            } else
+        if (attributeName.equals("user_searchable")) {
+            if (attributeValue.equals(Integer.toString(0)) || attributeValue.equalsIgnoreCase("false"))
+                pstmt = utils.setPreparedStatementArgs(pstmt, "0", uname);
+            else if (attributeValue.equals(Integer.toString(1)) || attributeValue.equalsIgnoreCase("true"))
+                pstmt = utils.setPreparedStatementArgs(pstmt, "1", uname);
+            else
                 ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
         } else {
             pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, uname);
@@ -214,14 +211,13 @@ public class UserService implements UserDao {
      * NOTE: This basically means that the user is inactive and this function only sets another "is_deleted"
      * attribute of the user to true
      *
-     * @param u             The user object, that needs to be deleted
+     * @param u The user object, that needs to be deleted
      * @return boolean      True, if the deletion operation was successful, false otherwise
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean deleteUser(User u) throws SQLException {
-        final String DELETE_USER =
-        		userProperties.getProperty("DELETE_USER");
+        final String DELETE_USER = userProperties.getProperty("DELETE_USER");
         pstmt = conn.getPreparedStatement(DELETE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, u.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -233,15 +229,14 @@ public class UserService implements UserDao {
     /**
      * add a entry for a user following other user
      *
-     * @param followee      user who is the followee
-     * @param follower      user who is the follower
+     * @param followee user who is the followee
+     * @param follower user who is the follower
      * @return boolean      true if the relation was inserted successfully
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean followUser(User followee, User follower) throws SQLException {
-        final String FOLLOW_USER =
-        		userProperties.getProperty("FOLLOW_USER");
+        final String FOLLOW_USER = userProperties.getProperty("FOLLOW_USER");
         pstmt = conn.getPreparedStatement(FOLLOW_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -252,15 +247,14 @@ public class UserService implements UserDao {
     /**
      * delete a entry for a user following other user
      *
-     * @param followee      user who is the followee
-     * @param follower      user who is the follower
+     * @param followee user who is the followee
+     * @param follower user who is the follower
      * @return boolean      true if the relation was deleted successfully
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public boolean unfollowUser(User followee, User follower) throws SQLException {
-        final String UNFOLLOW_USER =
-        		userProperties.getProperty("UNFOLLOW_USER");
+        final String UNFOLLOW_USER = userProperties.getProperty("UNFOLLOW_USER");
         pstmt = conn.getPreparedStatement(UNFOLLOW_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -273,7 +267,7 @@ public class UserService implements UserDao {
      * This returns all the users whose usernames or first names start with
      * the given search string
      *
-     * @param searchString  the search string
+     * @param searchString the search string
      * @return Map          the hash map containing the usernames mapped to the respective full names
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -291,7 +285,7 @@ public class UserService implements UserDao {
     /**
      * Returns a string which contains username of all the followers of a given user
      *
-     * @param followee      user who is the followee
+     * @param followee user who is the followee
      * @return Map          map of strings which contains username and the full names of all the followers
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -309,7 +303,7 @@ public class UserService implements UserDao {
     /**
      * Returns a string which contains username of all the followees of a given user
      *
-     * @param follower      user who is the follower
+     * @param follower user who is the follower
      * @return Map          the map of strings which contains username and full names of all the followees
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
@@ -329,15 +323,14 @@ public class UserService implements UserDao {
      * Returns a Map<String, String> which contains username of all the user who are
      * online from the list of followees of the given user
      *
-     * @param follower      user who is the follower
+     * @param follower user who is the follower
      * @return Map          the map of strings which contains username and full names of all online users that the user
-     *                      is following
+     * is following
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
     public Map<String, String> getOnlineUsers(User follower) throws SQLException {
-        final String GET_ONLINE_USER =
-        		userProperties.getProperty("GET_ONLINE_USER");
+        final String GET_ONLINE_USER = userProperties.getProperty("GET_ONLINE_USER");
         pstmt = conn.getPreparedStatement(GET_ONLINE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();
@@ -349,13 +342,13 @@ public class UserService implements UserDao {
     /**
      * Service for setting the is_tapped field in the user table to 1
      *
-     * @param userOfInterest    the user of interest that needs to be tapped
+     * @param userOfInterest the user of interest that needs to be tapped
      * @return boolean          true if the update was successful, false otherwise
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
-    public boolean tapUser(String userOfInterest) throws SQLException{
-        final String TAP_USER = "UPDATE prattle.user_profile SET is_tapped = 1 WHERE username = ?";
+    public boolean tapUser(String userOfInterest) throws SQLException {
+        final String TAP_USER = userProperties.getProperty("TAP_USER");
         pstmt = utils.setPreparedStatementArgs(conn.getPreparedStatement(TAP_USER), userOfInterest);
         int qResult = pstmt.executeUpdate();
         return qResult > 0;
@@ -365,11 +358,11 @@ public class UserService implements UserDao {
      * Helper method to populate a map with the usernames and their full names and return this map to the calling
      * function
      *
-     * @param resultSet     the ResultSet object that was returned from the database query
+     * @param resultSet the ResultSet object that was returned from the database query
      * @return Map          a map of the usernames and their respective full names
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private Map<String, String> populateMapWithNames(ResultSet resultSet) throws SQLException{
+    private Map<String, String> populateMapWithNames(ResultSet resultSet) throws SQLException {
         Map<String, String> resultUsers = new HashMap<>();
         while (resultSet.next()) {
             String username = resultSet.getString(USER_NAME);

@@ -133,7 +133,7 @@ public class ChatLogger {
             fileHandler.setLevel(Level.ALL);
             LOGGER.addHandler(fileHandler);
         } catch (IOException e) {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException("Exception occurred - ChatLogger.java - switchToFile() : " + e.getStackTrace());
         }
     }
 

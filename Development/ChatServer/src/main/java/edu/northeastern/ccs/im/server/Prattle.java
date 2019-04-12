@@ -24,7 +24,7 @@ import edu.northeastern.ccs.im.NetworkConnection;
  * version of the server spawns a new thread to handle each client that connects
  * to it. At this point, messages are broadcast to all of the other clients. It
  * does not send a response when the user has gone off-line.
- * <p>
+ *
  * This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
  * International License. To view a copy of this license, visit
  * http://creativecommons.org/licenses/by-sa/4.0/. It is based on work

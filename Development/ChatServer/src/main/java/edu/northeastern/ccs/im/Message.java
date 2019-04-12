@@ -8,7 +8,7 @@ import edu.northeastern.ccs.im.models.User;
 /**
  * Each instance of this class represents a single transmission by our IM
  * clients.
- * <p>
+ *
  * This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
  * International License. To view a copy of this license, visit
  * http://creativecommons.org/licenses/by-sa/4.0/. It is based on work

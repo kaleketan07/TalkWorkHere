@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.db.DBConnection;
 import edu.northeastern.ccs.im.db.DBUtils;
 import edu.northeastern.ccs.im.db.IDBConnection;
@@ -153,6 +154,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         try {
             res = pstmt.executeUpdate();
         } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ConversationalMessageService.java - deleteMessage() : " + e.getStackTrace());
             throw new SQLException(e);
         }
         pstmt.close();

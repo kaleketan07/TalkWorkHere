@@ -108,7 +108,7 @@ public class NetworkConnection implements Iterable<Message> {
             key = channel.register(selector, SelectionKey.OP_READ);
         } catch (IOException e) {
             // For the moment we are going to simply cover up that there was a problem.
-            ChatLogger.error(e.toString());
+            ChatLogger.error("IOException occurred - NetworkConnection.java - NetworkConnection() : " + e.getMessage());
             throw new AssertionError();
         }
     }
@@ -154,7 +154,7 @@ public class NetworkConnection implements Iterable<Message> {
             selector.close();
             channel.close();
         } catch (IOException e) {
-            ChatLogger.error("Caught exception: " + e.toString());
+            ChatLogger.error("Exception occurred - NetworkConnection.java - close() : " + e.getStackTrace());
             throw new AssertionError();
         }
     }
@@ -235,6 +235,7 @@ public class NetworkConnection implements Iterable<Message> {
                 }
             } catch (IOException ioe) {
                 // For the moment, we will cover up this exception and hope it never occurs.
+                ChatLogger.error("IOException occurred - NetworkConnection.java - hasNext() : " + ioe.getStackTrace());
                 throw new AssertionError();
             }
             // Do we now have any messages?

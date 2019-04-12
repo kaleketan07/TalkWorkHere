@@ -353,7 +353,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean tapUser(String userOfInterest) throws SQLException{
-        final String TAP_USER = "UPDATE prattle.user_profile SET is_tapped = 1 WHERE username = ?";
+        final String TAP_USER = userProperties.getProperty("TAP_USER");
         pstmt = utils.setPreparedStatementArgs(conn.getPreparedStatement(TAP_USER), userOfInterest);
         int qResult = pstmt.executeUpdate();
         return qResult > 0;

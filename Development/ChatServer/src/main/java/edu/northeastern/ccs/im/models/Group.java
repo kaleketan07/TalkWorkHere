@@ -61,7 +61,7 @@ public class Group implements Member {
         try {
             cms = ConversationalMessageService.getInstance();
         } catch (IOException | SQLException e) {
-            ChatLogger.error("Conversational Message Service failed to initialize: " + e);
+            ChatLogger.error("Group.java - Conversational Message Service failed to initialize: " + e.getStackTrace());
         }
     }
 
@@ -78,7 +78,7 @@ public class Group implements Member {
     /**
      * Sets the group name.
      *
-     * @param name      the new group name
+     * @param name the new group name
      */
     public void setGroupName(String name) {
         this.groupName = name;
@@ -96,7 +96,7 @@ public class Group implements Member {
     /**
      * Sets the moderator name.
      *
-     * @param name      the new moderator name
+     * @param name the new moderator name
      */
     public void setModeratorName(String name) {
         this.moderatorName = name;
@@ -123,7 +123,7 @@ public class Group implements Member {
     /**
      * Sets the member users.
      *
-     * @param users     the set of new member users
+     * @param users the set of new member users
      */
     public void setMemberUsers(Set<User> users) {
         this.memberUsers = users;
@@ -132,7 +132,7 @@ public class Group implements Member {
     /**
      * Sets the member groups.
      *
-     * @param groups    the set of new member groups
+     * @param groups the set of new member groups
      */
     public void setMemberGroups(Set<Group> groups) {
         this.memberGroups = groups;
@@ -141,7 +141,7 @@ public class Group implements Member {
     /**
      * Send message to members of this group
      *
-     * @param msg           the message to be sent
+     * @param msg the message to be sent
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     public void groupSendMessage(Message msg, String uniqueGroupKey) throws SQLException {
@@ -165,7 +165,7 @@ public class Group implements Member {
      * The overriden equals method to check if the two group objects are equal, based on the group name of the given
      * group objects
      *
-     * @param obj       The object to be checked for equality with the current object
+     * @param obj The object to be checked for equality with the current object
      * @return boolean  true if the current and given objects have same group name, false otherwise
      */
     @Override
@@ -179,7 +179,7 @@ public class Group implements Member {
     /**
      * Overridden method to generate unique hashcode for every Group object
      *
-     * @return  int     a unique integer for every Group object
+     * @return int     a unique integer for every Group object
      */
     @Override
     public int hashCode() {

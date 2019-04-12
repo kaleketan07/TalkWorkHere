@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledFuture;
+
 import edu.northeastern.ccs.im.ChatLogger;
 import edu.northeastern.ccs.im.Message;
 import edu.northeastern.ccs.im.NetworkConnection;
@@ -123,6 +124,18 @@ public class ClientRunnable implements Runnable {
     private static int invalidCounter = 0;
 
     /**
+     * Constant to store invalid id
+     */
+    private static final int INVALID_USER_ID = -1;
+
+    /**
+     * Constant to store a common error message denoting a syntax error
+     */
+    private static final String CHECK_SYNTAX_ERROR_MESSAGE = "Something went wrong while retrieving data. " +
+            "Please check your syntax";
+
+
+    /**
      * Used for incrementing the invalidCounter, defined a separate method here
      * on account of invalidCounter being a static field
      *
@@ -157,7 +170,7 @@ public class ClientRunnable implements Runnable {
             conversationalMessagesService = ConversationalMessageService.getInstance();
             invitationService = InvitationService.getInstance();
         } catch (SQLException | IOException e) {
-            ChatLogger.error("Exception occurred : " + e);
+            ChatLogger.error("Exception occurred - ClientRunnable.java - ClientRunnable() : " + e.getStackTrace());
         }
     }
 
@@ -185,12 +198,12 @@ public class ClientRunnable implements Runnable {
      * Check if the message is properly formed. At the moment, this means checking
      * that the identifier is set properly.
      *
-     * @param msg       Message to be checked
+     * @param msg Message to be checked
      * @return boolean  True if message is correct; false otherwise
      */
     private boolean messageChecks(Message msg) {
         // Check that the message name matches.
-        return (msg.getName() != null) && (msg.getName().compareToIgnoreCase(getName()) == 0);
+        return (msg.getName() != null) && (msg.getName().equalsIgnoreCase(getName()));
     }
 
     /**
@@ -204,7 +217,7 @@ public class ClientRunnable implements Runnable {
      * Immediately send this message to the client. This returns if we were
      * successful or not in our attempt to send the message.
      *
-     * @param message   Message to be sent immediately.
+     * @param message Message to be sent immediately.
      * @return boolean  True if we sent the message successfully; false otherwise.
      */
     private boolean sendMessage(Message message) {
@@ -215,7 +228,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Try allowing this user to set his/her user name to the given username.
      *
-     * @param userName      The new value to which we will try to set userName.
+     * @param userName The new value to which we will try to set userName.
      * @return boolean      True if the username is deemed acceptable; false otherwise
      */
     private boolean setUserName(String userName) {
@@ -231,14 +244,14 @@ public class ClientRunnable implements Runnable {
             } else {
                 incrementInvalidCounter(invalidCounter);
                 setName("invalid-" + userName + "-" + invalidCounter);
-                userId = -1;
+                userId = INVALID_USER_ID;
                 result = true;
-                this.enqueuePrattleResponseMessage("There is already a user connected with this username. Please type " +
-                        " BYE and try logging in with another username.");
+                this.enqueuePrattleResponseMessage("There is already a user connected with this username. Please " +
+                        "type BYE and try logging in with another username.");
             }
         } else {
             // Clear this name; we cannot use it. *sigh*
-            userId = -1;
+            userId = INVALID_USER_ID;
         }
         return result;
     }
@@ -247,7 +260,7 @@ public class ClientRunnable implements Runnable {
      * Add the given message to this client to the queue of message to be sent to
      * the client.
      *
-     * @param message   Complete message to be sent.
+     * @param message Complete message to be sent.
      */
     public void enqueueMessage(Message message) {
         waitingList.add(message);
@@ -265,7 +278,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Set the name of the user for which this ClientRunnable was created.
      *
-     * @param name      The name for which this ClientRunnable.
+     * @param name The name for which this ClientRunnable.
      */
     public void setName(String name) {
         this.name = name;
@@ -315,7 +328,7 @@ public class ClientRunnable implements Runnable {
                 terminateClient();
             }
         } catch (SQLException e) {
-            ChatLogger.error("SQL Exception occurred - run() : " + e);
+            ChatLogger.error("SQL Exception occurred - ClientRunnable.java - run() : " + e.getStackTrace());
         }
     }
 
@@ -344,7 +357,8 @@ public class ClientRunnable implements Runnable {
                 } else if (msg.isLoginMessage() || msg.isRegisterMessage() || (user != null && user.isLoggedIn())) {
                     processMessage(msg);
                 } else {
-                    this.enqueuePrattleResponseMessage("Sorry, you are not logged in to use Prattle. Please log in and try again.");
+                    this.enqueuePrattleResponseMessage("Sorry, you are not logged in to use Prattle. Please log in " +
+                            "and try again.");
                 }
             }
         }
@@ -353,8 +367,8 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the register message
      *
-     * @param msg             the incoming register message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming register message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleRegisterMessage(Message msg) throws SQLException {
         // Register the user after checking whether the user already exists or no
@@ -363,53 +377,48 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("Username already exists.");
         } else {
             // since the user was not found, a new user with this name may be created after password validation checks
-        	String password = msg.getTextOrPassword();
-        	String confirmPassword = msg.getReceiverOrPassword();
-            if (isValidPassword(password)) {
-            	if (password.equals(confirmPassword)) {
-	                userService.createUser(new User(null, null, msg.getName(), password, true));
-	                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
-            	} else {
-            		this.enqueuePrattleResponseMessage("Password and confirm password do not match");
-            	}
-            } else {
+            String password = msg.getTextOrPassword();
+            String confirmPassword = msg.getReceiverOrPassword();
+            if (!isValidPassword(password)) {
                 this.enqueuePrattleResponseMessage("Password not strong enough. Make sure the password:\n"
-                		+ "1. is 5 to 12 characters long.\n"
-                		+ "2. contains atleast one uppercase and one lowercase characters.\n"
-                		+ "3. contains atleast one digit from 0-9.\n"
-                		+ "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
-                		+ "5. contains no spaces");
+                        + "1. is 5 to 12 characters long.\n"
+                        + "2. contains atleast one uppercase and one lowercase characters.\n"
+                        + "3. contains atleast one digit from 0-9.\n"
+                        + "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
+                        + "5. contains no spaces");
+            } else if (password.equals(confirmPassword)) {
+                userService.createUser(new User(null, null, msg.getName(), password, true));
+                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            } else {
+                this.enqueuePrattleResponseMessage("Password and confirm password do not match");
             }
-
         }
     }
-    
-    
+
     /**
      * Checks if passed userName is valid.
      *
-     * @param userName      the user name of the user
+     * @param userName the user name of the user
      * @return boolean      true, if user name passes the checks of validity, else returns false
      */
     private boolean isValidUserName(String userName) {
-    	return (userName != null && userName.length() < 12);
+        return (userName != null && userName.length() < 12);
     }
-    
+
     /**
      * Checks if is valid password.
      *
-     * @param password      the password of the user
+     * @param password the password of the user
      * @return boolean      true, if the password satisfies all valid password checks
      */
     private boolean isValidPassword(String password) {
-    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!_])(?=\\S+$).{5,12}$";
-    	return password.matches(pattern);
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!_])(?=\\S+$).{5,12}$");
     }
 
     /**
      * Handles private message
      *
-     * @param msg           the incoming message_user type of message
+     * @param msg the incoming message_user type of message
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handlePrivateMessage(Message msg) throws SQLException {
@@ -417,70 +426,77 @@ public class ClientRunnable implements Runnable {
         if (destUser == null) {
             this.enqueuePrattleResponseMessage("Destination username does not exist.");
         } else {
-            this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
+            this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " +
+                    destUser.userSendMessage(msg));
         }
     }
 
     /**
      * Handles the login message
      *
-     * @param msg             the incoming login message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming login message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleLoginMessage(Message msg) throws SQLException {
         // Login the user after checking in the user with this username-password combo exists
         User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
         if (currentUser == null) {
             this.enqueuePrattleResponseMessage("Incorrect username and password");
-        } else if (!userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1")) {
-                this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
+        } else if (!userService.updateUserAttributes(
+                currentUser.getUserName(),
+                "logged_in",
+                "1")
+                ) {
+            this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName()
+                    + " was not updated.");
         } else {
             handleSuccessfulLogin(msg, currentUser);
         }
     }
 
-	/**
-	 * Handles successful login and does all activity happening after a successful login.
-	 *
-	 * @param msg           the message object that was sent
-	 * @param currentUser   the object representing the user under consideration
-	 * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
-	 */
-	private void handleSuccessfulLogin(Message msg, User currentUser) throws SQLException {
-		this.enqueuePrattleResponseMessage("Welcome " + msg.getName() + "!! Here's what you missed::\n");
-		if (currentUser.isTapped()) {
-			notifyGovernment(currentUser);
-		}
-		sendMessagesToUser(currentUser);
-		sendInvitationsToUser(msg);
-		sendInvitationsToModerator(msg);
-	}
-    
-    
+    /**
+     * Handles successful login and does all activity happening after a successful login.
+     *
+     * @param msg         the message object that was sent
+     * @param currentUser the object representing the user under consideration
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
+     */
+    private void handleSuccessfulLogin(Message msg, User currentUser) throws SQLException {
+        this.enqueuePrattleResponseMessage("Welcome " + msg.getName() + "!! Here's what you missed::\n");
+        if (currentUser.isTapped()) {
+            notifyGovernment(currentUser);
+        }
+        sendMessagesToUser(currentUser);
+        sendInvitationsToUser(msg);
+        sendInvitationsToModerator(msg);
+    }
+
+
     /**
      * Notify government that this user logged in.
      *
-     * @param currentUser   the user under consideration
+     * @param currentUser the user under consideration
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private void notifyGovernment(User currentUser) throws SQLException{
+    private void notifyGovernment(User currentUser) throws SQLException {
         Timestamp notificationTimestamp = new Timestamp(System.currentTimeMillis());
-    	String notification = "\nUser with user name: " + currentUser.getUserName() + " logged in at: " + notificationTimestamp + "\n"; 
-    	User govtUser = userService.getUserByUserName(GOVERNMENT);
-    	govtUser.userSendMessage(Message.makePrattleMessage(notification));
+        String notification = "\nUser with user name: " + currentUser.getUserName() + " logged in at: " +
+                notificationTimestamp + "\n";
+        User govtUser = userService.getUserByUserName(GOVERNMENT);
+        govtUser.userSendMessage(Message.makePrattleMessage(notification));
     }
 
     /**
      * sends unsent messages to user on successful login
      *
-     * @param currentUser       the user who has logged on
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param currentUser the user who has logged on
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void sendMessagesToUser(User currentUser) throws SQLException {
-        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
-        Message resultMessage;
-        for(ConversationalMessage m: unsentMessages) {
-            resultMessage = createMessageFromConversationalMessage(m);
+        List<ConversationalMessage> unsentMessages
+                = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
+        for (ConversationalMessage m : unsentMessages) {
+            Message resultMessage = createMessageFromConversationalMessage(m);
             currentUser.enqueueMessageToUser(resultMessage, m.getMessageUniquekey());
             conversationalMessagesService.markMessageAsSent(m.getMessageUniquekey());
         }
@@ -489,17 +505,21 @@ public class ClientRunnable implements Runnable {
     /**
      * sends unsent invitations to user on successful login
      *
-     * @param msg             the login message received which triggers this action
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the login message received which triggers this action
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void sendInvitationsToModerator(Message msg) throws SQLException {
         //send unsent invitations to the moderator for each group
         Set<String> groups = groupService.getGroupsByModerator(msg.getName());
-        for(String groupName: groups) {
+        for (String groupName : groups) {
             Set<Message> invitationsGroup = invitationService.getInvitationsForGroup(groupName);
-            for(Message invitation: invitationsGroup) {
-                this.enqueuePrattleResponseMessage(invitation.getName() + " has invited " + invitation.getTextOrPassword() + " to join the group " + groupName);
-                invitationService.setInvitationIsSentToModerator(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
+            for (Message invitation : invitationsGroup) {
+                this.enqueuePrattleResponseMessage(invitation.getName() + " has invited " +
+                        invitation.getTextOrPassword() + " to join the group " + groupName);
+                invitationService.setInvitationIsSentToModerator(
+                        invitation.getTextOrPassword(),
+                        invitation.getReceiverOrPassword()
+                );
             }
         }
     }
@@ -507,43 +527,53 @@ public class ClientRunnable implements Runnable {
     /**
      * sends unsent invitations to moderator on successful login
      *
-     * @param msg               the login message received which triggers this action
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the login message received which triggers this action
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void sendInvitationsToUser(Message msg) throws SQLException {
         // send unsent invitations to the user
         Set<Message> invitations = invitationService.getInvitationsForInvitee(msg.getName());
-        for(Message invitation: invitations) {
-            this.enqueuePrattleResponseMessage("You have been invited to join the group " + invitation.getReceiverOrPassword() + " by user " + invitation.getName());
-            invitationService.setInvitationIsSentToInvitee(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
+        for (Message invitation : invitations) {
+            this.enqueuePrattleResponseMessage("You have been invited to join the group " +
+                    invitation.getReceiverOrPassword() + " by user " + invitation.getName());
+            invitationService.setInvitationIsSentToInvitee(
+                    invitation.getTextOrPassword(),
+                    invitation.getReceiverOrPassword()
+            );
         }
     }
 
     /**
      * Creates the message from conversational message.
      *
-     * @param m         the conversational message object returned by the conversational message
-     *                  service for the unsent message
+     * @param m the conversational message object returned by the conversational message
+     *          service for the unsent message
      * @return Message  the message object of type Message for depending upon if the message is a
-     *                  group message of a private user message
+     * group message of a private user message
      */
-    private Message createMessageFromConversationalMessage (ConversationalMessage m) {
-    	Message resultMessage;
-    	if (m.getGroupUniqueKey() == null) {
-    		resultMessage = Message.makePrivateUserMessage(m.getSourceName(), m.getMessageText(), m.getDestinationName());
-    	} else {
-    		resultMessage = Message.makeGroupMessage(m.getSourceName(), m.getMessageText(), m.getGroupUniqueKey().split("::")[1]);
-    	}
-    	return resultMessage;
+    private Message createMessageFromConversationalMessage(ConversationalMessage m) {
+        Message resultMessage;
+        if (m.getGroupUniqueKey() == null) {
+            resultMessage = Message.makePrivateUserMessage(m.getSourceName(), m.getMessageText(), m.getDestinationName());
+        } else {
+            resultMessage = Message.makeGroupMessage(
+                    m.getSourceName(),
+                    m.getMessageText(),
+                    m.getGroupUniqueKey().split("::")[1]
+            );
+        }
+        return resultMessage;
     }
+
     /**
      * Handles the createGroupMessage
      *
-     * @param msg               the incoming createGroupMessage
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming createGroupMessage
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleCreateGroupMessage(Message msg) throws SQLException {
-        // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+        // Create a group with the specified name with the sender as the moderator,
+        // if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup != null) {
             this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
@@ -557,24 +587,26 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the GetGroupMessage
      *
-     * @param msg               the incoming getGroup message
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming getGroup message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleGetGroupMessage(Message msg) throws SQLException {
-        // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+        // Create a group with the specified name with the sender as the moderator,
+        // if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup == null) {
             this.enqueuePrattleResponseMessage("Groupname does not exist. So no details can be provided");
         } else {
-            this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
+            this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " +
+                    existingGroup.getModeratorName());
         }
     }
 
     /**
      * Handles the handleDeleteGroupMessage
      *
-     * @param msg               the incoming login message
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming login message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleDeleteGroupMessage(Message msg) throws SQLException {
         // Delete the group after getting the valid moderator name and valid group name
@@ -597,8 +629,8 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the handleDeleteUserMessage
      *
-     * @param msg               the incoming delete user message
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming delete user message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleDeleteUserMessage(Message msg) throws SQLException {
         // Delete the user after getting the user
@@ -615,9 +647,9 @@ public class ClientRunnable implements Runnable {
     /**
      * Helper for checking the validity of input before calling the handlers for add or remove user to group message
      *
-     * @param currentUser   the current user requesting the service
-     * @param currentGroup  the group from which the user needs to be removed or added to.
-     * @param guestUser     the user to be added or removed.
+     * @param currentUser  the current user requesting the service
+     * @param currentGroup the group from which the user needs to be removed or added to.
+     * @param guestUser    the user to be added or removed.
      * @return boolean      true or false value based on the required checks passed or failed respectively.
      */
     private boolean helperAddRemoveUserToGroupMessage(User currentUser, Group currentGroup, User guestUser) {
@@ -635,9 +667,9 @@ public class ClientRunnable implements Runnable {
     /**
      * Helper for checking the validity of the input before calling handlers for add or remove group to group message.
      *
-     * @param currentUser   the current user
-     * @param currentGroup  the current group
-     * @param guestGroup    the guest group
+     * @param currentUser  the current user
+     * @param currentGroup the current group
+     * @param guestGroup   the guest group
      * @return boolean      true, if successful
      */
     private boolean helperAddRemoveGroupToGroupMessage(User currentUser, Group currentGroup, Group guestGroup) {
@@ -656,7 +688,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle PrivateReplyMessage to group message.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handlePrivateReplyMessage(Message msg) throws SQLException {
@@ -666,7 +698,8 @@ public class ClientRunnable implements Runnable {
             if (destUser == null) {
                 this.enqueuePrattleResponseMessage("msg_UniqueKey provided is wrong");
             } else {
-                this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
+                this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " +
+                        destUser.userSendMessage(msg));
             }
         } else
             this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
@@ -676,7 +709,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle add user to group message.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleAddUserToGroupMessage(Message msg) throws SQLException {
@@ -696,7 +729,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle remove user from group message.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleRemoveUserFromGroupMessage(Message msg) throws SQLException {
@@ -717,7 +750,7 @@ public class ClientRunnable implements Runnable {
      * Handle the update message sent by the user. This just updates the first name and
      * last name for the time being.
      *
-     * @param msg           The incoming user profile update message
+     * @param msg The incoming user profile update message
      */
     private void handleUserProfileUpdateMessage(Message msg) {
         try {
@@ -727,15 +760,16 @@ public class ClientRunnable implements Runnable {
             else
                 this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
         } catch (SQLException e) {
-            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages " +
-                    "using HELP UPU");
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserProfileUpdateMessage() : " + e.getStackTrace());
+            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU " +
+                    "messages using HELP UPU");
         }
     }
 
     /**
      * Handle a user following other user of the other user exists in the database
      *
-     * @param msg           The incoming follow user message
+     * @param msg The incoming follow user message
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleFollowUserMessage(Message msg) throws SQLException {
@@ -744,37 +778,33 @@ public class ClientRunnable implements Runnable {
 
         if (followeeUser == null) {
             this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
-            return;
+        } else {
+            try {
+                userService.followUser(followeeUser, followerUser);
+                this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
+            } catch (SQLException e) {
+                ChatLogger.error("Exception occurred - ClientRunnable.java - handleFollowUserMessage() : " + e.getStackTrace());
+                this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
+            }
         }
-        try {
-        	userService.followUser(followeeUser, followerUser); 
-        }
-        catch(SQLException e) {
-        	this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
-            return;	
-        }
-        this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
-        
     }
 
     /**
      * Handle a user unfollowing other user if the other user exists in the database
      *
-     * @param msg           The incoming follow user message
+     * @param msg The incoming follow user message
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleUnfollowUserMessage(Message msg) throws SQLException {
         User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
         User followerUser = userService.getUserByUserName(msg.getName());
 
-        if (followeeUser == null) {
+        if (followeeUser == null)
             this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
-            return;
-        }
-        if(userService.unfollowUser(followeeUser, followerUser)) 
-        	this.enqueuePrattleResponseMessage("You have stopped following : " + followeeUser.getUserName());
+        else if (userService.unfollowUser(followeeUser, followerUser))
+            this.enqueuePrattleResponseMessage("You have stopped following : " + followeeUser.getUserName());
         else
-        	this.enqueuePrattleResponseMessage("Aborted ..! You were not following : " + followeeUser.getUserName());      
+            this.enqueuePrattleResponseMessage("Aborted ..! You were not following : " + followeeUser.getUserName());
     }
 
 
@@ -782,18 +812,18 @@ public class ClientRunnable implements Runnable {
      * Helper function to help map the attribute name
      * to the number value sent by the user
      *
-     * @param attributeNumber   The number of the attribute to be mapped
+     * @param attributeNumber The number of the attribute to be mapped
      * @return String           the mapped attribute name to be updated
      */
     private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException {
         String mappedAttribute;
-        if (attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.equals("1"))
             mappedAttribute = "first_name";
-        else if (attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.equals("2"))
             mappedAttribute = "last_name";
-        else if (attributeNumber.compareTo("3") == 0)
+        else if (attributeNumber.equals("3"))
             mappedAttribute = "user_password";
-        else if (attributeNumber.compareTo("4") == 0)
+        else if (attributeNumber.equals("4"))
             mappedAttribute = "user_searchable";
         else
             throw new SQLException("Number not in bounds");
@@ -803,7 +833,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the messages get followers.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleGetFollowersMessage(Message msg) throws SQLException {
@@ -811,12 +841,12 @@ public class ClientRunnable implements Runnable {
         Map<String, String> resultantSet;
         try {
             resultantSet = userService.getFollowers(currUser);
-            if (resultantSet.isEmpty()) {
+            if (resultantSet.isEmpty())
                 this.enqueuePrattleResponseMessage("Sorry, did not find any followers");
-                return;
-            }
-            helperForBuildingAndSendingSearchMessage(resultantSet, "User");
+            else
+                helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFollowersMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GFR.");
         }
@@ -825,7 +855,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the messages get online users.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleGetOnlineUserMessage(Message msg) throws SQLException {
@@ -833,12 +863,12 @@ public class ClientRunnable implements Runnable {
         Map<String, String> resultantSet;
         try {
             resultantSet = userService.getOnlineUsers(currUser);
-            if (resultantSet.isEmpty()) {
+            if (resultantSet.isEmpty())
                 this.enqueuePrattleResponseMessage("Sorry, did not find any online users");
-                return;
-            }
-            helperForBuildingAndSendingSearchMessage(resultantSet, "User");
+            else
+                helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetOnlineUserMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP GOU.");
         }
@@ -848,7 +878,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handles the messages get followees.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleGetFolloweesMessage(Message msg) throws SQLException {
@@ -856,21 +886,20 @@ public class ClientRunnable implements Runnable {
         Map<String, String> resultantSet;
         try {
             resultantSet = userService.getFollowees(currUser);
-            if (resultantSet.isEmpty()) {
+            if (resultantSet.isEmpty())
                 this.enqueuePrattleResponseMessage("Sorry, did not find any followees");
-                return;
-            }
-            helperForBuildingAndSendingSearchMessage(resultantSet, "User");
+            else
+                helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
-            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
-                    " using HELP GFE.");
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFolloweesMessage() : " + e.getStackTrace());
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE + " using HELP GFE.");
         }
     }
 
     /**
      * Handles the messages sent on Groups.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleGroupMessage(Message msg) throws SQLException {
@@ -879,7 +908,8 @@ public class ClientRunnable implements Runnable {
         if (currGroup == null) {
             this.enqueuePrattleResponseMessage("The destination group does not exist");
         } else if (!groupService.isUserMemberOfTheGroup(currGroup.getGroupName(), currUser.getUserName())) {
-            this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() + " to send a message on it");
+            this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() +
+                    " to send a message on it");
         } else {
             this.enqueuePrattleResponseMessage("message sent successfully");
             // generate the group key to mark all individual messages sent as a result of this group message
@@ -887,20 +917,22 @@ public class ClientRunnable implements Runnable {
             Timestamp sqlTimestamp = new Timestamp(time);
             String uniqueGroupKey = currUser.getUserName() + "::" + currGroup.getGroupName() + "::" + sqlTimestamp;
             currGroup.groupSendMessage(msg, uniqueGroupKey);
-            this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " + uniqueGroupKey);
+            this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " +
+                    uniqueGroupKey);
         }
     }
 
     /**
      * The helper for invitation messages to check if the pre conditions are met
      *
-     * @param inviter           The inviter who is sending a group message
-     * @param invitee           The invitee who will receive a group message
-     * @param groupName         The group which for which the message is being sent
+     * @param inviter   The inviter who is sending a group message
+     * @param invitee   The invitee who will receive a group message
+     * @param groupName The group which for which the message is being sent
      * @return boolean          true if all the checks pass else false
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean checkInvitationMessageFromUserHelper(String inviter, String invitee, String groupName) throws SQLException {
+    private boolean checkInvitationMessageFromUserHelper(String inviter, String invitee, String groupName)
+            throws SQLException {
         User userInviter = (inviter == null) ? null : userService.getUserByUserName(inviter);
         User userInvitee = userService.getUserByUserName(invitee);
         Group group = groupService.getGroup(groupName);
@@ -917,7 +949,8 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName);
             result = false;
         } else if (userInviter != null && !groupUsers.contains(userInviter)) {
-            this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName + "; you cannot perform this operation.");
+            this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName +
+                    "; you cannot perform this operation.");
             result = false;
         }
         return result;
@@ -927,7 +960,7 @@ public class ClientRunnable implements Runnable {
      * The handle for messages of type Create Invitation
      * where a user sends an invite to another user to join a group
      *
-     * @param msg           The message to be handled
+     * @param msg The message to be handled
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleCreateInvitationMessage(Message msg) throws SQLException {
@@ -936,22 +969,24 @@ public class ClientRunnable implements Runnable {
         String groupName = msg.getReceiverOrPassword();
         if (checkInvitationMessageFromUserHelper(inviter, invitee, groupName)) {
             if (invitationService.getInvitation(invitee, groupName) != null)
-                this.enqueuePrattleResponseMessage("An invitation has already been sent to user " + invitee + " for the group " + groupName);
+                this.enqueuePrattleResponseMessage("An invitation has already been sent to user " + invitee +
+                        " for the group " + groupName);
             else if (invitationService.createInvitation(inviter, invitee, groupName)) {
                 ClientRunnable inviteeClient = userClients.getOrDefault(invitee, null);
-                if(inviteeClient != null) {
-                    inviteeClient.enqueuePrattleResponseMessage("You have been invited to join group " + groupName + " by user " + inviter);
+                if (inviteeClient != null) {
+                    inviteeClient.enqueuePrattleResponseMessage("You have been invited to join group " +
+                            groupName + " by user " + inviter);
                     invitationService.setInvitationIsSentToInvitee(invitee, groupName);
                 }
                 String moderator = groupService.getGroup(groupName).getModeratorName();
                 ClientRunnable moderatorClient = userClients.getOrDefault(moderator, null);
-                if(moderatorClient != null) {
-                    moderatorClient.enqueuePrattleResponseMessage(inviter + " has invited user " + invitee + " to join the group " + groupName);
+                if (moderatorClient != null) {
+                    moderatorClient.enqueuePrattleResponseMessage(inviter + " has invited user " + invitee +
+                            " to join the group " + groupName);
                     invitationService.setInvitationIsSentToModerator(invitee, groupName);
                 }
                 this.enqueuePrattleResponseMessage("The invitation was successfully sent.");
-            }
-            else
+            } else
                 this.enqueuePrattleResponseMessage("Unable to send invitation.");
         }
     }
@@ -962,7 +997,7 @@ public class ClientRunnable implements Runnable {
      * so that it is unavailable for acceptance by the user
      * or approval by the moderator after deletion.
      *
-     * @param msg           The message to be handled
+     * @param msg The message to be handled
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleDeleteInvitationUserMessage(Message msg) throws SQLException {
@@ -973,7 +1008,7 @@ public class ClientRunnable implements Runnable {
         if (checkInvitationMessageFromUserHelper(inviter, invitee, groupName)) {
             Message invitation = invitationService.getInvitation(invitee, groupName);
             if (invitation == null)
-                this.enqueuePrattleResponseMessage("No invitaton exists for the given user and group.");
+                this.enqueuePrattleResponseMessage("No invitation exists for the given user and group.");
             else if (invitation.isInvitationDeleted())
                 this.enqueuePrattleResponseMessage("Invitation is already deleted.");
             else if (!invitation.getName().equals(inviter))
@@ -989,7 +1024,7 @@ public class ClientRunnable implements Runnable {
      * The handle for messages of type Accept Invitation where a user
      * accepts their invitation to join a group
      *
-     * @param msg           The message to be handled
+     * @param msg The message to be handled
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleAcceptInvitationUserMessage(Message msg) throws SQLException {
@@ -1001,17 +1036,21 @@ public class ClientRunnable implements Runnable {
             if (invitation == null)
                 this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
             else if (invitation.isInvitationAccepted())
-                this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been removed from the group");
+                this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been " +
+                        "removed from the group");
             else if (invitation.isInvitationDenied())
                 this.enqueuePrattleResponseMessage("You have already denied this invitation; you cannot accept it now.");
             else if (invitation.isInvitationRejected())
-                this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you will have to wait for an invite from another user");
+                this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you " +
+                        "will have to wait for an invite from another user");
             else if (invitation.isInvitationDeleted())
-                this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have to wait for another invite.");
+                this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have " +
+                        "to wait for another invite.");
             else if (invitationService.acceptDenyInvitation(invitee, groupName, true)) {
                 this.enqueuePrattleResponseMessage("The invitation was successfully accepted.");
                 if (invitation.isInvitationApproved() && groupService.addUserToGroup(groupName, invitee)) {
-                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
+                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you " +
+                            "have been added to the group " + groupName);
                 }
             } else
                 this.enqueuePrattleResponseMessage("Unable to accept invitation.");
@@ -1022,7 +1061,7 @@ public class ClientRunnable implements Runnable {
      * The handle for messages of type Deny Invitation where a user
      * denies their invitation to join a group
      *
-     * @param msg           The message to be handled
+     * @param msg The message to be handled
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleDenyInvitationUserMessage(Message msg) throws SQLException {
@@ -1033,7 +1072,8 @@ public class ClientRunnable implements Runnable {
             if (invitation == null)
                 this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
             else if (invitation.isInvitationRejected())
-                this.enqueuePrattleResponseMessage("This invitation is already rejected by moderator; you do not need to deny it anymore");
+                this.enqueuePrattleResponseMessage("This invitation is already rejected by moderator; " +
+                        "you do not need to deny it anymore");
             else if (invitation.isInvitationAccepted())
                 this.enqueuePrattleResponseMessage("You have already accepted this invitation; you cannot deny it now");
             else if (invitation.isInvitationDenied())
@@ -1051,7 +1091,7 @@ public class ClientRunnable implements Runnable {
      * The handle for messages of type Approve Invitation where a moderator
      * approves an invitation for a user to join their group
      *
-     * @param msg           The message to be handled
+     * @param msg The message to be handled
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleApproveInvitationModeratorMessage(Message msg) throws SQLException {
@@ -1063,14 +1103,16 @@ public class ClientRunnable implements Runnable {
         Message invitation = invitationService.getInvitation(invitee, groupName);
         Group group = groupService.getGroup(groupName);
 
-        if(group == null)
+        if (group == null)
             this.enqueuePrattleResponseMessage("Invalid group name " + groupName);
-        else if(!groupService.isModerator(groupName, moderator))
-            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are not a moderator of this group");
+        else if (!groupService.isModerator(groupName, moderator))
+            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are " +
+                    "not a moderator of this group");
         else if (groupUsers.contains(userInvitee))
             this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
         else if (invitation == null)
-            this.enqueuePrattleResponseMessage("The invitation for invitee " + invitee + " group " + groupName + " does not exist");
+            this.enqueuePrattleResponseMessage("The invitation for invitee " + invitee + " group " +
+                    groupName + " does not exist");
         else if (invitation.isInvitationRejected())
             this.enqueuePrattleResponseMessage("You have already rejected this invitation, you cannot approve it now.");
         else if (invitation.isInvitationDeleted())
@@ -1078,7 +1120,8 @@ public class ClientRunnable implements Runnable {
         else if (invitationService.approveRejectInvitation(invitee, groupName, true)) {
             this.enqueuePrattleResponseMessage("The invitation was successfully approved.");
             if (invitation.isInvitationAccepted() && groupService.addUserToGroup(groupName, invitee)) {
-                this.enqueuePrattleResponseMessage("Since this invitation is already accepted, the user " + invitee + " was added to " + groupName);
+                this.enqueuePrattleResponseMessage("Since this invitation is already accepted, " +
+                        "the user " + invitee + " was added to " + groupName);
             }
         } else
             this.enqueuePrattleResponseMessage("Unable to approve invitation.");
@@ -1088,7 +1131,7 @@ public class ClientRunnable implements Runnable {
      * The handle for messages of type Reject Invitation where a moderator
      * reject an invitation for a user to not allow them to join their group
      *
-     * @param msg           The message to be handled
+     * @param msg The message to be handled
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleRejectInvitationModeratorMessage(Message msg) throws SQLException {
@@ -1100,19 +1143,20 @@ public class ClientRunnable implements Runnable {
         Message invitation = invitationService.getInvitation(invitee, groupName);
         Group group = groupService.getGroup(groupName);
 
-        if(group == null)
+        if (group == null)
             this.enqueuePrattleResponseMessage("Invalid Group name " + groupName);
-        if(!groupService.isModerator(groupName, moderator))
-            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are not a moderator of this group");
-        else if(groupUsers.contains(userInvitee))
+        if (!groupService.isModerator(groupName, moderator))
+            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are " +
+                    "not a moderator of this group");
+        else if (groupUsers.contains(userInvitee))
             this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
-        else if(invitation == null)
+        else if (invitation == null)
             this.enqueuePrattleResponseMessage("This invitation does not exist" + groupName);
-        else if(invitation.isInvitationApproved())
+        else if (invitation.isInvitationApproved())
             this.enqueuePrattleResponseMessage("You have already approved this invitation, you cannot reject it now.");
-        else if(invitation.isInvitationDeleted())
+        else if (invitation.isInvitationDeleted())
             this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, hence cannot be rejected");
-        else if(invitationService.approveRejectInvitation(invitee, groupName, false))
+        else if (invitationService.approveRejectInvitation(invitee, groupName, false))
             this.enqueuePrattleResponseMessage("The invitation was successfully rejected.");
         else
             this.enqueuePrattleResponseMessage("Unable to reject invitation.");
@@ -1121,7 +1165,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle the update group message method
      *
-     * @param msg   the message sent by the client
+     * @param msg the message sent by the client
      */
     private void handleUpdateGroupMessage(Message msg) {
         try {
@@ -1142,12 +1186,13 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Sorry, you are not allowed to change settings for this group.");
             }
         } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUpdateGroupMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     "group update syntax using HELP UPG");
         }
     }
-    
-    
+
+
     /**
      * Handles the updating of group setting based on particular attribute.
      *
@@ -1155,17 +1200,18 @@ public class ClientRunnable implements Runnable {
      * @param attributeName  the attribute name
      * @param attributeValue the attribute value
      * @return the boolean   True if the attribute was successfully updated, false otherwise
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean handleGroupUpdate(String groupName , String attributeName , String attributeValue) throws SQLException {
-    	boolean result = false;
-    	if (attributeName.compareTo("is_searchable") == 0) 
-    		result = handleGroupUpdateForIsSearchable(groupName, attributeName, attributeValue);
-    	if (attributeName.compareTo("moderator_name") == 0)   	
-    		result = handleGroupUpdateForModeratorChange(groupName, attributeName, attributeValue);
-    	return result;
+    private boolean handleGroupUpdate(String groupName, String attributeName, String attributeValue)
+            throws SQLException {
+        boolean result = false;
+        if (attributeName.equals("is_searchable"))
+            result = handleGroupUpdateForIsSearchable(groupName, attributeName, attributeValue);
+        if (attributeName.equals("moderator_name"))
+            result = handleGroupUpdateForModeratorChange(groupName, attributeName, attributeValue);
+        return result;
     }
-    
+
     /**
      * Handles the updating of group setting moderator_name attribute.
      *
@@ -1173,22 +1219,22 @@ public class ClientRunnable implements Runnable {
      * @param attributeName  the attribute name
      * @param attributeValue the attribute value which can be a group member
      * @return the boolean   True if the attribute was successfully updated, false otherwise
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean handleGroupUpdateForModeratorChange(String groupName , String attributeName , String attributeValue) throws SQLException {
-    	boolean result = false;
-    	User nextModerator = userService.getUserByUserName(attributeValue);
-    	if(nextModerator == null) {
-    		this.enqueuePrattleResponseMessage("The user you provided does not exist");
-    	}
-    	else if(!groupService.checkMembershipInGroup(groupName, nextModerator.getUserName())) {
-    		this.enqueuePrattleResponseMessage("The user you are trying to make a moderator is not a member of the group");
-    	}
-    	else
-    		result = groupService.updateGroupSettings(groupName, attributeName, nextModerator.getUserName());	
-    	return result;
-	}
-    
+    private boolean handleGroupUpdateForModeratorChange(String groupName, String attributeName, String attributeValue)
+            throws SQLException {
+        boolean result = false;
+        User nextModerator = userService.getUserByUserName(attributeValue);
+        if (nextModerator == null) {
+            this.enqueuePrattleResponseMessage("The user you provided does not exist");
+        } else if (!groupService.checkMembershipInGroup(groupName, nextModerator.getUserName())) {
+            this.enqueuePrattleResponseMessage("The user you are trying to make a moderator is not " +
+                    "a member of the group");
+        } else
+            result = groupService.updateGroupSettings(groupName, attributeName, nextModerator.getUserName());
+        return result;
+    }
+
     /**
      * Handles the updating of group setting based on is_searchable attribute.
      *
@@ -1196,34 +1242,35 @@ public class ClientRunnable implements Runnable {
      * @param attributeName  the attribute name
      * @param attributeValue the attribute value which can 0/1/true/false
      * @return the boolean   True if the attribute was successfully updated, false otherwise
-     * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean handleGroupUpdateForIsSearchable(String groupName , String attributeName , String attributeValue) throws SQLException {
-    	boolean result = false;
-    	if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {    
+    private boolean handleGroupUpdateForIsSearchable(String groupName, String attributeName, String attributeValue)
+            throws SQLException {
+        boolean result = false;
+        if (attributeValue.equals(Integer.toString(0)) || attributeValue.equalsIgnoreCase("false"))
             result = groupService.updateGroupSettings(groupName, attributeName, "0");
-        } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
+        else if (attributeValue.equals(Integer.toString(1)) || attributeValue.equalsIgnoreCase("true"))
             result = groupService.updateGroupSettings(groupName, attributeName, "1");
-        } else
+        else
             this.enqueuePrattleResponseMessage("Searchable values should be boolean (1/0 True/False)");
-    
-    	return result;
-	}
-    
+
+        return result;
+    }
+
     /**
      * This method is used for mapping the group setting number sent in the update group message
      * to the group setting name that is present in the database. This is a separate function since
      * more group settings may get added later on.
      *
-     * @param attributeNumber  the number of the attribute
+     * @param attributeNumber the number of the attribute
      * @return String          a String which is the name of the attribute as defined in the database
-     * @throws SQLException    the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private String getGroupAttributeName(String attributeNumber) throws SQLException {
         String attributeName;
-        if (attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.equals("1"))
             attributeName = "is_searchable";
-        else if (attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.equals("2"))
             attributeName = "moderator_name";
         else
             throw new SQLException("Group setting number out of bounds");
@@ -1235,7 +1282,7 @@ public class ClientRunnable implements Runnable {
      * Handles the search message type when encountered. Will call search method for users or groups
      * depending on the parameter passed by the user.
      *
-     * @param msg   The message sent by the user
+     * @param msg The message sent by the user
      */
     private void handleSearchMessage(Message msg) {
         if (msg.getTextOrPassword().equalsIgnoreCase("user"))
@@ -1243,15 +1290,15 @@ public class ClientRunnable implements Runnable {
         else if (msg.getTextOrPassword().equalsIgnoreCase("group"))
             handleGroupSearchMessage(msg.getReceiverOrPassword());
         else
-            this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check the syntax" +
-                    " for SRH using HELP SRH.");
+            this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check " +
+                    "the syntax for SRH using HELP SRH.");
     }
 
 
     /**
      * This method is used to handle the search functionality for when users are to be searched.
      *
-     * @param searchString  The string that is used for the regex to retrieve all similar users
+     * @param searchString The string that is used for the regex to retrieve all similar users
      */
     private void handleUserSearchMessage(String searchString) {
         Map<String, String> resultantSet;
@@ -1263,6 +1310,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserSearchMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
@@ -1271,7 +1319,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle the search message when groups are supposed to be searched, given the search string
      *
-     * @param searchString  the string that is used by the regex to retrieve all the similar groups
+     * @param searchString the string that is used by the regex to retrieve all the similar groups
      */
     private void handleGroupSearchMessage(String searchString) {
         Map<String, String> resultantSet;
@@ -1283,6 +1331,7 @@ public class ClientRunnable implements Runnable {
             }
             helperForBuildingAndSendingSearchMessage(resultantSet, "Group");
         } catch (Exception e) {
+            ChatLogger.error("Error occurred - ClientRunnable.java - handleGroupSearchMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
                     " using HELP SRH.");
         }
@@ -1293,7 +1342,7 @@ public class ClientRunnable implements Runnable {
      * with all the usernames and fullnames OR groupnames and their moderator usernames depending
      * on the user's request. The string is then enqueued to be sent to the client
      *
-     * @param resultantSet  the set containing the mapped values that is retrieved from the database
+     * @param resultantSet the set containing the mapped values that is retrieved from the database
      */
     private void helperForBuildingAndSendingSearchMessage(Map<String, String> resultantSet, String userOrGroup) {
         StringBuilder workString = new StringBuilder();
@@ -1314,7 +1363,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle message of type delete group message.
      *
-     * @param msg           the message object
+     * @param msg the message object
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleDeleteGroupMessageMessage(Message msg) throws SQLException {
@@ -1322,7 +1371,8 @@ public class ClientRunnable implements Runnable {
         String msgSender = msg.getTextOrPassword().split("::")[0];
         if (msg.getName().equals(msgSender)) {
             if (conversationalMessagesService.deleteGroupMessage(msg.getTextOrPassword())) {
-                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully.");
+                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() +
+                        " deleted successfully.");
             } else {
                 this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
             }
@@ -1334,14 +1384,15 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle delete private message message.
      *
-     * @param msg           the msg
+     * @param msg the msg
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleDeletePrivateMessageMessage(Message msg) throws SQLException {
         String messageSender = conversationalMessagesService.getSender(msg.getTextOrPassword());
         if (msg.getName().equals(messageSender)) {
             if (conversationalMessagesService.deleteMessage(msg.getTextOrPassword())) {
-                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully.");
+                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() +
+                        " deleted successfully.");
             } else {
                 this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
             }
@@ -1354,7 +1405,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle add group to group message.
      *
-     * @param msg           the msg object of type Add Group to Group
+     * @param msg the msg object of type Add Group to Group
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleAddGroupToGroupMessage(Message msg) throws SQLException {
@@ -1373,7 +1424,7 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle remove group from group message.
      *
-     * @param msg           the msg object of type Remove Group from Group
+     * @param msg the msg object of type Remove Group from Group
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleRemoveGroupFromGroupMessage(Message msg) throws SQLException {
@@ -1384,7 +1435,8 @@ public class ClientRunnable implements Runnable {
             if (groupService.removeGroupFromGroup(currentGroup.getGroupName(), guestGroup.getGroupName())) {
                 this.enqueuePrattleResponseMessage("Group was removed successfully");
             } else {
-                this.enqueuePrattleResponseMessage("Internal error occurred while removing the group. Group could not be removed");
+                this.enqueuePrattleResponseMessage("Internal error occurred while removing the group. Group " +
+                        "could not be removed");
             }
         }
     }
@@ -1392,30 +1444,28 @@ public class ClientRunnable implements Runnable {
     /**
      * Handle leave group message.
      *
-     * @param msg           the msg object of type Remove Group from Group
+     * @param msg the msg object of type Remove Group from Group
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleLeaveGroupMessage(Message msg) throws SQLException {
         User currentUser = userService.getUserByUserName(msg.getName());
         Group guestGroup = groupService.getGroup(msg.getTextOrPassword());
         try {
-	        if(guestGroup == null) {
-	        	this.enqueuePrattleResponseMessage("The group you are trying to leave does not exist");
-	        }
-	        else if (groupService.isModerator(guestGroup.getGroupName(), currentUser.getUserName())) {
-	        	this.enqueuePrattleResponseMessage("As you are the moderator of the group you cannot leave the group "
-	        			+ "Please transfer the ownership to someone else and then leave");
-	        }
-	        else if (groupService.checkMembershipInGroup(guestGroup.getGroupName(), currentUser.getUserName())){
-	        	groupService.removeUserFromGroup(guestGroup.getGroupName(), currentUser.getUserName());
-	        }
-	        else {
-	        	this.enqueuePrattleResponseMessage("You are not a member of the group you are trying to leave");
-	        }
+            if (guestGroup == null) {
+                this.enqueuePrattleResponseMessage("The group you are trying to leave does not exist");
+            } else if (guestGroup.getModeratorName().equalsIgnoreCase(currentUser.getUserName())) {
+                this.enqueuePrattleResponseMessage("As you are the moderator of the group you cannot leave the group "
+                        + "Please transfer the ownership to someone else and then leave");
+            } else if (groupService.checkMembershipInGroup(guestGroup.getGroupName(), currentUser.getUserName())) {
+                groupService.removeUserFromGroup(guestGroup.getGroupName(), currentUser.getUserName());
+                this.enqueuePrattleResponseMessage("You successfully left the group.");
+            } else {
+                this.enqueuePrattleResponseMessage("You are not a member of the group you are trying to leave");
+            }
+        } catch (SQLException e) {
+            ChatLogger.error("SQLException occurred - ClientRunnable.java - handleLeaveGroupMessage() : " + e.getStackTrace());
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE);
         }
-        catch (SQLException e) {
-        	this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE);
-		}
     }
 
     /**
@@ -1424,17 +1474,17 @@ public class ClientRunnable implements Runnable {
      * It generates two separate strings, one for the group messages and one for the private messages and sends the
      * concatenated string to the user.
      *
-     * @param msg   the message object sent by the user
+     * @param msg the message object sent by the user
      */
-    private void handleGetPastMessages(Message msg){
-        List<ConversationalMessage> msgs;
+    private void handleGetPastMessages(Message msg) {
         try {
-            msgs = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
-        }catch (Exception e){
+            List<ConversationalMessage> msgs
+                    = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
+            this.helperFormatAndEnqueueMessages(msgs);
+        } catch (Exception e) {
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
-            return;
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + e.getStackTrace());
         }
-        this.helperFormatAndEnqueueMessages(msgs);
     }
 
 
@@ -1442,35 +1492,35 @@ public class ClientRunnable implements Runnable {
      * This function returns the conversation history of a user to the government, provided the request comes from the
      * government
      *
-     * @param msg   The message object sent by the government
+     * @param msg The message object sent by the government
      */
-    private void handleGetConversationHistory(Message msg){
+    private void handleGetConversationHistory(Message msg) {
         try {
             // Check if the message is from the government
             if (!msg.getName().equalsIgnoreCase(GOVERNMENT)) {
                 enqueuePrattleResponseMessage("Sorry, you are not allowed to perform this operation");
-            } else if (userService.getUserByUserName(msg.getTextOrPassword()) == null){
-                enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct username" +
-                        " with SRH");
+            } else if (userService.getUserByUserName(msg.getTextOrPassword()) == null) {
+                enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct " +
+                        "username with SRH");
             } else {
                 List<ConversationalMessage> msgs = conversationalMessagesService.
                         getMessagesForUser(msg.getTextOrPassword(), false);
                 this.helperFormatAndEnqueueMessages(msgs);
             }
-        }catch(SQLException e){
-            ChatLogger.error(e.getMessage());
-            enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again." );
+        } catch (SQLException e) {
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + e.getStackTrace());
+            enqueuePrattleResponseMessage("Looks like gremlins are at work, please try again.");
         }
     }
 
     /**
      * Helper method for formatting the message history and sending it to the appropriate user (user or government)
      *
-     * @param msgs  the list of conversational messages
+     * @param msgs the list of conversational messages
      */
-    private void helperFormatAndEnqueueMessages(List<ConversationalMessage> msgs){
+    private void helperFormatAndEnqueueMessages(List<ConversationalMessage> msgs) {
         List<String> conversations = helperFormatMessagesString(msgs);
-        for(String s : conversations)
+        for (String s : conversations)
             enqueuePrattleResponseMessage(s);
     }
 
@@ -1478,27 +1528,37 @@ public class ClientRunnable implements Runnable {
      * Helper method that will return all the formatted strings of a user's conversation history.
      * The return list is an attempt to enqueue separate messages to the user to reduce the load on the network.
      *
-     * @param msgs      The list of conversational message objects
+     * @param msgs The list of conversational message objects
      * @return List     This returns a list of two strings (one string contains the private chats, another string
-     *                  returns the group messages for a user.
+     * returns the group messages for a user.
      */
-    private List<String> helperFormatMessagesString(List<ConversationalMessage> msgs){
+    private List<String> helperFormatMessagesString(List<ConversationalMessage> msgs) {
         List<String> toSend = new ArrayList<>();
         StringBuilder workSpaceForPrivate = new StringBuilder();
         workSpaceForPrivate.append("\nAll their private messages::\n");
-        workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s%n","Sender Username"
-                , "Destination Username", "Message","Message Key"));
+        workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s%n", "Sender Username"
+                , "Destination Username", "Message", "Message Key"));
         StringBuilder workSpaceForGroups = new StringBuilder();
         workSpaceForGroups.append("\n\nAll their group messages::\n");
-        workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s%n","Group Name","Sender Username",
-                "Message","Message Key"));
-        for(ConversationalMessage m : msgs){
-            if(m.getGroupUniqueKey()==null)
-                workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s",m.getSourceName(), m.getDestinationName(),
-                        m.getMessageText(),m.getMessageUniquekey()));
+        workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s%n", "Group Name", "Sender Username",
+                "Message", "Message Key"));
+        for (ConversationalMessage m : msgs) {
+            if (m.getGroupUniqueKey() == null)
+                workSpaceForPrivate.append(String.format(
+                        "%n%-15s | %-20s | %-30s | %-15s",
+                        m.getSourceName(),
+                        m.getDestinationName(),
+                        m.getMessageText(),
+                        m.getMessageUniquekey()
+                ));
             else
-                workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s",m.getGroupUniqueKey().split("::")[1],
-                        m.getSourceName(), m.getMessageText(),m.getMessageUniquekey()));
+                workSpaceForGroups.append(String.format(
+                        "%n%-15s | %-15s | %-30s | %-15s",
+                        m.getGroupUniqueKey().split("::")[1],
+                        m.getSourceName(),
+                        m.getMessageText(),
+                        m.getMessageUniquekey()
+                ));
         }
         toSend.add(workSpaceForPrivate.toString());
         toSend.add(workSpaceForGroups.toString());
@@ -1510,188 +1570,192 @@ public class ClientRunnable implements Runnable {
      * Method to tap a user of interest, provided the operation is requested by the government and
      * the user of interest is present in the system.
      *
-     * @param msg   the message object sent by the government.
+     * @param msg the message object sent by the government.
      */
-    private void handleTapUserMessage(Message msg){
-        try{
-            if(!msg.getName().equalsIgnoreCase(GOVERNMENT))
+    private void handleTapUserMessage(Message msg) {
+        try {
+            if (!msg.getName().equalsIgnoreCase(GOVERNMENT))
                 enqueuePrattleResponseMessage("Sorry, you are not allowed to do this operation");
-            else if(userService.getUserByUserName(msg.getTextOrPassword()) == null)
+            else if (userService.getUserByUserName(msg.getTextOrPassword()) == null)
                 enqueuePrattleResponseMessage("This user does not exist, please check the username again.");
-            else{
-                if(userService.tapUser(msg.getTextOrPassword()))
-                    enqueuePrattleResponseMessage(msg.getTextOrPassword() + " is now being tapped.");
-                else
-                    enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
-            }
-        }catch (Exception e){
-            ChatLogger.error(e.getMessage());
-            enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, please try again.");
+            else if (userService.tapUser(msg.getTextOrPassword()))
+                enqueuePrattleResponseMessage(msg.getTextOrPassword() + " is now being tapped.");
+            else
+                enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
+        } catch (Exception e) {
+            ChatLogger.error("Exception occurred - ClientRunnable.java - handleTapUserMessage() : " + e.getStackTrace());
+            enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, " +
+                    "please try again.");
         }
     }
 
     /**
      * This method handles general messages
      *
-     * @param msg           The incoming message
+     * @param msg The incoming message
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleGeneralMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isBroadcastMessage()) {
             Prattle.broadcastMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isLoginMessage()) {
             handleLoginMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isRegisterMessage()) {
             handleRegisterMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isSearchMessage()) {
             handleSearchMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
      * This method handles communication messages
      *
-     * @param msg             The incoming message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg The incoming message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleCommunicationMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isPrivateUserMessage()) {
             handlePrivateMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isPrivateReplyMessage()) {
             handlePrivateReplyMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGroupMessage()) {
             handleGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeletePrivateMessageMessage()) {
             handleDeletePrivateMessageMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetPastMessages()) {
             handleGetPastMessages(msg);
-            return true;
+            result = true;
         } else if (msg.isGetConversationHistory()) {
             handleGetConversationHistory(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
      * This method handles group messages
      *
-     * @param msg             The incoming message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg The incoming message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleGroupMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isCreateGroupMessage()) {
             handleCreateGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteGroupMessage()) {
             handleDeleteGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isAddUserToGroupMessage()) {
             handleAddUserToGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isRemoveUserFromGroupMessage()) {
             handleRemoveUserFromGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetGroupMessage()) {
             handleGetGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isUpdateGroupMessage()) {
             handleUpdateGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteGroupMessageMessage()) {
             handleDeleteGroupMessageMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isAddGroupToGroupMessage()) {
             handleAddGroupToGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isRemoveGroupFromGroupMessage()) {
             handleRemoveGroupFromGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isLeaveGroupMessage()) {
             handleLeaveGroupMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
      * This method handles user messages
      *
-     * @param msg             The incoming message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg The incoming message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleUserMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isUserProfileUpdateMessage()) {
             handleUserProfileUpdateMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteUserMessage()) {
             handleDeleteUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isFollowUserMessage()) {
             handleFollowUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isUnfollowUserMessage()) {
             handleUnfollowUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetFollowersMessage()) {
             handleGetFollowersMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetFolloweesMessage()) {
             handleGetFolloweesMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetOnlineUsersMessage()) {
             handleGetOnlineUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isTapUserMessage()) {
             handleTapUserMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
      * This method handles Invitation messages
      *
-     * @param msg             The incoming message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg The incoming message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleInvitationMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isCreateInvitationMessage()) {
             handleCreateInvitationMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteInvitationMessage()) {
             handleDeleteInvitationUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isAcceptInviteUserMessage()) {
             handleAcceptInvitationUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDenyInviteUserMessage()) {
             handleDenyInvitationUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isApproveInviteModeratorMessage()) {
             handleApproveInvitationModeratorMessage(msg);
-            return true;
-        } else if(msg.isRejectInviteModeratorMessage()) {
+            result = true;
+        } else if (msg.isRejectInviteModeratorMessage()) {
             handleRejectInvitationModeratorMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
      * This method handles different types of messages and delegates works to its respective methods
      *
-     * @param msg             The incoming message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg The incoming message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleMessageByType(Message msg) throws SQLException {
         // Check for our "special messages"
@@ -1710,8 +1774,8 @@ public class ClientRunnable implements Runnable {
     /**
      * This method handles the incoming message
      *
-     * @param msg             the incoming message
-     * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @param msg the incoming message
+     * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void processMessage(Message msg) throws SQLException {
         // Check if the message is legal formatted
@@ -1732,8 +1796,7 @@ public class ClientRunnable implements Runnable {
         boolean keepAlive = true;
         if (!waitingList.isEmpty()) {
             keepAlive = false;
-            // Send out all of the message that have been added to the
-            // queue.
+            // Send out all of the message that have been added to the queue.
             do {
                 Message msg = waitingList.remove();
                 boolean sentGood = sendMessage(msg);
@@ -1769,9 +1832,14 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserName(this.getName());
         userClients.remove(this.getName());
         if (currentUser.isLoggedIn()) {
-            boolean updated = userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "0");
+            boolean updated = userService.updateUserAttributes(
+                    currentUser.getUserName(),
+                    "logged_in",
+                    "0"
+            );
             if (!updated) {
-                ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
+                ChatLogger.error("LOGOUT: terminateClient: The profile details for " +
+                        currentUser.getUserName() + " was not updated.");
             }
         }
         // Remove the client from our client listing.
@@ -1783,12 +1851,10 @@ public class ClientRunnable implements Runnable {
     /**
      * This method gets the client runnable instance based on the username provided
      *
-     * @param username          key on which the corresponding instance is to be found
+     * @param username key on which the corresponding instance is to be found
      * @return ClientRunnable   null (if there no entry for the key) or the corresponding ClientRunnable instance
      */
     public static ClientRunnable getClientByUsername(String username) {
         return userClients.getOrDefault(username, null);
     }
-
-    private static final String CHECK_SYNTAX_ERROR_MESSAGE = "Something went wrong while retrieving data. Please check your syntax";
 }

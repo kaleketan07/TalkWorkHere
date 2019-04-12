@@ -172,7 +172,7 @@ public enum MessageType {
      * Message handle for a user to retrieve all their messages
      */
     GET_PAST_MESSAGES("GPM"),
-    
+
     /**
      * Message handle for a user to leave a group
      */
@@ -199,7 +199,7 @@ public enum MessageType {
      *
      * @param abbrev Short name of this message type, as a String.
      */
-    private MessageType(String abbrev) {
+    MessageType(String abbrev) {
         abbreviation = abbrev;
     }
 

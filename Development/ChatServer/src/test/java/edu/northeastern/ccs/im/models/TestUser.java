@@ -86,7 +86,7 @@ public class TestUser {
         ALICE.setLoggedIn(false);
         assertFalse(ALICE.isLoggedIn());
     }
-    
+
     /**
      * Test is tapped for false.
      */
@@ -95,7 +95,7 @@ public class TestUser {
         ALICE.setTapped(false);
         assertFalse(ALICE.isTapped());
     }
-    
+
     /**
      * Test is tapped for true.
      */
@@ -108,8 +108,8 @@ public class TestUser {
     /**
      * Test user send message when ClientRunnable is Null and not initialized
      *
-     * @throws SQLException           the sql exception
-     * @throws NoSuchFieldException   the no such field exception
+     * @throws SQLException         the sql exception
+     * @throws NoSuchFieldException the no such field exception
      */
     @Test
     public void testUserSendMessageWhenClientRunnableIsNull() throws SQLException, NoSuchFieldException,

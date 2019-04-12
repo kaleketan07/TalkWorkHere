@@ -173,7 +173,7 @@ public class TestPrattle {
             method.invoke(Prattle.class, ssc, ses);
             handler.flush();
             String message = out.toString();
-            assertTrue(message.contains("Caught Assertion: " + e.toString()));
+            assertTrue(message.contains("Caught AssertionError - Prattle.java - createClientThread() : "));
         } finally {
             logger.removeHandler(handler);
         }
@@ -207,7 +207,7 @@ public class TestPrattle {
             method.invoke(Prattle.class, ssc, ses);
             handler.flush();
             String message = out.toString();
-            assertTrue(message.contains("Caught Exception: " + e.toString()));
+            assertTrue(message.contains("IOException occurred - Prattle.java - createClientThread(): "));
         } finally {
             logger.removeHandler(handler);
         }

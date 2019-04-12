@@ -23,8 +23,8 @@ public class TestDBConnection {
     /**
      * Test if the constructor creates the DBConnection object
      *
-     * @throws SQLException           - Thrown if there is an exception while connecting to MySQL
-     * @throws IOException            - when config file is not found
+     * @throws SQLException - Thrown if there is an exception while connecting to MySQL
+     * @throws IOException  - when config file is not found
      */
     @Test
     public void testConstructor() throws SQLException, IOException {
@@ -36,8 +36,8 @@ public class TestDBConnection {
      * Test if the connection gets closed. Should throw exception when connection is used
      * after closing
      *
-     * @throws SQLException           - Thrown if there is an exception while connecting to MySQL
-     * @throws IOException            - when config file is not found
+     * @throws SQLException - Thrown if there is an exception while connecting to MySQL
+     * @throws IOException  - when config file is not found
      */
     @Test
     public void testClose() throws SQLException, IOException {

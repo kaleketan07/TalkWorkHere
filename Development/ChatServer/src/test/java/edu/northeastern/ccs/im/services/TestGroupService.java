@@ -190,42 +190,42 @@ public class TestGroupService {
         Assertions.assertEquals("TempGroup", testGS.getGroup("TempGroup").getGroupName());
 
     }
-    
+
     /**
      * Test check membership in group.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testCheckMembershipInGroupWithNegetiveCase() throws SQLException {   
+    public void testCheckMembershipInGroupWithNegetiveCase() throws SQLException {
         when(mockedRS.first()).thenReturn(false);
-        Assertions.assertEquals(false, testGS.checkMembershipInGroup("TempGroup" , "ABC"));
+        Assertions.assertEquals(false, testGS.checkMembershipInGroup("TempGroup", "ABC"));
     }
-    
+
     /**
      * Test check membership in group.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testCheckMembershipInGroupWithPositiveCase() throws SQLException {   
+    public void testCheckMembershipInGroupWithPositiveCase() throws SQLException {
         when(mockedRS.first()).thenReturn(true);
         when(mockedRS.getBoolean("is_removed")).thenReturn(false);
-        Assertions.assertEquals(true, testGS.checkMembershipInGroup("TempGroup" , "ABC"));
+        Assertions.assertEquals(true, testGS.checkMembershipInGroup("TempGroup", "ABC"));
     }
-    
+
     /**
      * Test check membership in group.
      *
      * @throws SQLException the SQL exception
      */
     @Test
-    public void testCheckMembershipInGroupWithNegativeCaseOfAlreadyRemoved() throws SQLException {   
+    public void testCheckMembershipInGroupWithNegativeCaseOfAlreadyRemoved() throws SQLException {
         when(mockedRS.first()).thenReturn(true);
         when(mockedRS.getBoolean("is_removed")).thenReturn(true);
-        Assertions.assertEquals(false, testGS.checkMembershipInGroup("TempGroup" , "ABC"));
+        Assertions.assertEquals(false, testGS.checkMembershipInGroup("TempGroup", "ABC"));
     }
-    
+
 
     /**
      * Test get member groups. Should test getting member groups of a group
@@ -615,8 +615,9 @@ public class TestGroupService {
     }
 
     /**
-     *  Test getGroupsByModerator when no record is found
-     * @throws  SQLException - the exception thrown when a downstream database error occurs
+     * Test getGroupsByModerator when no record is found
+     *
+     * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test
     public void testGetGroupsForModeratorNull() throws SQLException {
@@ -626,6 +627,7 @@ public class TestGroupService {
 
     /**
      * Test the getGroupsByModerator method when match is found
+     *
      * @throws SQLException - the exception thrown when a downstream database error occurs
      */
     @Test

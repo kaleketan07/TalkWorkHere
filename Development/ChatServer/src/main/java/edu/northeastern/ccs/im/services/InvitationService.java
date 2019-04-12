@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -33,7 +34,8 @@ public class InvitationService implements InvitationDao {
     private PreparedStatement preparedStatement;
     private ResultSet result;
     private static InvitationService invitationServiceInstance;
-
+    private Properties invitationProperties;
+    
     /**
      * Constants used in multiple methods of the service
      */
@@ -55,6 +57,7 @@ public class InvitationService implements InvitationDao {
     private InvitationService() throws SQLException, IOException {
         connection = new DBConnection();
         utils = new DBUtils();
+        invitationProperties = connection.getQueryProperties();
     }
 
     /**
@@ -83,7 +86,7 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public Message getInvitation(String inviter, String invitee, String groupName) throws SQLException {
-        final String QUERY = "SELECT * from group_invitation where inviter = ? and invitee = ? and group_name = ?";
+        final String QUERY = invitationProperties.getProperty("GET_INVITATION_BOTH");
         preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, inviter, invitee, groupName);
         result = preparedStatement.executeQuery();
@@ -116,8 +119,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public Message getInvitation(String invitee, String groupName) throws SQLException {
-        final String QUERY = "SELECT * from group_invitation where invitee = ? and group_name = ?";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("GET_INVITATION");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         result = preparedStatement.executeQuery();
         Message message = null;
@@ -151,8 +154,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public boolean approveRejectInvitation(String invitee, String groupName, boolean approved) throws SQLException {
-        final String QUERY = "UPDATE group_invitation SET is_approved = ?, is_rejected = ? WHERE invitee = ? and group_name = ?";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("APPROVE_REJECT_INVITATION");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, approved, !approved, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -171,8 +174,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public boolean acceptDenyInvitation(String invitee, String groupName, boolean accepted) throws SQLException {
-        final String QUERY = "UPDATE group_invitation SET is_accepted = ?, is_denied = ? WHERE invitee = ? and group_name = ?";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("ACCEPT_DENY_INVITATION");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, accepted, !accepted, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -190,8 +193,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public boolean createInvitation(String inviter, String invitee, String groupName) throws SQLException {
-        final String QUERY = "INSERT INTO group_invitation (inviter, invitee, group_name) VALUES (?,?,?)";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("CREATE_INVITATION");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, inviter, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -209,8 +212,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public boolean deleteInvitation(String inviter, String invitee, String groupName) throws SQLException {
-        final String QUERY = "UPDATE group_invitation SET is_deleted = ? WHERE inviter = ? and invitee = ? and group_name = ?";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("DELETE_INVITATION");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, true, inviter, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -226,8 +229,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public Set<Message> getInvitationsForInvitee(String invitee) throws SQLException {
-        final String QUERY = "SELECT * from group_invitation where invitee = ? and is_sent_invitee = 0";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("GET_INVITATION_FOR_INVITEE");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee);
         result = preparedStatement.executeQuery();
         Set<Message> messages = extractInvitations();
@@ -244,8 +247,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public Set<Message> getInvitationsForGroup(String groupName) throws SQLException {
-        final String QUERY = "SELECT * from group_invitation where group_name = ? and is_sent_moderator = 0";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("GET_INVITATION_FOR_GROUP");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, groupName);
         result = preparedStatement.executeQuery();
         Set<Message> messages = extractInvitations();
@@ -265,8 +268,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public boolean setInvitationIsSentToInvitee(String invitee, String groupName) throws SQLException {
-        final String QUERY = "UPDATE group_invitation SET is_sent_invitee = 1 WHERE invitee = ? and group_name = ?";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("INVITATION_SENT_TO_INVITEE");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -282,8 +285,8 @@ public class InvitationService implements InvitationDao {
      */
     @Override
     public boolean setInvitationIsSentToModerator(String invitee, String groupName) throws SQLException {
-        final String QUERY = "UPDATE group_invitation SET is_sent_moderator = 1 WHERE invitee = ? and group_name = ?";
-        preparedStatement = connection.getPreparedStatement(QUERY);
+    	final String QUERY = invitationProperties.getProperty("INVITATION_SENT_TO_MODERATOR");
+    	preparedStatement = connection.getPreparedStatement(QUERY);
         preparedStatement = utils.setPreparedStatementArgs(preparedStatement, invitee, groupName);
         int qResult = preparedStatement.executeUpdate();
         preparedStatement.close();

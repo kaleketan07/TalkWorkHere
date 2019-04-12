@@ -76,8 +76,7 @@ public abstract class Prattle {
      *             since quit.
      */
     static void removeClient(ClientRunnable dead) {
-        // Test and see if the thread was in our list of active clients so that we
-        // can remove it.
+        // Test and see if the thread was in our list of active clients so that we can remove it.
         if (!active.remove(dead)) {
             ChatLogger.info("Could not find a thread that I tried to remove!\n");
         }

@@ -116,6 +116,18 @@ public class ClientRunnable implements Runnable {
     private static int invalidCounter = 0;
 
     /**
+     * Constant to store invalid id
+     */
+    private static final int INVALID_USER_ID = -1;
+
+    /**
+     * Constant to store a common error message denoting a syntax error
+     */
+    private static final String CHECK_SYNTAX_ERROR_MESSAGE = "Something went wrong while retrieving data. " +
+            "Please check your syntax";
+
+
+    /**
      * Used for incrementing the invalidCounter, defined a separate method here
      * on account of invalidCounter being a static field
      *
@@ -183,7 +195,7 @@ public class ClientRunnable implements Runnable {
      */
     private boolean messageChecks(Message msg) {
         // Check that the message name matches.
-        return (msg.getName() != null) && (msg.getName().compareToIgnoreCase(getName()) == 0);
+        return (msg.getName() != null) && (msg.getName().equalsIgnoreCase(getName()));
     }
 
     /**
@@ -224,14 +236,14 @@ public class ClientRunnable implements Runnable {
             } else {
                 incrementInvalidCounter(invalidCounter);
                 setName("invalid-" + userName + "-" + invalidCounter);
-                userId = -1;
+                userId = INVALID_USER_ID;
                 result = true;
-                this.enqueuePrattleResponseMessage("There is already a user connected with this username. Please type " +
-                        " BYE and try logging in with another username.");
+                this.enqueuePrattleResponseMessage("There is already a user connected with this username. Please " +
+                        "type BYE and try logging in with another username.");
             }
         } else {
             // Clear this name; we cannot use it. *sigh*
-            userId = -1;
+            userId = INVALID_USER_ID;
         }
         return result;
     }
@@ -337,7 +349,8 @@ public class ClientRunnable implements Runnable {
                 } else if (msg.isLoginMessage() || msg.isRegisterMessage() || (user != null && user.isLoggedIn())) {
                     processMessage(msg);
                 } else {
-                    this.enqueuePrattleResponseMessage("Sorry, you are not logged in to use Prattle. Please log in and try again.");
+                    this.enqueuePrattleResponseMessage("Sorry, you are not logged in to use Prattle. Please log in " +
+                            "and try again.");
                 }
             }
         }
@@ -358,25 +371,21 @@ public class ClientRunnable implements Runnable {
             // since the user was not found, a new user with this name may be created after password validation checks
         	String password = msg.getTextOrPassword();
         	String confirmPassword = msg.getReceiverOrPassword();
-            if (isValidPassword(password)) {
-            	if (password.equals(confirmPassword)) {
-	                userService.createUser(new User(null, null, msg.getName(), password, true));
-	                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
-            	} else {
-            		this.enqueuePrattleResponseMessage("Password and confirm password do not match");
-            	}
-            } else {
+            if (!isValidPassword(password)) {
                 this.enqueuePrattleResponseMessage("Password not strong enough. Make sure the password:\n"
-                		+ "1. is 5 to 12 characters long.\n"
-                		+ "2. contains atleast one uppercase and one lowercase characters.\n"
-                		+ "3. contains atleast one digit from 0-9.\n"
-                		+ "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
-                		+ "5. contains no spaces");
+                        + "1. is 5 to 12 characters long.\n"
+                        + "2. contains atleast one uppercase and one lowercase characters.\n"
+                        + "3. contains atleast one digit from 0-9.\n"
+                        + "4. contains atleast one character from @, #, $, %, ^, &, +, =.\n"
+                        + "5. contains no spaces");
+            } else if (password.equals(confirmPassword)) {
+                userService.createUser(new User(null, null, msg.getName(), password, true));
+                this.enqueuePrattleResponseMessage("User " + msg.getName() + " registered!");
+            } else {
+                this.enqueuePrattleResponseMessage("Password and confirm password do not match");
             }
-
         }
     }
-    
     
     /**
      * Checks if passed userName is valid.
@@ -395,8 +404,7 @@ public class ClientRunnable implements Runnable {
      * @return boolean      true, if the password satisfies all valid password checks
      */
     private boolean isValidPassword(String password) {
-    	String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!_])(?=\\S+$).{5,12}$";
-    	return password.matches(pattern);
+    	return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!_])(?=\\S+$).{5,12}$");
     }
 
     /**
@@ -410,7 +418,8 @@ public class ClientRunnable implements Runnable {
         if (destUser == null) {
             this.enqueuePrattleResponseMessage("Destination username does not exist.");
         } else {
-            this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
+            this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " +
+                    destUser.userSendMessage(msg));
         }
     }
 
@@ -425,8 +434,13 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserNameAndPassword(msg.getName(), msg.getTextOrPassword());
         if (currentUser == null) {
             this.enqueuePrattleResponseMessage("Incorrect username and password");
-        } else if (!userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "1")) {
-                this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName() + " was not updated.");
+        } else if (!userService.updateUserAttributes(
+                currentUser.getUserName(),
+                "logged_in",
+                "1")
+                ) {
+                this.enqueuePrattleResponseMessage("The profile details for " + currentUser.getUserName()
+                        + " was not updated.");
         } else {
             handleSuccessfulLogin(msg, currentUser);
         }
@@ -458,7 +472,8 @@ public class ClientRunnable implements Runnable {
      */
     private void notifyGovernment(User currentUser) throws SQLException{
         Timestamp notificationTimestamp = new Timestamp(System.currentTimeMillis());
-    	String notification = "\nUser with user name: " + currentUser.getUserName() + " logged in at: " + notificationTimestamp + "\n"; 
+    	String notification = "\nUser with user name: " + currentUser.getUserName() + " logged in at: " +
+                notificationTimestamp + "\n";
     	User govtUser = userService.getUserByUserName(GOVERNMENT);
     	govtUser.userSendMessage(Message.makePrattleMessage(notification));
     }
@@ -470,10 +485,10 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void sendMessagesToUser(User currentUser) throws SQLException {
-        List<ConversationalMessage> unsentMessages = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
-        Message resultMessage;
+        List<ConversationalMessage> unsentMessages
+                = conversationalMessagesService.getMessagesForUser(currentUser.getUserName(), true);
         for(ConversationalMessage m: unsentMessages) {
-            resultMessage = createMessageFromConversationalMessage(m);
+            Message resultMessage = createMessageFromConversationalMessage(m);
             currentUser.enqueueMessageToUser(resultMessage, m.getMessageUniquekey());
             conversationalMessagesService.markMessageAsSent(m.getMessageUniquekey());
         }
@@ -491,8 +506,12 @@ public class ClientRunnable implements Runnable {
         for(String groupName: groups) {
             Set<Message> invitationsGroup = invitationService.getInvitationsForGroup(groupName);
             for(Message invitation: invitationsGroup) {
-                this.enqueuePrattleResponseMessage(invitation.getName() + " has invited " + invitation.getTextOrPassword() + " to join the group " + groupName);
-                invitationService.setInvitationIsSentToModerator(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
+                this.enqueuePrattleResponseMessage(invitation.getName() + " has invited " +
+                        invitation.getTextOrPassword() + " to join the group " + groupName);
+                invitationService.setInvitationIsSentToModerator(
+                        invitation.getTextOrPassword(),
+                        invitation.getReceiverOrPassword()
+                );
             }
         }
     }
@@ -507,8 +526,12 @@ public class ClientRunnable implements Runnable {
         // send unsent invitations to the user
         Set<Message> invitations = invitationService.getInvitationsForInvitee(msg.getName());
         for(Message invitation: invitations) {
-            this.enqueuePrattleResponseMessage("You have been invited to join the group " + invitation.getReceiverOrPassword() + " by user " + invitation.getName());
-            invitationService.setInvitationIsSentToInvitee(invitation.getTextOrPassword(), invitation.getReceiverOrPassword());
+            this.enqueuePrattleResponseMessage("You have been invited to join the group " +
+                    invitation.getReceiverOrPassword() + " by user " + invitation.getName());
+            invitationService.setInvitationIsSentToInvitee(
+                    invitation.getTextOrPassword(),
+                    invitation.getReceiverOrPassword()
+            );
         }
     }
 
@@ -525,7 +548,11 @@ public class ClientRunnable implements Runnable {
     	if (m.getGroupUniqueKey() == null) {
     		resultMessage = Message.makePrivateUserMessage(m.getSourceName(), m.getMessageText(), m.getDestinationName());
     	} else {
-    		resultMessage = Message.makeGroupMessage(m.getSourceName(), m.getMessageText(), m.getGroupUniqueKey().split("::")[1]);
+    		resultMessage = Message.makeGroupMessage(
+    		        m.getSourceName(),
+                    m.getMessageText(),
+                    m.getGroupUniqueKey().split("::")[1]
+            );
     	}
     	return resultMessage;
     }
@@ -536,7 +563,8 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleCreateGroupMessage(Message msg) throws SQLException {
-        // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+        // Create a group with the specified name with the sender as the moderator,
+        // if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup != null) {
             this.enqueuePrattleResponseMessage("Groupname already exists! Please use a different group name.");
@@ -554,12 +582,14 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private void handleGetGroupMessage(Message msg) throws SQLException {
-        // Create a group with the specified name with the sender as the moderator, if a group with the same name does not already exists
+        // Create a group with the specified name with the sender as the moderator,
+        // if a group with the same name does not already exists
         Group existingGroup = groupService.getGroup(msg.getTextOrPassword());
         if (existingGroup == null) {
             this.enqueuePrattleResponseMessage("Groupname does not exist. So no details can be provided");
         } else {
-            this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " + existingGroup.getModeratorName());
+            this.enqueuePrattleResponseMessage("Groupname: " + existingGroup.getGroupName() + " Moderator: " +
+                    existingGroup.getModeratorName());
         }
     }
 
@@ -659,7 +689,8 @@ public class ClientRunnable implements Runnable {
             if (destUser == null) {
                 this.enqueuePrattleResponseMessage("msg_UniqueKey provided is wrong");
             } else {
-                this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " + destUser.userSendMessage(msg));
+                this.enqueuePrattleResponseMessage("the unique key for the message that you just sent is: " +
+                        destUser.userSendMessage(msg));
             }
         } else
             this.enqueuePrattleResponseMessage("The msg_uniqueKey provided was wrong."
@@ -721,8 +752,8 @@ public class ClientRunnable implements Runnable {
                 this.enqueuePrattleResponseMessage("Failed updating the value:" + mappedAttributeName);
         } catch (SQLException e) {
             ChatLogger.error("Exception occurred - ClientRunnable.java - handleUserProfileUpdateMessage() : " + e.getStackTrace());
-            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU messages " +
-                    "using HELP UPU");
+            this.enqueuePrattleResponseMessage("Failed updating the attribute. Please note the syntax for UPU " +
+                    "messages using HELP UPU");
         }
     }
 
@@ -738,18 +769,16 @@ public class ClientRunnable implements Runnable {
 
         if (followeeUser == null) {
             this.enqueuePrattleResponseMessage("The user you are trying to follow does not exist");
-            return;
+        } else {
+            try {
+                userService.followUser(followeeUser, followerUser);
+                this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
+            }
+            catch(SQLException e) {
+                ChatLogger.error("Exception occurred - ClientRunnable.java - handleFollowUserMessage() : " + e.getStackTrace());
+                this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
+            }
         }
-        try {
-        	userService.followUser(followeeUser, followerUser); 
-        }
-        catch(SQLException e) {
-            ChatLogger.error("Exception occurred - ClientRunnable.java - handleFollowUserMessage() : " + e.getStackTrace());
-            this.enqueuePrattleResponseMessage("You are already following : " + followeeUser.getUserName());
-            return;	
-        }
-        this.enqueuePrattleResponseMessage("You are now following : " + followeeUser.getUserName());
-        
     }
 
     /**
@@ -762,11 +791,9 @@ public class ClientRunnable implements Runnable {
         User followeeUser = userService.getUserByUserName(msg.getTextOrPassword());
         User followerUser = userService.getUserByUserName(msg.getName());
 
-        if (followeeUser == null) {
+        if (followeeUser == null)
             this.enqueuePrattleResponseMessage("The user you are trying to unfollow does not exist");
-            return;
-        }
-        if(userService.unfollowUser(followeeUser, followerUser)) 
+        else if(userService.unfollowUser(followeeUser, followerUser))
         	this.enqueuePrattleResponseMessage("You have stopped following : " + followeeUser.getUserName());
         else
         	this.enqueuePrattleResponseMessage("Aborted ..! You were not following : " + followeeUser.getUserName());      
@@ -782,13 +809,13 @@ public class ClientRunnable implements Runnable {
      */
     private String helperUserProfileUpdateMessage(String attributeNumber) throws SQLException {
         String mappedAttribute;
-        if (attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.equals("1"))
             mappedAttribute = "first_name";
-        else if (attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.equals("2"))
             mappedAttribute = "last_name";
-        else if (attributeNumber.compareTo("3") == 0)
+        else if (attributeNumber.equals("3"))
             mappedAttribute = "user_password";
-        else if (attributeNumber.compareTo("4") == 0)
+        else if (attributeNumber.equals("4"))
             mappedAttribute = "user_searchable";
         else
             throw new SQLException("Number not in bounds");
@@ -806,11 +833,10 @@ public class ClientRunnable implements Runnable {
         Map<String, String> resultantSet;
         try {
             resultantSet = userService.getFollowers(currUser);
-            if (resultantSet.isEmpty()) {
+            if (resultantSet.isEmpty())
                 this.enqueuePrattleResponseMessage("Sorry, did not find any followers");
-                return;
-            }
-            helperForBuildingAndSendingSearchMessage(resultantSet, "User");
+            else
+                helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
             ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFollowersMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
@@ -829,11 +855,10 @@ public class ClientRunnable implements Runnable {
         Map<String, String> resultantSet;
         try {
             resultantSet = userService.getOnlineUsers(currUser);
-            if (resultantSet.isEmpty()) {
+            if (resultantSet.isEmpty())
                 this.enqueuePrattleResponseMessage("Sorry, did not find any online users");
-                return;
-            }
-            helperForBuildingAndSendingSearchMessage(resultantSet, "User");
+            else
+                helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
             ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetOnlineUserMessage() : " + e.getStackTrace());
             this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
@@ -853,15 +878,13 @@ public class ClientRunnable implements Runnable {
         Map<String, String> resultantSet;
         try {
             resultantSet = userService.getFollowees(currUser);
-            if (resultantSet.isEmpty()) {
+            if (resultantSet.isEmpty())
                 this.enqueuePrattleResponseMessage("Sorry, did not find any followees");
-                return;
-            }
-            helperForBuildingAndSendingSearchMessage(resultantSet, "User");
+            else
+                helperForBuildingAndSendingSearchMessage(resultantSet, "User");
         } catch (Exception e) {
             ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetFolloweesMessage() : " + e.getStackTrace());
-            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE +
-                    " using HELP GFE.");
+            this.enqueuePrattleResponseMessage(CHECK_SYNTAX_ERROR_MESSAGE + " using HELP GFE.");
         }
     }
 
@@ -877,7 +900,8 @@ public class ClientRunnable implements Runnable {
         if (currGroup == null) {
             this.enqueuePrattleResponseMessage("The destination group does not exist");
         } else if (!groupService.isUserMemberOfTheGroup(currGroup.getGroupName(), currUser.getUserName())) {
-            this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() + " to send a message on it");
+            this.enqueuePrattleResponseMessage("Please join group " + currGroup.getGroupName() +
+                    " to send a message on it");
         } else {
             this.enqueuePrattleResponseMessage("message sent successfully");
             // generate the group key to mark all individual messages sent as a result of this group message
@@ -885,7 +909,8 @@ public class ClientRunnable implements Runnable {
             Timestamp sqlTimestamp = new Timestamp(time);
             String uniqueGroupKey = currUser.getUserName() + "::" + currGroup.getGroupName() + "::" + sqlTimestamp;
             currGroup.groupSendMessage(msg, uniqueGroupKey);
-            this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " + uniqueGroupKey);
+            this.enqueuePrattleResponseMessage("The group message key for the message you just sent is: " +
+                    uniqueGroupKey);
         }
     }
 
@@ -898,7 +923,8 @@ public class ClientRunnable implements Runnable {
      * @return boolean          true if all the checks pass else false
      * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean checkInvitationMessageFromUserHelper(String inviter, String invitee, String groupName) throws SQLException {
+    private boolean checkInvitationMessageFromUserHelper(String inviter, String invitee, String groupName)
+            throws SQLException {
         User userInviter = (inviter == null) ? null : userService.getUserByUserName(inviter);
         User userInvitee = userService.getUserByUserName(invitee);
         Group group = groupService.getGroup(groupName);
@@ -915,7 +941,8 @@ public class ClientRunnable implements Runnable {
             this.enqueuePrattleResponseMessage("The invitee " + invitee + " is already a member of group " + groupName);
             result = false;
         } else if (userInviter != null && !groupUsers.contains(userInviter)) {
-            this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName + "; you cannot perform this operation.");
+            this.enqueuePrattleResponseMessage("Since you are not a member of group " + groupName +
+                    "; you cannot perform this operation.");
             result = false;
         }
         return result;
@@ -934,17 +961,20 @@ public class ClientRunnable implements Runnable {
         String groupName = msg.getReceiverOrPassword();
         if (checkInvitationMessageFromUserHelper(inviter, invitee, groupName)) {
             if (invitationService.getInvitation(invitee, groupName) != null)
-                this.enqueuePrattleResponseMessage("An invitation has already been sent to user " + invitee + " for the group " + groupName);
+                this.enqueuePrattleResponseMessage("An invitation has already been sent to user " + invitee +
+                        " for the group " + groupName);
             else if (invitationService.createInvitation(inviter, invitee, groupName)) {
                 ClientRunnable inviteeClient = userClients.getOrDefault(invitee, null);
                 if(inviteeClient != null) {
-                    inviteeClient.enqueuePrattleResponseMessage("You have been invited to join group " + groupName + " by user " + inviter);
+                    inviteeClient.enqueuePrattleResponseMessage("You have been invited to join group " +
+                            groupName + " by user " + inviter);
                     invitationService.setInvitationIsSentToInvitee(invitee, groupName);
                 }
                 String moderator = groupService.getGroup(groupName).getModeratorName();
                 ClientRunnable moderatorClient = userClients.getOrDefault(moderator, null);
                 if(moderatorClient != null) {
-                    moderatorClient.enqueuePrattleResponseMessage(inviter + " has invited user " + invitee + " to join the group " + groupName);
+                    moderatorClient.enqueuePrattleResponseMessage(inviter + " has invited user " + invitee +
+                            " to join the group " + groupName);
                     invitationService.setInvitationIsSentToModerator(invitee, groupName);
                 }
                 this.enqueuePrattleResponseMessage("The invitation was successfully sent.");
@@ -971,7 +1001,7 @@ public class ClientRunnable implements Runnable {
         if (checkInvitationMessageFromUserHelper(inviter, invitee, groupName)) {
             Message invitation = invitationService.getInvitation(invitee, groupName);
             if (invitation == null)
-                this.enqueuePrattleResponseMessage("No invitaton exists for the given user and group.");
+                this.enqueuePrattleResponseMessage("No invitation exists for the given user and group.");
             else if (invitation.isInvitationDeleted())
                 this.enqueuePrattleResponseMessage("Invitation is already deleted.");
             else if (!invitation.getName().equals(inviter))
@@ -999,17 +1029,21 @@ public class ClientRunnable implements Runnable {
             if (invitation == null)
                 this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
             else if (invitation.isInvitationAccepted())
-                this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been removed from the group");
+                this.enqueuePrattleResponseMessage("You have already accepted this invitation; you may have been " +
+                        "removed from the group");
             else if (invitation.isInvitationDenied())
                 this.enqueuePrattleResponseMessage("You have already denied this invitation; you cannot accept it now.");
             else if (invitation.isInvitationRejected())
-                this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you will have to wait for an invite from another user");
+                this.enqueuePrattleResponseMessage("This invitation was rejected by the group moderator, you " +
+                        "will have to wait for an invite from another user");
             else if (invitation.isInvitationDeleted())
-                this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have to wait for another invite.");
+                this.enqueuePrattleResponseMessage("This invitation was deleted by the sender, you will have " +
+                        "to wait for another invite.");
             else if (invitationService.acceptDenyInvitation(invitee, groupName, true)) {
                 this.enqueuePrattleResponseMessage("The invitation was successfully accepted.");
                 if (invitation.isInvitationApproved() && groupService.addUserToGroup(groupName, invitee)) {
-                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you have been added to the group " + groupName);
+                    this.enqueuePrattleResponseMessage("Since your invitation approved by the moderator you " +
+                            "have been added to the group " + groupName);
                 }
             } else
                 this.enqueuePrattleResponseMessage("Unable to accept invitation.");
@@ -1031,7 +1065,8 @@ public class ClientRunnable implements Runnable {
             if (invitation == null)
                 this.enqueuePrattleResponseMessage("There is no invitation in your name for the group " + groupName);
             else if (invitation.isInvitationRejected())
-                this.enqueuePrattleResponseMessage("This invitation is already rejected by moderator; you do not need to deny it anymore");
+                this.enqueuePrattleResponseMessage("This invitation is already rejected by moderator; " +
+                        "you do not need to deny it anymore");
             else if (invitation.isInvitationAccepted())
                 this.enqueuePrattleResponseMessage("You have already accepted this invitation; you cannot deny it now");
             else if (invitation.isInvitationDenied())
@@ -1064,11 +1099,13 @@ public class ClientRunnable implements Runnable {
         if(group == null)
             this.enqueuePrattleResponseMessage("Invalid group name " + groupName);
         else if(!groupService.isModerator(groupName, moderator))
-            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are not a moderator of this group");
+            this.enqueuePrattleResponseMessage("You cannot approve this invitation since you are " +
+                    "not a moderator of this group");
         else if (groupUsers.contains(userInvitee))
             this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
         else if (invitation == null)
-            this.enqueuePrattleResponseMessage("The invitation for invitee " + invitee + " group " + groupName + " does not exist");
+            this.enqueuePrattleResponseMessage("The invitation for invitee " + invitee + " group " +
+                    groupName + " does not exist");
         else if (invitation.isInvitationRejected())
             this.enqueuePrattleResponseMessage("You have already rejected this invitation, you cannot approve it now.");
         else if (invitation.isInvitationDeleted())
@@ -1076,7 +1113,8 @@ public class ClientRunnable implements Runnable {
         else if (invitationService.approveRejectInvitation(invitee, groupName, true)) {
             this.enqueuePrattleResponseMessage("The invitation was successfully approved.");
             if (invitation.isInvitationAccepted() && groupService.addUserToGroup(groupName, invitee)) {
-                this.enqueuePrattleResponseMessage("Since this invitation is already accepted, the user " + invitee + " was added to " + groupName);
+                this.enqueuePrattleResponseMessage("Since this invitation is already accepted, " +
+                        "the user " + invitee + " was added to " + groupName);
             }
         } else
             this.enqueuePrattleResponseMessage("Unable to approve invitation.");
@@ -1101,7 +1139,8 @@ public class ClientRunnable implements Runnable {
         if(group == null)
             this.enqueuePrattleResponseMessage("Invalid Group name " + groupName);
         if(!groupService.isModerator(groupName, moderator))
-            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are not a moderator of this group");
+            this.enqueuePrattleResponseMessage("You cannot reject this invitation since you are " +
+                    "not a moderator of this group");
         else if(groupUsers.contains(userInvitee))
             this.enqueuePrattleResponseMessage("The user " + invitee + " is already a member of the group " + groupName);
         else if(invitation == null)
@@ -1156,11 +1195,12 @@ public class ClientRunnable implements Runnable {
      * @return the boolean   True if the attribute was successfully updated, false otherwise
      * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean handleGroupUpdate(String groupName , String attributeName , String attributeValue) throws SQLException {
+    private boolean handleGroupUpdate(String groupName , String attributeName , String attributeValue)
+            throws SQLException {
     	boolean result = false;
-    	if (attributeName.compareTo("is_searchable") == 0) 
+    	if (attributeName.equals("is_searchable"))
     		result = handleGroupUpdateForIsSearchable(groupName, attributeName, attributeValue);
-    	if (attributeName.compareTo("moderator_name") == 0)   	
+    	if (attributeName.equals("moderator_name"))
     		result = handleGroupUpdateForModeratorChange(groupName, attributeName, attributeValue);
     	return result;
     }
@@ -1174,14 +1214,16 @@ public class ClientRunnable implements Runnable {
      * @return the boolean   True if the attribute was successfully updated, false otherwise
      * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean handleGroupUpdateForModeratorChange(String groupName , String attributeName , String attributeValue) throws SQLException {
+    private boolean handleGroupUpdateForModeratorChange(String groupName , String attributeName , String attributeValue)
+            throws SQLException {
     	boolean result = false;
     	User nextModerator = userService.getUserByUserName(attributeValue);
     	if(nextModerator == null) {
     		this.enqueuePrattleResponseMessage("The user you provided does not exist");
     	}
     	else if(!groupService.checkMembershipInGroup(groupName, nextModerator.getUserName())) {
-    		this.enqueuePrattleResponseMessage("The user you are trying to make a moderator is not a member of the group");
+    		this.enqueuePrattleResponseMessage("The user you are trying to make a moderator is not " +
+                    "a member of the group");
     	}
     	else
     		result = groupService.updateGroupSettings(groupName, attributeName, nextModerator.getUserName());	
@@ -1197,13 +1239,14 @@ public class ClientRunnable implements Runnable {
      * @return the boolean   True if the attribute was successfully updated, false otherwise
      * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    private boolean handleGroupUpdateForIsSearchable(String groupName , String attributeName , String attributeValue) throws SQLException {
+    private boolean handleGroupUpdateForIsSearchable(String groupName , String attributeName , String attributeValue)
+            throws SQLException {
     	boolean result = false;
-    	if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {    
+    	if (attributeValue.equals(Integer.toString(0)) || attributeValue.equalsIgnoreCase("false"))
             result = groupService.updateGroupSettings(groupName, attributeName, "0");
-        } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
+        else if (attributeValue.equals(Integer.toString(1)) || attributeValue.equalsIgnoreCase("true"))
             result = groupService.updateGroupSettings(groupName, attributeName, "1");
-        } else
+        else
             this.enqueuePrattleResponseMessage("Searchable values should be boolean (1/0 True/False)");
     
     	return result;
@@ -1220,9 +1263,9 @@ public class ClientRunnable implements Runnable {
      */
     private String getGroupAttributeName(String attributeNumber) throws SQLException {
         String attributeName;
-        if (attributeNumber.compareTo("1") == 0)
+        if (attributeNumber.equals("1"))
             attributeName = "is_searchable";
-        else if (attributeNumber.compareTo("2") == 0)
+        else if (attributeNumber.equals("2"))
             attributeName = "moderator_name";
         else
             throw new SQLException("Group setting number out of bounds");
@@ -1242,8 +1285,8 @@ public class ClientRunnable implements Runnable {
         else if (msg.getTextOrPassword().equalsIgnoreCase("group"))
             handleGroupSearchMessage(msg.getReceiverOrPassword());
         else
-            this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check the syntax" +
-                    " for SRH using HELP SRH.");
+            this.enqueuePrattleResponseMessage("We support searching for users and groups only, please check " +
+                    "the syntax for SRH using HELP SRH.");
     }
 
 
@@ -1323,7 +1366,8 @@ public class ClientRunnable implements Runnable {
         String msgSender = msg.getTextOrPassword().split("::")[0];
         if (msg.getName().equals(msgSender)) {
             if (conversationalMessagesService.deleteGroupMessage(msg.getTextOrPassword())) {
-                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully.");
+                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() +
+                        " deleted successfully.");
             } else {
                 this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
             }
@@ -1342,7 +1386,8 @@ public class ClientRunnable implements Runnable {
         String messageSender = conversationalMessagesService.getSender(msg.getTextOrPassword());
         if (msg.getName().equals(messageSender)) {
             if (conversationalMessagesService.deleteMessage(msg.getTextOrPassword())) {
-                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() + " deleted successfully.");
+                this.enqueuePrattleResponseMessage("message with key: " + msg.getTextOrPassword() +
+                        " deleted successfully.");
             } else {
                 this.enqueuePrattleResponseMessage("error deleting message with key: " + msg.getTextOrPassword());
             }
@@ -1385,7 +1430,8 @@ public class ClientRunnable implements Runnable {
             if (groupService.removeGroupFromGroup(currentGroup.getGroupName(), guestGroup.getGroupName())) {
                 this.enqueuePrattleResponseMessage("Group was removed successfully");
             } else {
-                this.enqueuePrattleResponseMessage("Internal error occurred while removing the group. Group could not be removed");
+                this.enqueuePrattleResponseMessage("Internal error occurred while removing the group. Group " +
+                        "could not be removed");
             }
         }
     }
@@ -1430,15 +1476,14 @@ public class ClientRunnable implements Runnable {
      * @param msg   the message object sent by the user
      */
     private void handleGetPastMessages(Message msg){
-        List<ConversationalMessage> msgs;
         try {
-            msgs = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
+            List<ConversationalMessage> msgs
+                    = conversationalMessagesService.getMessagesForUser(msg.getName(), false);
+            this.helperFormatAndEnqueueMessages(msgs);
         }catch (Exception e){
             enqueuePrattleResponseMessage("Something went wrong while retrieving your messages, please try again");
             ChatLogger.error("Exception occurred - ClientRunnable.java - handleGetConversationHistory() : " + e.getStackTrace());
-            return;
         }
-        this.helperFormatAndEnqueueMessages(msgs);
     }
 
 
@@ -1454,8 +1499,8 @@ public class ClientRunnable implements Runnable {
             if (!msg.getName().equalsIgnoreCase(GOVERNMENT)) {
                 enqueuePrattleResponseMessage("Sorry, you are not allowed to perform this operation");
             } else if (userService.getUserByUserName(msg.getTextOrPassword()) == null){
-                enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct username" +
-                        " with SRH");
+                enqueuePrattleResponseMessage("This user does not exist in the system, please check for correct " +
+                        "username with SRH");
             } else {
                 List<ConversationalMessage> msgs = conversationalMessagesService.
                         getMessagesForUser(msg.getTextOrPassword(), false);
@@ -1498,11 +1543,21 @@ public class ClientRunnable implements Runnable {
                 "Message","Message Key"));
         for(ConversationalMessage m : msgs){
             if(m.getGroupUniqueKey()==null)
-                workSpaceForPrivate.append(String.format("%n%-15s | %-20s | %-30s | %-15s",m.getSourceName(), m.getDestinationName(),
-                        m.getMessageText(),m.getMessageUniquekey()));
+                workSpaceForPrivate.append(String.format(
+                        "%n%-15s | %-20s | %-30s | %-15s",
+                        m.getSourceName(),
+                        m.getDestinationName(),
+                        m.getMessageText(),
+                        m.getMessageUniquekey()
+                ));
             else
-                workSpaceForGroups.append(String.format("%n%-15s | %-15s | %-30s | %-15s",m.getGroupUniqueKey().split("::")[1],
-                        m.getSourceName(), m.getMessageText(),m.getMessageUniquekey()));
+                workSpaceForGroups.append(String.format(
+                        "%n%-15s | %-15s | %-30s | %-15s",
+                        m.getGroupUniqueKey().split("::")[1],
+                        m.getSourceName(),
+                        m.getMessageText(),
+                        m.getMessageUniquekey()
+                ));
         }
         toSend.add(workSpaceForPrivate.toString());
         toSend.add(workSpaceForGroups.toString());
@@ -1522,15 +1577,14 @@ public class ClientRunnable implements Runnable {
                 enqueuePrattleResponseMessage("Sorry, you are not allowed to do this operation");
             else if(userService.getUserByUserName(msg.getTextOrPassword()) == null)
                 enqueuePrattleResponseMessage("This user does not exist, please check the username again.");
-            else{
-                if(userService.tapUser(msg.getTextOrPassword()))
+            else if(userService.tapUser(msg.getTextOrPassword()))
                     enqueuePrattleResponseMessage(msg.getTextOrPassword() + " is now being tapped.");
-                else
-                    enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
-            }
-        }catch (Exception e){
+            else
+                enqueuePrattleResponseMessage("Couldn't tap the user, please try again.");
+        } catch (Exception e){
             ChatLogger.error("Exception occurred - ClientRunnable.java - handleTapUserMessage() : " + e.getStackTrace());
-            enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, please try again.");
+            enqueuePrattleResponseMessage("Seems like gremlins are at work today, something went wrong, " +
+                    "please try again.");
         }
     }
 
@@ -1541,20 +1595,21 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleGeneralMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isBroadcastMessage()) {
             Prattle.broadcastMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isLoginMessage()) {
             handleLoginMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isRegisterMessage()) {
             handleRegisterMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isSearchMessage()) {
             handleSearchMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
@@ -1564,26 +1619,27 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleCommunicationMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isPrivateUserMessage()) {
             handlePrivateMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isPrivateReplyMessage()) {
             handlePrivateReplyMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGroupMessage()) {
             handleGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeletePrivateMessageMessage()) {
             handleDeletePrivateMessageMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetPastMessages()) {
             handleGetPastMessages(msg);
-            return true;
+            result = true;
         } else if (msg.isGetConversationHistory()) {
             handleGetConversationHistory(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
@@ -1593,38 +1649,39 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleGroupMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isCreateGroupMessage()) {
             handleCreateGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteGroupMessage()) {
             handleDeleteGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isAddUserToGroupMessage()) {
             handleAddUserToGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isRemoveUserFromGroupMessage()) {
             handleRemoveUserFromGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetGroupMessage()) {
             handleGetGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isUpdateGroupMessage()) {
             handleUpdateGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteGroupMessageMessage()) {
             handleDeleteGroupMessageMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isAddGroupToGroupMessage()) {
             handleAddGroupToGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isRemoveGroupFromGroupMessage()) {
             handleRemoveGroupFromGroupMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isLeaveGroupMessage()) {
             handleLeaveGroupMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
@@ -1634,32 +1691,33 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleUserMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isUserProfileUpdateMessage()) {
             handleUserProfileUpdateMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteUserMessage()) {
             handleDeleteUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isFollowUserMessage()) {
             handleFollowUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isUnfollowUserMessage()) {
             handleUnfollowUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetFollowersMessage()) {
             handleGetFollowersMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetFolloweesMessage()) {
             handleGetFolloweesMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isGetOnlineUsersMessage()) {
             handleGetOnlineUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isTapUserMessage()) {
             handleTapUserMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
@@ -1669,26 +1727,27 @@ public class ClientRunnable implements Runnable {
      * @throws SQLException   the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private boolean handleInvitationMessages(Message msg) throws SQLException {
+        boolean result = false;
         if (msg.isCreateInvitationMessage()) {
             handleCreateInvitationMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDeleteInvitationMessage()) {
             handleDeleteInvitationUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isAcceptInviteUserMessage()) {
             handleAcceptInvitationUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isDenyInviteUserMessage()) {
             handleDenyInvitationUserMessage(msg);
-            return true;
+            result = true;
         } else if (msg.isApproveInviteModeratorMessage()) {
             handleApproveInvitationModeratorMessage(msg);
-            return true;
+            result = true;
         } else if(msg.isRejectInviteModeratorMessage()) {
             handleRejectInvitationModeratorMessage(msg);
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     }
 
     /**
@@ -1736,8 +1795,7 @@ public class ClientRunnable implements Runnable {
         boolean keepAlive = true;
         if (!waitingList.isEmpty()) {
             keepAlive = false;
-            // Send out all of the message that have been added to the
-            // queue.
+            // Send out all of the message that have been added to the queue.
             do {
                 Message msg = waitingList.remove();
                 boolean sentGood = sendMessage(msg);
@@ -1773,9 +1831,14 @@ public class ClientRunnable implements Runnable {
         User currentUser = userService.getUserByUserName(this.getName());
         userClients.remove(this.getName());
         if (currentUser.isLoggedIn()) {
-            boolean updated = userService.updateUserAttributes(currentUser.getUserName(), "logged_in", "0");
+            boolean updated = userService.updateUserAttributes(
+                    currentUser.getUserName(),
+                    "logged_in",
+                    "0"
+            );
             if (!updated) {
-                ChatLogger.error("LOGOUT: terminateClient: The profile details for " + currentUser.getUserName() + " was not updated.");
+                ChatLogger.error("LOGOUT: terminateClient: The profile details for " +
+                        currentUser.getUserName() + " was not updated.");
             }
         }
         // Remove the client from our client listing.
@@ -1793,6 +1856,4 @@ public class ClientRunnable implements Runnable {
     public static ClientRunnable getClientByUsername(String username) {
         return userClients.getOrDefault(username, null);
     }
-
-    private static final String CHECK_SYNTAX_ERROR_MESSAGE = "Something went wrong while retrieving data. Please check your syntax";
 }

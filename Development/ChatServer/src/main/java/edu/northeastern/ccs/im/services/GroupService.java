@@ -24,8 +24,8 @@ import edu.northeastern.ccs.im.models.Group;
 import edu.northeastern.ccs.im.models.User;
 
 /**
- * The Class GroupService implements the Group DAO interface and provides a set of methods that could be performed on the
- * groups in the database
+ * The Class GroupService implements the Group DAO interface and provides a set of methods that could be performed on
+ * the groups in the database
  *
  * @author - Team-201 - Ketan Kale
  */
@@ -50,22 +50,21 @@ public class GroupService implements GroupDao {
     /**
      * Instantiates a new group service.
      *
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException            Signals that an I/O exception has occurred.
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException      Signals that an I/O exception has occurred.
      */
     private GroupService() throws SQLException, IOException {
         conn = new DBConnection();
         utils = new DBUtils();
         groupProperties = conn.getQueryProperties();
-
     }
 
     /**
      * Gets the singleton group service instance.
      *
-     * @return GroupService           the group service instance
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException            Signals that an I/O exception has occurred.
+     * @return GroupService     the group service instance
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException      Signals that an I/O exception has occurred.
      */
     public static GroupService getGroupServiceInstance() throws SQLException, IOException {
         if (groupServiceInstance == null) {
@@ -83,12 +82,13 @@ public class GroupService implements GroupDao {
      */
     @Override
     public Group getGroup(String groupName) throws SQLException {
-        Group g = new Group();
+        Group g = null;
         final String GET_GROUP = groupProperties.getProperty("GET_GROUP");
         pstmt = conn.getPreparedStatement(GET_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         result = pstmt.executeQuery();
         if (result.first()) {
+            g = new Group();
             String gName = result.getString(GROUP_NAME);
             String modName = result.getString(MODERATOR_NAME);
             g.setGroupName(gName);
@@ -102,8 +102,6 @@ public class GroupService implements GroupDao {
                 groups.add(temp);
             }
             g.setMemberGroups(groups);
-        } else {
-            g = null;
         }
         pstmt.close();
         return g;
@@ -136,8 +134,7 @@ public class GroupService implements GroupDao {
      */
     @Override
     public boolean deleteGroup(String groupName) throws SQLException {
-        final String DELETE_GROUP =
-        		groupProperties.getProperty("DELETE_GROUP");
+        final String DELETE_GROUP = groupProperties.getProperty("DELETE_GROUP");
         pstmt = conn.getPreparedStatement(DELETE_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, groupName);
         int qResult = pstmt.executeUpdate();
@@ -150,7 +147,8 @@ public class GroupService implements GroupDao {
      *
      * @param groupName             the group name
      * @return Set of User objects  the member users in the group
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data
+     *                              source
      */
     @Override
     public Set<User> getMemberUsers(String groupName) throws SQLException {
@@ -165,7 +163,7 @@ public class GroupService implements GroupDao {
             String lName = result.getString(LAST_NAME);
             String uName = result.getString(USER_NAME);
             boolean stat = result.getBoolean(LOGGED_IN);
-            User user = new User(fName, lName, uName, "", stat);    // do we need a constructor without password here?
+            User user = new User(fName, lName, uName, null, stat);
             users.add(user);
         }
         pstmt.close();
@@ -177,7 +175,8 @@ public class GroupService implements GroupDao {
      *
      * @param groupName             the group name
      * @return Set of Group names   the member groups
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data
+     *                              source
      */
     @Override
     public Set<String> getMemberGroups(String groupName) throws SQLException {
@@ -198,7 +197,8 @@ public class GroupService implements GroupDao {
      * Gets all the groups.
      *
      * @return  Set of Group objects    all the groups present in the system
-     * @throws SQLException             the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException             the sql exception thrown in case of an error with jdbc's interaction with the
+     *                                  data source
      */
     @Override
     public Set<Group> getAllGroups() throws SQLException {
@@ -255,7 +255,9 @@ public class GroupService implements GroupDao {
      * @return boolean      true, if user was added successfully, false otherwise
      * @throws SQLException the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
-    public boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+    public boolean addUserToGroup(String hostGroupName, String guestUserName) throws SQLException {
+        // Assumption: The group name is valid and the group exists
+
         Set<User> users = getMemberUsers(hostGroupName);
         for (User u : users) {
             if (u.getUserName().equals(guestUserName)) return false;
@@ -277,7 +279,9 @@ public class GroupService implements GroupDao {
      * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
-    public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+    public boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException {
+        // Assumption: The group name is valid and the group exists
+
         final String REMOVE_USER_FROM_GROUP = groupProperties.getProperty("REMOVE_USER_FROM_GROUP");
         pstmt = conn.getPreparedStatement(REMOVE_USER_FROM_GROUP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
@@ -295,7 +299,8 @@ public class GroupService implements GroupDao {
      * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
-    public boolean checkMembershipInGroup(String hostGroupName, String guestUserName) throws SQLException { // Assumes that the group name is valid and the group exists
+    public boolean checkMembershipInGroup(String hostGroupName, String guestUserName) throws SQLException {
+        // Assumption: The group name is valid and the group exists
         final String CHECK_USER_MEMEBERSHIP = groupProperties.getProperty("CHECK_USER_MEMEBERSHIP");
         pstmt = conn.getPreparedStatement(CHECK_USER_MEMEBERSHIP);
         pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestUserName);
@@ -305,7 +310,6 @@ public class GroupService implements GroupDao {
         }
         pstmt.close();
         return false;
-        
     }
     	
     
@@ -337,9 +341,7 @@ public class GroupService implements GroupDao {
         Group grp = getGroup(guestGroupName);
         Set<String> descendantGroups = new HashSet<>();
         descendantGroups = getFlatListOfGroups(grp, descendantGroups);
-        if (descendantGroups.contains(hostGroupName)) {
-            return false;
-        } else {
+        if (!descendantGroups.contains(hostGroupName)) {
             final String ADD_GROUP_TO_GROUP = groupProperties.getProperty("ADD_GROUP_TO_GROUP");
             pstmt = conn.getPreparedStatement(ADD_GROUP_TO_GROUP);
             pstmt = utils.setPreparedStatementArgs(pstmt, hostGroupName, guestGroupName);
@@ -347,6 +349,7 @@ public class GroupService implements GroupDao {
             pstmt.close();
             return (qResult > 0);
         }
+        return false;
     }
 
 
@@ -374,12 +377,12 @@ public class GroupService implements GroupDao {
      * @return Set      the flat list of user names strings
      */
     private Set<String> getFlatListOfUsers(Group grp, Set<String> userNames) {
-        for (User u : grp.getMemberUsers()) {
+        for (User u : grp.getMemberUsers())
             userNames.add(u.getUserName());
-        }
-        for (Group g : grp.getMemberGroups()) {
+
+        for (Group g : grp.getMemberGroups())
             userNames = getFlatListOfUsers(g, userNames);
-        }
+
         return userNames;
     }
 
@@ -408,7 +411,8 @@ public class GroupService implements GroupDao {
      * Retrieve all the searchable groups from the given string
      *
      * @param searchString   the string to be used in the regex to find all similar groups
-     * @return Map           A hashmap containing the group names as keys and their moderator usernames as corresponding values
+     * @return Map           A hashmap containing the group names as keys and their moderator usernames as corresponding
+     *                       values
      * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     @Override
@@ -446,9 +450,8 @@ public class GroupService implements GroupDao {
             int qResult = pstmt.executeUpdate();
             pstmt.close();
             return (qResult > 0);
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**

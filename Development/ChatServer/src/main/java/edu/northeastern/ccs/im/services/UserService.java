@@ -53,7 +53,7 @@ public class UserService implements UserDao {
      * and establish the connection to the database for the user_profile table for each
      * user.
      *
-     * @throws SQLException          the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     private UserService() throws SQLException, IOException {
         conn = new DBConnection();
@@ -66,8 +66,8 @@ public class UserService implements UserDao {
      * Gets instance of the user service class
      *
      * @return the instance
-     * @throws SQLException           the sql exception thrown in case of an error with jdbc's interaction with the data source
-     * @throws IOException            the io exception
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws IOException      the io exception
      */
     public static UserService getInstance() throws SQLException, IOException {
         if (userServiceInstance == null)
@@ -187,16 +187,13 @@ public class UserService implements UserDao {
     @Override
     public boolean updateUserAttributes(String uname, String attributeName, String attributeValue) throws SQLException {
         final String UPDATE_USER = "UPDATE user_profile SET " + attributeName + "  = ? WHERE username = ?";
-        String trueOrFalse;
         pstmt = conn.getPreparedStatement(UPDATE_USER);
-        if (attributeName.compareTo("user_searchable") == 0) {
-            if (attributeValue.compareTo(Integer.toString(0)) == 0 || attributeValue.equalsIgnoreCase("false")) {
-                trueOrFalse = "0";
-                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, uname);
-            } else if (attributeValue.compareTo(Integer.toString(1)) == 0 || attributeValue.equalsIgnoreCase("true")) {
-                trueOrFalse = "1";
-                pstmt = utils.setPreparedStatementArgs(pstmt, trueOrFalse, uname);
-            } else
+        if (attributeName.equals("user_searchable")) {
+            if (attributeValue.equals(Integer.toString(0)) || attributeValue.equalsIgnoreCase("false"))
+                pstmt = utils.setPreparedStatementArgs(pstmt, "0", uname);
+            else if (attributeValue.equals(Integer.toString(1)) || attributeValue.equalsIgnoreCase("true"))
+                pstmt = utils.setPreparedStatementArgs(pstmt, "1", uname);
+            else
                 ChatLogger.error("Searchable values should be boolean (1/0 True/False)");
         } else {
             pstmt = utils.setPreparedStatementArgs(pstmt, attributeValue, uname);
@@ -218,8 +215,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean deleteUser(User u) throws SQLException {
-        final String DELETE_USER =
-        		userProperties.getProperty("DELETE_USER");
+        final String DELETE_USER = userProperties.getProperty("DELETE_USER");
         pstmt = conn.getPreparedStatement(DELETE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, u.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -238,8 +234,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean followUser(User followee, User follower) throws SQLException {
-        final String FOLLOW_USER =
-        		userProperties.getProperty("FOLLOW_USER");
+        final String FOLLOW_USER = userProperties.getProperty("FOLLOW_USER");
         pstmt = conn.getPreparedStatement(FOLLOW_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -257,8 +252,7 @@ public class UserService implements UserDao {
      */
     @Override
     public boolean unfollowUser(User followee, User follower) throws SQLException {
-        final String UNFOLLOW_USER =
-        		userProperties.getProperty("UNFOLLOW_USER");
+        final String UNFOLLOW_USER = userProperties.getProperty("UNFOLLOW_USER");
         pstmt = conn.getPreparedStatement(UNFOLLOW_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, followee.getUserName(), follower.getUserName());
         int qResult = pstmt.executeUpdate();
@@ -334,8 +328,7 @@ public class UserService implements UserDao {
      */
     @Override
     public Map<String, String> getOnlineUsers(User follower) throws SQLException {
-        final String GET_ONLINE_USER =
-        		userProperties.getProperty("GET_ONLINE_USER");
+        final String GET_ONLINE_USER = userProperties.getProperty("GET_ONLINE_USER");
         pstmt = conn.getPreparedStatement(GET_ONLINE_USER);
         pstmt = utils.setPreparedStatementArgs(pstmt, follower.getUserName());
         result = pstmt.executeQuery();

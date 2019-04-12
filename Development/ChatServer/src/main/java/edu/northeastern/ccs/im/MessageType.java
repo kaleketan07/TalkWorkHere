@@ -4,6 +4,7 @@ package edu.northeastern.ccs.im;
  * Enumeration for the different types of messages.
  *
  * @author Maria Jump
+ *
  */
 public enum MessageType {
     /**
@@ -192,7 +193,7 @@ public enum MessageType {
      *
      * @param abbrev Short name of this message type, as a String.
      */
-    private MessageType(String abbrev) {
+    MessageType(String abbrev) {
         abbreviation = abbrev;
     }
 

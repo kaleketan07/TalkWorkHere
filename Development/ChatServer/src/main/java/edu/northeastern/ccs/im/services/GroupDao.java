@@ -54,7 +54,8 @@ public interface GroupDao {
      *
      * @param groupName             the group name
      * @return Set of User objects  the member users in the group
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data
+     *                              source
      */
     Set<User> getMemberUsers(String groupName) throws SQLException;
 
@@ -63,7 +64,8 @@ public interface GroupDao {
      *
      * @param groupName             the group name
      * @return Set of Group names   the member groups
-     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException         the sql exception thrown in case of an error with jdbc's interaction with the data
+     *                              source
      */
     Set<String> getMemberGroups(String groupName) throws SQLException;
 
@@ -71,7 +73,8 @@ public interface GroupDao {
      * Gets the all groups.
      *
      * @return  Set of Group objects    all the groups present in the system
-     * @throws SQLException             the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException             the sql exception thrown in case of an error with jdbc's interaction with the
+     *                                  data source
      */
     Set<Group> getAllGroups() throws SQLException;
 
@@ -104,7 +107,8 @@ public interface GroupDao {
      * @param hostGroupName     the name of the host group
      * @param guestUserName     the username of the guest user
      * @return boolean          true, if successful
-     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data source
+     * @throws SQLException     the sql exception thrown in case of an error with jdbc's interaction with the data
+     *                          source
      */
     boolean removeUserFromGroup(String hostGroupName, String guestUserName) throws SQLException;
 
@@ -146,7 +150,8 @@ public interface GroupDao {
      * Retrieve all the searchable groups from the given string
      *
      * @param searchString   the string to be used in the regex to find all similar groups
-     * @return Map           A hashmap containing the group names as keys and their moderator usernames as corresponding values
+     * @return Map           A HashMap containing the group names as keys and their moderator username as corresponding
+     *                       values
      * @throws SQLException  the sql exception thrown in case of an error with jdbc's interaction with the data source
      */
     Map<String, String> searchGroup(String searchString) throws SQLException;

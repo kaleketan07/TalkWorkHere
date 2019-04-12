@@ -97,8 +97,8 @@ public class ChatLogger {
 
     /**
      * Gets the stack trace of the given error
-     * @param e the exception whose stack trace needs to be updated
-     * @return the stack trace extracted from the exception
+     * @param e the error whose stack trace needs to be updated
+     * @return the stack trace extracted from the error
      */
     public static final String getTrace(Error e) {
         StringWriter errors = new StringWriter();

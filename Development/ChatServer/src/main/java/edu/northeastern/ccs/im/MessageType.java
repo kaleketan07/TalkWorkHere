@@ -4,6 +4,7 @@ package edu.northeastern.ccs.im;
  * Enumeration for the different types of messages.
  *
  * @author Maria Jump
+ *
  */
 public enum MessageType {
     /**

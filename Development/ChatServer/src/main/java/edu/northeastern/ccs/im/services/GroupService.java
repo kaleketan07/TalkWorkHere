@@ -215,7 +215,7 @@ public class GroupService implements GroupDao {
             }
 
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - GroupService.java - getAllGroups() : " + ChatLogger.getTrace(e)());
+            ChatLogger.error("Exception occurred - GroupService.java - getAllGroups() : " + ChatLogger.getTrace(e));
             throw new SQLException("Exception occurred in getAllGroups");
         }
         pstmt.close();

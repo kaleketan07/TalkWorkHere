@@ -167,7 +167,7 @@ public class ConversationalMessageService implements ConversationalMessageDAO {
         try {
             res = pstmt.executeUpdate();
         } catch (Exception e) {
-            ChatLogger.error("Exception occurred - ConversationalMessageService.java - deleteMessage() : " + ChatLogger.getTrace(e)());
+            ChatLogger.error("Exception occurred - ConversationalMessageService.java - deleteMessage() : " + ChatLogger.getTrace(e));
             throw new SQLException(e);
         }
         pstmt.close();

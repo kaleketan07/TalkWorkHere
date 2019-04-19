@@ -61,7 +61,7 @@ public class Group implements Member {
         try {
             cms = ConversationalMessageService.getInstance();
         } catch (IOException | SQLException e) {
-            ChatLogger.error("Group.java - Conversational Message Service failed to initialize: " + e.getStackTrace());
+            ChatLogger.error("Group.java - Conversational Message Service failed to initialize: " + ChatLogger.getTrace(e));
         }
     }
 

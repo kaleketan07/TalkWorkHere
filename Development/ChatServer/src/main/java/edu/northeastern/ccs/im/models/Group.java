@@ -20,7 +20,7 @@ import edu.northeastern.ccs.im.services.ConversationalMessageService;
  *
  * @author - team 201 - Ketan Kale
  */
-public class Group implements Member {
+public class Group {
 
 
     /**

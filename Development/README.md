@@ -1,3 +1,11 @@
+# team-201-SP19
+## Team Members & Authors
+
+- Ketan Kale ([kaleketan07](https://github.ccs.neu.edu/kaleketan07))
+- Kunal Patil ([kspatil](https://github.ccs.neu.edu/kspatil))
+- Rahul Bhat ([rahulbhat31](https://github.ccs.neu.edu/rahulbhat31))
+- Sachin Haldavanekar ([sachinh](https://github.ccs.neu.edu/sachinh))
+
 # CS5500-Prattle Server
 Prattle is a network server that communicates with IM clients that connect to it.  The capabilities of the server have been described below:
 
@@ -68,13 +76,6 @@ You can run the tests using the command `mvn test`
 
 Credits to the instructors and TAs of CS5500 for guiding us throughout the project and providing the started code. 
 Also credit to other teams who helped out resolving common problems and classmates who provided valuable feedback during the in class codewalk.
-
-## Authors
-
-- Ketan Kale ([kaleketan07](https://github.ccs.neu.edu/kaleketan07))
-- Kunal Patil ([kspatil](https://github.ccs.neu.edu/kspatil))
-- Rahul Bhat ([rahulbhat31](https://github.ccs.neu.edu/rahulbhat31))
-- Sachin Haldavanekar ([sachinh](https://github.ccs.neu.edu/sachinh))
 
 ## License
 

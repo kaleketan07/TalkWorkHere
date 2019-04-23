@@ -15,6 +15,13 @@ This work was created by team-201-SP19
 
 ## [Final Presentation](https://youtu.be/dSdsUXV1uW4)
 
+## [System Setup Walkthrough](https://youtu.be/cvos1oqbPCo)
+
+## Report, Usecases and Presentation slides
+
+We have placed the Project Report, Usecases and the Presentation slides [at this location](https://github.ccs.neu.edu/cs5500/team-201-SP19/tree/master/final)
+
+
 ## How to use?
 
 1. Clone this repository. The steps to clone a git repository can be found [here](https://help.github.com/en/articles/cloning-a-repository)
@@ -22,7 +29,6 @@ This work was created by team-201-SP19
 3. Connect using the client jar (provide the hostname and port P). The latest Client jar can be found [at this location](https://github.ccs.neu.edu/cs5500/team-201-SP19/blob/master/Development/ChatServer/src/main/resources/Chatter-0.0.1-SNAPSHOT-jar-with-dependencies.jar)
 4. Communicate with different clients using the message handles provided in the table above.
 
-[System Setup Walkthrough](https://youtu.be/cvos1oqbPCo)
 
 
 ## Current Version

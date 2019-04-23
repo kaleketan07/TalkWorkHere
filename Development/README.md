@@ -1,13 +1,29 @@
-# team-201-SP19
-## Team Members & Authors
+# TalkWorkHere &copy;
+TalkWorkHere is a network server that communicates with IM clients that connect to it.  The capabilities of the server have been described below:
+
+## Team Members/Authors
+This work was created by team-201-SP19
 
 - Ketan Kale ([kaleketan07](https://github.ccs.neu.edu/kaleketan07))
 - Kunal Patil ([kspatil](https://github.ccs.neu.edu/kspatil))
 - Rahul Bhat ([rahulbhat31](https://github.ccs.neu.edu/rahulbhat31))
 - Sachin Haldavanekar ([sachinh](https://github.ccs.neu.edu/sachinh))
 
-# CS5500-Prattle Server
-Prattle is a network server that communicates with IM clients that connect to it.  The capabilities of the server have been described below:
+## [Live System](ec2-3-80-147-81.compute-1.amazonaws.com)
+
+## [System Demo](https://youtu.be/zS41IBbE1dI)
+
+## [Final Presentation](https://youtu.be/dSdsUXV1uW4)
+
+## How to use?
+
+1. Clone this repository. The steps to clone a git repository can be found [here](https://help.github.com/en/articles/cloning-a-repository)
+2. Get the prattle.main() running on some port P
+3. Connect using the client jar (provide the hostname and port P). The latest Client jar can be found [at this location](https://github.ccs.neu.edu/cs5500/team-201-SP19/blob/master/Development/ChatServer/src/main/resources/Chatter-0.0.1-SNAPSHOT-jar-with-dependencies.jar)
+4. Communicate with different clients using the message handles provided in the table above.
+
+[System Setup Walkthrough](https://youtu.be/cvos1oqbPCo)
+
 
 ## Current Version
 2.0
@@ -58,6 +74,10 @@ The following handles can be used to use the client jar to interact with other c
 |GPM|Get all your past messages|`GPM`|Completed|
 |GOU|Get online users that you are following|`GOU`|Completed|
 |LGP|Leave group|`LGP;{GroupName}`|Completed|
+|AGG|Add group to group|`AGG;{GroupToAdd};{HostGroup}`|Completed
+|RGG|Remove group from group|`RGG;{GroupToRemove};{HostGroup}`|Completed
+|GCH|Get Conversation History of a user (only for GOVERNMENT)|`GCH;{Username}`|Completed
+|TPU|Tap a user (only for GOVERNMENT)|`TPU;{Username}`|Completed
 
 ## Tests
 
@@ -65,18 +85,13 @@ This is a maven project, and all tests are written using JUnit 5.
 
 You can run the tests using the command `mvn test`
 
-## How to use?
-
-1. Clone this repository. The steps to clone a git repository can be found [here](https://help.github.com/en/articles/cloning-a-repository)
-2. Get the prattle.main() running on some port P
-3. Connect using the client jar (provide the hostname and port P). The latest Client jar can be found [at this location](https://github.ccs.neu.edu/cs5500/team-201-SP19/blob/master/Development/ChatServer/src/main/resources/Chatter-0.0.1-SNAPSHOT-jar-with-dependencies.jar)
-4. Communicate with different clients using the message handles provided in the table above.
 
 ## Credits
 
-Credits to the instructors and TAs of CS5500 for guiding us throughout the project and providing the started code. 
+Credits to the instructors and TAs of CS5500 Managing Software Development for guiding us throughout the project and providing the started code. 
 Also credit to other teams who helped out resolving common problems and classmates who provided valuable feedback during the in class codewalk.
 
 ## License
 
 This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/. It is based on work originally written by Matthew Hertz and has been adapted for use in a class assignment at Northeastern University.
+

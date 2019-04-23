@@ -409,6 +409,7 @@ public class ClientRunnable implements Runnable {
      * Checks if is valid password.
      *
      * @param password the password of the user
+     * @see https://stackoverflow.com/a/3802238 for the regular expression used in this method
      * @return boolean      true, if the password satisfies all valid password checks
      */
     private boolean isValidPassword(String password) {

@@ -9,11 +9,11 @@ This work was created by team-201-SP19
 - Rahul Bhat ([rahulbhat31](https://github.ccs.neu.edu/rahulbhat31))
 - Sachin Haldavanekar ([sachinh](https://github.ccs.neu.edu/sachinh))
 
-## [Live System]()
+## [Live System](ec2-3-80-147-81.compute-1.amazonaws.com)
 
-## [System Demo]()
+## [System Demo](https://youtu.be/zS41IBbE1dI)
 
-## [Final Presentation]()
+## [Final Presentation](https://youtu.be/dSdsUXV1uW4)
 
 ## How to use?
 
@@ -22,7 +22,7 @@ This work was created by team-201-SP19
 3. Connect using the client jar (provide the hostname and port P). The latest Client jar can be found [at this location](https://github.ccs.neu.edu/cs5500/team-201-SP19/blob/master/Development/ChatServer/src/main/resources/Chatter-0.0.1-SNAPSHOT-jar-with-dependencies.jar)
 4. Communicate with different clients using the message handles provided in the table above.
 
-[System Setup Walkthrough URL]()
+[System Setup Walkthrough](https://youtu.be/cvos1oqbPCo)
 
 
 ## Current Version
